@@ -85,5 +85,5 @@ func withConnection(callback createdCallback) error {
 		}
 	}(db)
 
-	return err
+	return nil
 } //Defer runs here.
