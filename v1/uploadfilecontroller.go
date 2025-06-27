@@ -23,3 +23,6 @@ func uploadDocument(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 	}
 }
+
+func uploadDocumentSQL(db *sql.DB) {
+}
