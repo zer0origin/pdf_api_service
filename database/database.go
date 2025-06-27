@@ -1,6 +1,11 @@
 package database
 
-import "os"
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"strconv"
+)
 
 var (
 	host          = os.Getenv("DATABASE_HOST")
@@ -18,9 +23,9 @@ func getHost() string {
 	return host
 }
 
-func getPort() string {
-	if port == "" {
-		return "8080"
+func getPort() int {
+	if portErr != nil {
+		return 8080
 	}
 
 	return port
