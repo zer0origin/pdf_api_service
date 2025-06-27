@@ -3,11 +3,11 @@ package database
 import "os"
 
 var (
-	host     = os.Getenv("DATABASE_HOST")
-	port     = os.Getenv("DATABASE_PORT")
-	user     = os.Getenv("DATABASE_USER")
-	password = os.Getenv("DATABASE_PASSWORD")
-	dbname   = os.Getenv("DATABASE_DATABASE")
+	host          = os.Getenv("DATABASE_HOST")
+	port, portErr = strconv.Atoi(os.Getenv("DATABASE_PORT"))
+	user          = os.Getenv("DATABASE_USER")
+	password      = os.Getenv("DATABASE_PASSWORD")
+	dbname        = os.Getenv("DATABASE_DATABASE")
 )
 
 func getHost() string {
