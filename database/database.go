@@ -66,12 +66,12 @@ func getPsqlInfo() string {
 type createdCallback func(db *sql.DB)
 
 func withConnection(callback createdCallback) error {
-	db, err := sql.Open("postgres", getPsqlInfo())
+	db, err := sql.Open("postgres", getPsqlInfo()) //Create connection string
 	if err != nil {
 		return err
 	}
 
-	err = db.Ping()
+	err = db.Ping() //open up a connection to the database
 	if err != nil {
 		return err
 	}
