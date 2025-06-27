@@ -1,9 +1,11 @@
 package v1
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	database "pdf_service_api/database"
 )
 
 type Base64DocumentString struct {
