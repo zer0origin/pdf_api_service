@@ -70,6 +70,12 @@ func withConnection(callback createdCallback) error {
 	if err != nil {
 		panic(err)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+
 	callback(db)
 
 	defer func(db *sql.DB) { // Runs once withConnection has finished execution!
