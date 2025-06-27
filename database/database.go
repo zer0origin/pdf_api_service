@@ -68,7 +68,7 @@ type createdCallback func(db *sql.DB)
 func withConnection(callback createdCallback) error {
 	db, err := sql.Open("postgres", getPsqlInfo())
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = db.Ping()
