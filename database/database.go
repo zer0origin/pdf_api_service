@@ -12,11 +12,12 @@ var (
 	port, portErr = strconv.Atoi(os.Getenv("DATABASE_PORT"))
 	user          = os.Getenv("DATABASE_USER")
 	password      = os.Getenv("DATABASE_PASSWORD")
-	dbname        = os.Getenv("DATABASE_DATABASE")
+	dbname        = os.Getenv("DATABASE_DB")
 )
 
 func getHost() string {
 	if host == "" {
+		fmt.Println("DATABASE_HOST environment variable not set. Using default: localhost")
 		return "localhost"
 	}
 
@@ -25,7 +26,8 @@ func getHost() string {
 
 func getPort() int {
 	if portErr != nil {
-		return 8080
+		fmt.Println("DATABASE_PORT environment variable not set. Using default: 5432")
+		return 5432
 	}
 
 	return port
@@ -33,7 +35,8 @@ func getPort() int {
 
 func getUser() string {
 	if user == "" {
-		return "postgres"
+		fmt.Println("DATABASE_USER environment variable not set. Using default: user")
+		return "user"
 	}
 
 	return user
@@ -41,7 +44,8 @@ func getUser() string {
 
 func getPassword() string {
 	if password == "" {
-		return "postgres"
+		fmt.Println("DATABASE_PASSWORD environment variable not set. Using default: password")
+		return "password"
 	}
 
 	return password
@@ -49,7 +53,8 @@ func getPassword() string {
 
 func getDatabase() string {
 	if dbname == "" {
-		return "postgres"
+		fmt.Println("DATABASE_DB environment variable not set. Using default: job_store")
+		return "job_store"
 	}
 
 	return dbname
