@@ -18,9 +18,8 @@ func uploadDocument(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err == nil {
 		fmt.Printf("Document received!\n")
 
-		//create callback
-		var uploadDocumentSQL = createUploadDocumentFunction(body)
-
+		var u uuid.UUID
+		var uploadDocumentSQL = createUploadDocumentFunction(body, &u) //create callback
 		err := database.WithConnection(uploadDocumentSQL)
 		if err != nil {
 			c.JSON(200, gin.H{"Error": err})
