@@ -83,6 +83,8 @@ func WithConnection(callback createdCallback) error {
 		if err != nil {
 			panic(err)
 		}
+
+		recover()
 	}(db)
 
 	return nil
