@@ -26,5 +26,15 @@ func uploadDocument(c *gin.Context) {
 	}
 }
 
-func uploadDocumentSQL(db *sql.DB) {
+func createUploadDocumentFunction(documentString *Base64DocumentString) func(db *sql.DB) {
+	return func(db *sql.DB) {
+		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`
+
+		uuid := uuid.New()
+		_, err := db.Exec(sqlStatement, uuid, documentString.Data)
+
+		if err != nil {
+			panic(err)
+		}
+	}
 }
