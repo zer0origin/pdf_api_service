@@ -84,7 +84,9 @@ func WithConnection(callback createdCallback) error {
 			panic(err)
 		}
 
-		recover()
+		if r := recover(); r != nil {
+			fmt.Printf("Recovered from panic: %v (type: %T)\n", r, r)
+		}
 	}(db)
 
 	return nil
