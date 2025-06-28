@@ -4,18 +4,22 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	database "pdf_service_api/database"
 )
 
 type Base64DocumentString struct {
-	DocumentString string `json:"pdfBase64"`
+	Data string `json:"pdfBase64"`
 }
 
 func uploadDocument(c *gin.Context) {
 	body := &Base64DocumentString{}
-	if err := c.ShouldBindJSON(&body); err != nil {
+	if err := c.ShouldBindJSON(&body); err == nil {
 		fmt.Printf("Document received!\n")
+
+		//create callback
+		var uploadDocumentSQL = createUploadDocumentFunction(body)
 
 		err := database.WithConnection(uploadDocumentSQL)
 		if err != nil {
