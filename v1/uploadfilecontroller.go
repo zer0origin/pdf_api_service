@@ -47,6 +47,6 @@ func createUploadDocumentFunction(documentString *Base64DocumentString, inserted
 			panic(err)
 		}
 
-		insertedUUID = &u
+		*insertedUUID = u
 	}
 }
