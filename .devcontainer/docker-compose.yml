@@ -28,7 +28,7 @@ services:
     image: postgres:latest
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     env_file:
       # Ensure that the variables in .env match the same variables in devcontainer.json
       - .env

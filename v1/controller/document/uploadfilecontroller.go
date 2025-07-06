@@ -1,4 +1,4 @@
-package v1
+package document
 
 import (
 	"database/sql"
@@ -9,14 +9,14 @@ import (
 	"pdf_service_api/database"
 )
 
-type Base64DocumentString struct {
+type Base64DocumentString struct { //TODO: Move!
 	Data string `json:"pdfBase64"`
 }
 
 func uploadDocument(c *gin.Context) {
 	body := &Base64DocumentString{}
 	if err := c.ShouldBindJSON(&body); err == nil {
-		fmt.Printf("Document received!\n")
+		fmt.Printf("Body Parsed!\n")
 		fmt.Println(body.Data)
 
 		u := uuid.Nil
