@@ -81,7 +81,10 @@ func WithConnection(callback createdCallback) error {
 		return err
 	}
 
-	callback(db)
+	err = callback(db)
+	if err != nil {
+		return err
+	}
 
 	defer func(db *sql.DB) { // Runs once withConnection has finished execution!
 		err := db.Close()
