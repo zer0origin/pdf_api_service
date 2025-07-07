@@ -23,18 +23,23 @@ func NewDocumentController(repository repositories.DocumentRepository) *Document
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 	body := &requests.GetDocumentRequest{}
 
-	if err := c.ShouldBind(body); err != nil {
+	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
 
-	c.JSON(200, body)
+	document, err := t.DocumentRepository.GetDocumentById(body.DocumentUuid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+
+	c.JSON(200, document)
 }
 
 // UploadDocumentHandler gin handler function
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 	body := &models.Document{}
 
-	if err := c.ShouldBindJSON(body); err != nil {
+	if err := c.ShouldBindJSON(body); err != nil { //Assume all requests bodies are json.
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}

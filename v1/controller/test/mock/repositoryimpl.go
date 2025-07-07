@@ -8,6 +8,10 @@ import (
 type EmptyRepository struct {
 }
 
+func (e EmptyRepository) GetDocumentById(_ uuid.UUID) (models.Document, error) {
+	//TODO implement me
+	panic("implement me")
+}
 func (e EmptyRepository) UploadDocument(_ models.Document) (uuid.UUID, error) {
 	panic("implement me")
 }

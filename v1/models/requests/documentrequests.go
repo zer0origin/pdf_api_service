@@ -1,7 +1,7 @@
 package requests
 
-import "pdf_service_api/v1/models"
+import "github.com/google/uuid"
 
 type GetDocumentRequest struct {
-	Document models.Document `json:"document"`
+	DocumentUuid uuid.UUID `json:"document_uuid"`
 }
