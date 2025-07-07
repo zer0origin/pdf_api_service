@@ -1,0 +1,26 @@
+package mock
+
+import (
+	"github.com/google/uuid"
+	"pdf_service_api/v1/models"
+)
+
+type EmptyRepository struct {
+}
+
+func (e EmptyRepository) UploadDocument(_ models.Document) (uuid.UUID, error) {
+	panic("implement me")
+}
+
+type MapRepository struct {
+	Repo map[uuid.UUID]models.Document
+}
+
+func (m *MapRepository) UploadDocument(document models.Document) (uuid.UUID, error) {
+	m.Repo[document.Uuid] = document
+	return document.Uuid, nil
+}
+
+func (m *MapRepository) GetDocumentByUuid(uuid uuid.UUID) (models.Document, error) {
+	return m.Repo[uuid], nil
+}
