@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	router := v1.SetupRouter()
+	documentController := controller.NewDocumentController(repositories.NewDocumentRepository())
+	router := v1.SetupRouter(*documentController)
 	_ = router.Run() // listen and serve on 0.0.0.0:8080
 }
