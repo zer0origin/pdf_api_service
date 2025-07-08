@@ -3,80 +3,90 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"strconv"
+	_ "github.com/lib/pq"
 )
 
-var (
-	host          = os.Getenv("DATABASE_HOST")
-	port, portErr = strconv.Atoi(os.Getenv("DATABASE_PORT"))
-	user          = os.Getenv("DATABASE_USER")
-	password      = os.Getenv("DATABASE_PASSWORD")
-	dbname        = os.Getenv("DATABASE_DB")
-)
+type ConfigForDatabase struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Database string
+}
 
-func getHost() string {
-	if host == "" {
+func (t *ConfigForDatabase) getHost() string {
+	if t.Host == "" {
 		fmt.Println("DATABASE_HOST environment variable not set. Using default: localhost")
-		return "localhost"
+		t.Host = "localhost"
+	} else {
+		fmt.Println("DATABASE_HOST environment variable set to " + t.Host)
 	}
 
-	return host
+	return t.Host
 }
 
-func getPort() int {
-	if portErr != nil {
+func (t *ConfigForDatabase) getPort() string {
+	if t.Port == "" {
 		fmt.Println("DATABASE_PORT environment variable not set. Using default: 5432")
-		return 5432
+		t.Port = "5432"
+	} else {
+		fmt.Println("DATABASE_PORT environment variable set to " + t.Port)
 	}
 
-	return port
+	return t.Port
 }
 
-func getUser() string {
-	if user == "" {
+func (t *ConfigForDatabase) getUser() string {
+	if t.Username == "" {
 		fmt.Println("DATABASE_USER environment variable not set. Using default: user")
-		return "user"
+		t.Username = "user"
+	} else {
+		fmt.Println("DATABASE_USER environment variable set to " + t.Username)
 	}
 
-	return user
+	return t.Username
 }
 
-func getPassword() string {
-	if password == "" {
-		fmt.Println("DATABASE_PASSWORD environment variable not set. Using default: password")
-		return "password"
+func (t *ConfigForDatabase) getPassword() string {
+	if t.Password == "" {
+		fmt.Println("DATABASE_PASSWORD environment variable not set. Using default: Password")
+		t.Password = "password"
+	} else {
+		fmt.Println("DATABASE_PASSWORD environment variable set to " + t.Password)
 	}
 
-	return password
+	return t.Password
 }
 
-func getDatabase() string {
-	if dbname == "" {
-		fmt.Println("DATABASE_DB environment variable not set. Using default: job_store")
-		return "job_store"
+func (t *ConfigForDatabase) getDatabase() string {
+	if t.Database == "" {
+		fmt.Println("DATABASE_DB environment variable not set. Using default: postgres")
+		t.Database = "postgres"
+	} else {
+		fmt.Println("DATABASE_DB environment variable set to " + t.Database)
 	}
 
-	return dbname
+	return t.Database
 }
 
-func getPsqlInfo() string {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		getHost(), getPort(), getUser(), getPassword(), getDatabase())
+func (t *ConfigForDatabase) getPsqlInfo() string {
+	psqlInfo := fmt.Sprintf("Host=%s Port=%s user=%s Password=%s dbname=%s sslmode=disable",
+		t.getHost(), t.getPort(), t.getUser(), t.getPassword(), t.getDatabase())
 
 	return psqlInfo
 }
 
 type createdCallback func(db *sql.DB) error
 
-func WithConnection(callback createdCallback) error {
-	db, err := sql.Open("postgres", getPsqlInfo()) //Create connection string
+func (t *ConfigForDatabase) WithConnection(callback createdCallback) error {
+	fmt.Println("CALLED WITH CONNECTION")
+	str := t.getPsqlInfo()
+	db, err := sql.Open("postgres", str) //Create connection string
 	if err != nil {
 		return err
 	}
 
-	err = db.Ping() //open up a connection to the database
+	err = db.Ping() //open up a connection to the Database
 	if err != nil {
 		return err
 	}

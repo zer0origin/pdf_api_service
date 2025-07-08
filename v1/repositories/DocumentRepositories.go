@@ -13,15 +13,16 @@ type DocumentRepository interface {
 }
 
 type documentRepository struct {
+	databaseManager database.ConfigForDatabase
 }
 
-func NewDocumentRepository() DocumentRepository {
-	return documentRepository{}
+func NewDocumentRepository(databaseManager database.ConfigForDatabase) DocumentRepository {
+	return documentRepository{databaseManager: databaseManager}
 }
 
 func (d documentRepository) GetDocumentById(uid uuid.UUID) (models.Document, error) {
 	document := &models.Document{}
-	err := database.WithConnection(getDocumentByUUIDFunction(uid, func(data models.Document) {
+	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data models.Document) {
 		*document = data
 	}))
 
@@ -35,7 +36,7 @@ func (d documentRepository) GetDocumentById(uid uuid.UUID) (models.Document, err
 func (d documentRepository) UploadDocument(document models.Document) (uuid.UUID, error) {
 	u := uuid.New()
 	uploadDocumentSQL := createUploadDocumentSqlDatabase(&document, u) //create callback
-	err := database.WithConnection(uploadDocumentSQL)
+	err := d.databaseManager.WithConnection(uploadDocumentSQL)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -46,7 +47,7 @@ func (d documentRepository) UploadDocument(document models.Document) (uuid.UUID,
 // SQL Query to database | TODO: MOVE!
 func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := "SELECT document_id FROM documents WHERE document_id = $1"
+		sqlStatement := "SELECT document_id FROM document_table WHERE document_id = $1"
 
 		rows := db.QueryRow(sqlStatement, uid)
 
