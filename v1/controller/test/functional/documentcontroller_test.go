@@ -18,9 +18,10 @@ var dbUser = "user"
 var dbPassword = "password"
 
 func TestDatabaseConnection(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ctr, err := createTestContainerPostgres(ctx)
-	fmt.Println(ctr.ConnectionString(ctx, "sslmode=disable"))
+
 	t.Cleanup(func() {
 		err := ctr.Terminate(ctx)
 		if err != nil {
@@ -54,7 +55,6 @@ func TestDatabaseConnection(t *testing.T) {
 }
 
 func createTestContainerPostgres(ctx context.Context) (ctr *postgres.PostgresContainer, err error) {
-
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err

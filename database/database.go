@@ -79,7 +79,6 @@ func (t *ConfigForDatabase) getPsqlInfo() string {
 type createdCallback func(db *sql.DB) error
 
 func (t *ConfigForDatabase) WithConnection(callback createdCallback) error {
-	fmt.Println("CALLED WITH CONNECTION")
 	str := t.getPsqlInfo()
 	db, err := sql.Open("postgres", str) //Create connection string
 	if err != nil {
