@@ -20,6 +20,7 @@ var dbPassword = "password"
 func TestDatabaseConnection(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := createTestContainerPostgres(ctx)
+	fmt.Println(ctr.ConnectionString(ctx, "sslmode=disable"))
 	t.Cleanup(func() {
 		err := ctr.Terminate(ctx)
 		if err != nil {
@@ -40,7 +41,7 @@ func TestDatabaseConnection(t *testing.T) {
 	var databasePresent bool
 
 	err = dbConfig.WithConnection(func(db *sql.DB) error {
-		sqlStatement := "SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = '$1' AND table_name   = '$2');"
+		sqlStatement := "SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = $1 AND table_name   = $2);"
 		row := db.QueryRow(sqlStatement, "public", "document_table")
 		err := row.Scan(&databasePresent)
 		if err != nil {
