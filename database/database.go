@@ -70,8 +70,8 @@ func (t *ConfigForDatabase) getDatabase() string {
 }
 
 func (t *ConfigForDatabase) getPsqlInfo() string {
-	psqlInfo := fmt.Sprintf("Host=%s Port=%s user=%s Password=%s dbname=%s sslmode=disable",
-		t.getHost(), t.getPort(), t.getUser(), t.getPassword(), t.getDatabase())
+	psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		t.getUser(), t.getPassword(), t.getHost(), t.getPort(), t.getDatabase())
 
 	return psqlInfo
 }
