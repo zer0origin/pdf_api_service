@@ -1,7 +1,6 @@
 package functional
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -9,7 +8,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"io"
 	"os"
 	"pdf_service_api/database"
 	"testing"
@@ -24,22 +22,6 @@ func TestDatabaseConnection(t *testing.T) {
 	ctr, err := createTestContainerPostgres(ctx)
 
 	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) // Small timeout for cleanup
-		defer cancel()
-
-		// --- Get container logs ---
-		logsReader, logErr := ctr.Logs(ctx)
-		if logErr != nil {
-			t.Logf("Failed to get PostgreSQL container logs during cleanup: %v", logErr)
-		} else {
-			buf := new(bytes.Buffer)
-			if _, err := io.Copy(buf, logsReader); err == nil {
-				t.Logf("--- PostgreSQL Container Logs (on failure) ---\n%s\n--- End PostgreSQL Logs ---", buf.String())
-			} else {
-				t.Logf("Failed to read PostgreSQL container logs during cleanup: %v", err)
-			}
-		}
-
 		err := ctr.Terminate(ctx)
 		if err != nil {
 			fmt.Println(err)
