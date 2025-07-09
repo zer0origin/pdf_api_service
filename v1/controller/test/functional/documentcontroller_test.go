@@ -36,6 +36,12 @@ func TestDatabaseConnection(t *testing.T) {
 		Port: portStr,
 	}
 
+	fmt.Println(connectionString)
+
+	dbConfig := database.ConfigForDatabase{
+		ConUrl: connectionString,
+	}
+
 	assert.NoError(t, err, "Error creating postgres container")
 
 	var databasePresent bool
