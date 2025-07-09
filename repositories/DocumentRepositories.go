@@ -8,7 +8,7 @@ import (
 )
 
 type DocumentRepository interface {
-	UploadDocument(document models.Document) (uuid.UUID, error)
+	UploadDocument(document models.Document) error
 	GetDocumentById(id uuid.UUID) (models.Document, error)
 }
 
@@ -33,15 +33,14 @@ func (d documentRepository) GetDocumentById(uid uuid.UUID) (models.Document, err
 	return *document, nil
 }
 
-func (d documentRepository) UploadDocument(document models.Document) (uuid.UUID, error) {
-	u := uuid.New()
-	uploadDocumentSQL := createUploadDocumentSqlDatabase(&document, u) //create callback
+func (d documentRepository) UploadDocument(document models.Document) error {
+	uploadDocumentSQL := createUploadDocumentSqlDatabase(&document) //create callback
 	err := d.databaseManager.WithConnection(uploadDocumentSQL)
 	if err != nil {
-		return uuid.Nil, err
+		return err
 	}
 
-	return u, nil
+	return nil
 }
 
 // SQL Query to database | TODO: MOVE!
@@ -65,10 +64,10 @@ func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document
 }
 
 // SQL Query to database | TODO: MOVE!
-func createUploadDocumentSqlDatabase(document *models.Document, insertedUUID uuid.UUID) func(db *sql.DB) error {
+func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`
-		_, err := db.Exec(sqlStatement, insertedUUID, document.PdfBase64, insertedUUID)
+		_, err := db.Exec(sqlStatement, document.Uuid, document.PdfBase64)
 
 		if err != nil {
 			return err
