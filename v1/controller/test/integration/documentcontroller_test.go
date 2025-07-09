@@ -1,4 +1,4 @@
-package imtegration
+package integration
 
 import (
 	"context"
