@@ -74,7 +74,10 @@ func (t *ConfigForDatabase) GetPsqlInfo() string {
 		psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			t.getUser(), t.getPassword(), t.getHost(), t.getPort(), t.getDatabase())
 
-	return psqlInfo
+		return psqlInfo
+	}
+
+	return t.ConUrl
 }
 
 type createdCallback func(db *sql.DB) error
