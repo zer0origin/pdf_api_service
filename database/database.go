@@ -69,9 +69,10 @@ func (t *ConfigForDatabase) getDatabase() string {
 	return t.Database
 }
 
-func (t *ConfigForDatabase) getPsqlInfo() string {
-	psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		t.getUser(), t.getPassword(), t.getHost(), t.getPort(), t.getDatabase())
+func (t *ConfigForDatabase) GetPsqlInfo() string {
+	if t.ConUrl == "" {
+		psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+			t.getUser(), t.getPassword(), t.getHost(), t.getPort(), t.getDatabase())
 
 	return psqlInfo
 }
