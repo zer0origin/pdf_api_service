@@ -28,12 +28,9 @@ func TestDatabaseConnection(t *testing.T) {
 		}
 	})
 
-	port, err := ctr.Container.MappedPort(ctx, "5432/tcp")
-	assert.NoError(t, err, "could not find a port for postgres")
-	portStr := port.Port()
-
-	dbConfig := database.ConfigForDatabase{
-		Port: portStr,
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		return
 	}
 
 	fmt.Println(connectionString)
@@ -45,7 +42,6 @@ func TestDatabaseConnection(t *testing.T) {
 	assert.NoError(t, err, "Error creating postgres container")
 
 	var databasePresent bool
-
 	err = dbConfig.WithConnection(func(db *sql.DB) error {
 		sqlStatement := "SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = $1 AND table_name   = $2);"
 		row := db.QueryRow(sqlStatement, "public", "document_table")
@@ -59,13 +55,13 @@ func TestDatabaseConnection(t *testing.T) {
 	assert.True(t, databasePresent, "Database should exists")
 }
 
-func createTestContainerPostgres(ctx context.Context) (ctr *postgres.PostgresContainer, err error) {
+func createTestContainerPostgres(ctx context.Context, filename string) (ctr *postgres.PostgresContainer, err error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
-	sqlScript := wd + "/test-container/sql/init.sql"
+	sqlScript := wd + "/test-container/sql/" + filename + ".sql"
 
 	ctr, err = postgres.Run(
 		ctx,

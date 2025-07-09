@@ -12,6 +12,7 @@ type ConfigForDatabase struct {
 	Username string
 	Password string
 	Database string
+	ConUrl   string
 }
 
 func (t *ConfigForDatabase) getHost() string {
