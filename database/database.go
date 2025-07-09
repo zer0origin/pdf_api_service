@@ -111,4 +111,4 @@ func (t *ConfigForDatabase) WithConnection(callback createdCallback) error {
 	}(db)
 
 	return nil
-} //Defer runs here.
+}
