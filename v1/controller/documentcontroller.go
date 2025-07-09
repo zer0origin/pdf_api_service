@@ -25,11 +25,13 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
 	}
 
 	document, err := t.DocumentRepository.GetDocumentById(body.DocumentUuid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
 	}
 
 	c.JSON(200, document)

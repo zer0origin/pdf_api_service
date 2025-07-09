@@ -47,16 +47,14 @@ func (d documentRepository) UploadDocument(document models.Document) (uuid.UUID,
 // SQL Query to database | TODO: MOVE!
 func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := "SELECT document_id FROM document_table WHERE document_id = $1"
-
+		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
 		rows := db.QueryRow(sqlStatement, uid)
-
 		if rows.Err() != nil {
 			return rows.Err()
 		}
 
 		document := &models.Document{}
-		err := rows.Scan(document)
+		err := rows.Scan(&document.Uuid, &document.PdfBase64)
 		if err != nil {
 			return err
 		}
