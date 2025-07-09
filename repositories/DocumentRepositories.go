@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/google/uuid"
 	"pdf_service_api/database"
-	"pdf_service_api/v1/models"
+	"pdf_service_api/models"
 )
 
 type DocumentRepository interface {

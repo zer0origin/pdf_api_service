@@ -4,9 +4,9 @@ import (
 	"github.com/go-playground/assert/v2"
 	"net/http"
 	"net/http/httptest"
+	"pdf_service_api/repositories/mock"
 	"pdf_service_api/v1"
 	"pdf_service_api/v1/controller"
-	"pdf_service_api/v1/controller/test/mock"
 	"testing"
 )
 

@@ -2,7 +2,7 @@ package mock
 
 import (
 	"github.com/google/uuid"
-	"pdf_service_api/v1/models"
+	"pdf_service_api/models"
 )
 
 type EmptyRepository struct {

@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"pdf_service_api/v1/models"
-	"pdf_service_api/v1/models/requests"
-	"pdf_service_api/v1/repositories"
+	"pdf_service_api/models"
+	"pdf_service_api/models/requests"
+	"pdf_service_api/repositories"
 )
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
