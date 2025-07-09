@@ -83,7 +83,7 @@ func (t *ConfigForDatabase) GetPsqlInfo() string {
 type createdCallback func(db *sql.DB) error
 
 func (t *ConfigForDatabase) WithConnection(callback createdCallback) error {
-	str := t.getPsqlInfo()
+	str := t.GetPsqlInfo()
 	db, err := sql.Open("postgres", str) //Create connection string
 	if err != nil {
 		return err
