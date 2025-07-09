@@ -19,7 +19,7 @@ var dbPassword = "password"
 
 func TestDatabaseConnection(t *testing.T) {
 	ctx := context.Background()
-	ctr, err := createTestContainerPostgres(ctx)
+	ctr, err := createTestContainerPostgres(ctx, "TestDatabaseConnection")
 
 	t.Cleanup(func() {
 		err := ctr.Terminate(ctx)
