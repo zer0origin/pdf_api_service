@@ -20,6 +20,15 @@ func NewDocumentRepository(databaseManager database.ConfigForDatabase) DocumentR
 	return documentRepository{databaseManager: databaseManager}
 }
 
+func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
+	err := d.databaseManager.WithConnection(deleteDocumentSqlDatabase(uuid))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (d documentRepository) GetDocumentById(uid uuid.UUID) (models.Document, error) {
 	document := &models.Document{}
 	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data models.Document) {
@@ -66,6 +75,19 @@ func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB)
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`
 		_, err := db.Exec(sqlStatement, document.Uuid, document.PdfBase64)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func deleteDocumentSqlDatabase(uuid uuid.UUID) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+		sqlStatement := `DELETE FROM document_table where "Document_UUID" = $1`
+		_, err := db.Exec(sqlStatement, uuid)
 
 		if err != nil {
 			return err
