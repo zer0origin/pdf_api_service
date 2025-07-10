@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"pdf_service_api/models"
-	"pdf_service_api/models/requests"
 	"pdf_service_api/repositories"
 )
 
@@ -34,7 +33,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 // UploadDocumentHandler gin handler function
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
-	body := &requests.UploadRequest{}
+	body := &models.UploadRequest{}
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {

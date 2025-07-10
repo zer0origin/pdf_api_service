@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"pdf_service_api/models"
-	"pdf_service_api/models/requests"
 	"pdf_service_api/repositories/mock"
 	v1 "pdf_service_api/v1"
 	"pdf_service_api/v1/controller"
@@ -25,7 +24,7 @@ func TestUploadDocument(t *testing.T) {
 	documentController := controller.NewDocumentController(repo)
 	router := v1.SetupRouter(documentController)
 
-	data := requests.UploadRequest{
+	data := models.UploadRequest{
 		DocumentBase64String: func() *string { v := "TEMP DOCUMENT"; return &v }(),
 	}
 	documentJSON, _ := json.Marshal(data)
@@ -58,7 +57,7 @@ func TestGetDocument(t *testing.T) {
 	}
 	repo.Repo[ExampleUUID] = ExampleDocument
 
-	request := &requests.GetDocumentRequest{DocumentUuid: ExampleUUID}
+	request := &models.GetDocumentRequest{DocumentUuid: ExampleUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()

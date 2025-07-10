@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"pdf_service_api/models"
-	"pdf_service_api/models/requests"
 	"pdf_service_api/repositories"
 	"pdf_service_api/testutil"
 	v1 "pdf_service_api/v1"
@@ -61,7 +60,7 @@ func TestGetDocumentHandler(t *testing.T) {
 	documentController := controller.NewDocumentController(repo)
 	router := v1.SetupRouter(documentController)
 
-	request := &requests.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
+	request := &models.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -98,7 +97,7 @@ func TestUploadDocument(t *testing.T) {
 	documentController := controller.NewDocumentController(repo)
 	router := v1.SetupRouter(documentController)
 
-	request := &requests.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	request := &models.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
