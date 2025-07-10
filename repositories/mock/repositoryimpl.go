@@ -8,12 +8,15 @@ import (
 type EmptyRepository struct {
 }
 
+func (e EmptyRepository) DeleteDocumentById(id uuid.UUID) error {
+	return nil
+}
 func (e EmptyRepository) GetDocumentById(_ uuid.UUID) (models.Document, error) {
 	//TODO implement me
 	panic("implement me")
 }
 func (e EmptyRepository) UploadDocument(_ models.Document) error {
-	panic("implement me")
+	return nil
 }
 
 type MapRepository struct {

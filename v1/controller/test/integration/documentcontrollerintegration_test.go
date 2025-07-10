@@ -24,7 +24,7 @@ var dbPassword = "password"
 
 func TestDatabaseConnection(t *testing.T) {
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "TestDatabaseConnection", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
 	assert.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
@@ -50,13 +50,12 @@ func TestGetDocumentHandler(t *testing.T) {
 	TestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "TestGetDatabase", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
 	assert.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
 	assert.NoError(t, err)
-	fmt.Println(dbConfig.ConUrl)
 
 	repo := repositories.NewDocumentRepository(dbConfig)
 	documentController := controller.NewDocumentController(repo)
@@ -84,17 +83,16 @@ type UploadResponse struct {
 	DocumentUUID uuid.UUID `json:"documentUUID"`
 }
 
-func TestUploadDocumentHandler(t *testing.T) {
+func TestUploadDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "TestGetDatabase", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
 	assert.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
 	assert.NoError(t, err)
-	fmt.Println(dbConfig.ConUrl)
 
 	repo := repositories.NewDocumentRepository(dbConfig)
 	documentController := controller.NewDocumentController(repo)
@@ -116,4 +114,39 @@ func TestUploadDocumentHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.NotEqual(t, uuid.Nil, response.DocumentUUID)
+}
+
+type DeleteResponse struct {
+	Success bool `json:"success"`
+}
+
+func TestDeleteDocument(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	assert.NoError(t, err)
+	t.Cleanup(testutil.CleanUp(ctx, *ctr))
+
+	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	assert.NoError(t, err)
+
+	repo := repositories.NewDocumentRepository(dbConfig)
+	documentController := controller.NewDocumentController(repo)
+	router := v1.SetupRouter(documentController)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/api/v1/documents/%s", "b66fd223-515f-4503-80cc-2bdaa50ef474"),
+		nil,
+	))
+
+	fmt.Println(w.Body.String())
+	response := DeleteResponse{}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
+	assert.True(t, response.Success)
 }

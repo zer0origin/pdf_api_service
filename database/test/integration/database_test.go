@@ -3,7 +3,6 @@ package integration
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"pdf_service_api/models"
 	"pdf_service_api/testutil"
@@ -23,7 +22,6 @@ func TestGetDatabase(t *testing.T) {
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
 	assert.NoError(t, err)
-	fmt.Println(dbConfig.ConUrl)
 
 	document := &models.Document{}
 	err = dbConfig.WithConnection(func(db *sql.DB) error {

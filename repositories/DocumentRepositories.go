@@ -10,6 +10,7 @@ import (
 type DocumentRepository interface {
 	UploadDocument(document models.Document) error
 	GetDocumentById(id uuid.UUID) (models.Document, error)
+	DeleteDocumentById(id uuid.UUID) error
 }
 
 type documentRepository struct {
