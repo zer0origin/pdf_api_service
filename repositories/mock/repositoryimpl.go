@@ -28,3 +28,9 @@ func (m *MapRepository) UploadDocument(document models.Document) error {
 func (m *MapRepository) GetDocumentById(uuid uuid.UUID) (models.Document, error) {
 	return m.Repo[uuid], nil
 }
+
+func (m *MapRepository) DeleteDocumentById(uuid uuid.UUID) error {
+	delete(m.Repo, uuid)
+
+	return nil
+}

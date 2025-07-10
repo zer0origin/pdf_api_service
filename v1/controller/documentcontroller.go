@@ -43,6 +43,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -54,6 +55,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	err = t.DocumentRepository.UploadDocument(newModel)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
