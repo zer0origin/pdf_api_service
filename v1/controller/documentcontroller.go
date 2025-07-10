@@ -54,7 +54,6 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	err = t.DocumentRepository.UploadDocument(newModel)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 

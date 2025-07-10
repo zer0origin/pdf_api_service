@@ -15,14 +15,18 @@ import (
 	"testing"
 )
 
+type UploadResponse struct {
+	DocumentUUID uuid.UUID `json:"documentUUID"`
+}
+
 func TestUploadDocument(t *testing.T) {
 	t.Parallel()
 	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := controller.NewDocumentController(repo)
 	router := v1.SetupRouter(documentController)
 
-	data := models.Document{Uuid: uuid.New(),
-		PdfBase64: func() *string { v := "TEMP DOCUMENT"; return &v }(),
+	data := requests.UploadRequest{
+		DocumentBase64String: func() *string { v := "TEMP DOCUMENT"; return &v }(),
 	}
 	documentJSON, _ := json.Marshal(data)
 
@@ -33,8 +37,11 @@ func TestUploadDocument(t *testing.T) {
 		strings.NewReader(string(documentJSON)),
 	))
 
+	responseUUID := UploadResponse{}
+	err := json.NewDecoder(w.Body).Decode(&responseUUID)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
-	assert.Equal(t, data.Uuid, repo.Repo[data.Uuid].Uuid, "Data was not saved to repository")
+	assert.NotEqual(t, uuid.Nil, responseUUID.DocumentUUID)
 }
 
 func TestGetDocument(t *testing.T) {

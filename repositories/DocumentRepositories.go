@@ -43,7 +43,6 @@ func (d documentRepository) UploadDocument(document models.Document) error {
 	return nil
 }
 
-// SQL Query to database | TODO: MOVE!
 func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
@@ -63,7 +62,6 @@ func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document
 	}
 }
 
-// SQL Query to database | TODO: MOVE!
 func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`

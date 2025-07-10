@@ -78,3 +78,7 @@ func TestGetDocumentHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.Equal(t, TestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
 }
+
+func TestUploadDocumentHandler(t *testing.T) {
+
+}
