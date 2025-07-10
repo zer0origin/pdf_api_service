@@ -69,8 +69,8 @@ func TestGetDocument(t *testing.T) {
 	))
 
 	responseDocument := &models.Document{}
-	json.NewDecoder(w.Body).Decode(responseDocument)
-
+	err := json.NewDecoder(w.Body).Decode(responseDocument)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.Equal(t, responseDocument.Uuid, ExampleDocument.Uuid, "Response uuid does not match")
 	assert.Equal(t, responseDocument.PdfBase64, ExampleDocument.PdfBase64, "Response PdfBase64 does not match")

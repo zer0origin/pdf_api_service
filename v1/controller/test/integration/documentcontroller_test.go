@@ -73,7 +73,8 @@ func TestGetDocumentHandler(t *testing.T) {
 	))
 
 	responseDocument := &models.Document{}
-	json.NewDecoder(w.Body).Decode(responseDocument)
+	err = json.NewDecoder(w.Body).Decode(responseDocument)
+	assert.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.Equal(t, TestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
