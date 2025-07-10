@@ -80,6 +80,40 @@ func TestGetDocumentHandler(t *testing.T) {
 	assert.Equal(t, TestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
 }
 
-func TestUploadDocumentHandler(t *testing.T) {
+type UploadResponse struct {
+	DocumentUUID uuid.UUID `json:"documentUUID"`
+}
 
+func TestUploadDocumentHandler(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "TestGetDatabase", dbUser, dbPassword)
+	assert.NoError(t, err)
+	t.Cleanup(testutil.CleanUp(ctx, *ctr))
+
+	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	assert.NoError(t, err)
+	fmt.Println(dbConfig.ConUrl)
+
+	repo := repositories.NewDocumentRepository(dbConfig)
+	documentController := controller.NewDocumentController(repo)
+	router := v1.SetupRouter(documentController)
+
+	request := &requests.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	requestJSON, _ := json.Marshal(request)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/documents/",
+		strings.NewReader(string(requestJSON)),
+	))
+
+	response := UploadResponse{}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
+	assert.NotEqual(t, uuid.Nil, response.DocumentUUID)
 }
