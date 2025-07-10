@@ -12,7 +12,7 @@ type SelectionController struct {
 }
 
 func (t SelectionController) getSelectionFromId(c *gin.Context) {
-	uid, err := uuid.Parse(c.Param("uid"))
+	uid, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
 	}
@@ -23,4 +23,8 @@ func (t SelectionController) getSelectionFromId(c *gin.Context) {
 	}
 
 	c.JSON(200, results)
+}
+
+func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
+	c.GET("/", t.getSelectionFromId)
 }

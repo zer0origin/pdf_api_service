@@ -10,7 +10,8 @@ import (
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
 type DocumentController struct {
-	DocumentRepository repositories.DocumentRepository
+	DocumentRepository  repositories.DocumentRepository
+	SelectionController SelectionController
 }
 
 // NewDocumentController creates a new instance of the repository using the injected repositories.DocumentRepository
@@ -76,4 +77,5 @@ func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
 	c.PUT("/", t.UploadDocumentHandler)
 	c.GET("/:id", t.GetDocumentHandler)
 	c.DELETE("/:id", t.DeleteDocumentHandler)
+	c.DELETE("/:id/Selection", t.SelectionController.getSelectionFromId)
 }
