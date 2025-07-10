@@ -39,31 +39,26 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 // UploadDocumentHandler gin handler function
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
-	body := &models.Document{}
+	body := &requests.UploadRequest{}
 
-	if err := c.ShouldBindJSON(body); err != nil { //Assume all requests bodies are json.
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	err := c.ShouldBindJSON(body)
+	if err != nil {
 		return
 	}
 
-	if body.Uuid == uuid.Nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "uuid is required"})
-		return
+	newModel := models.Document{
+		Uuid:          uuid.New(),
+		PdfBase64:     body.DocumentBase64String,
+		SelectionData: nil,
 	}
 
-	if *body.PdfBase64 == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "pdfBase64 is required"})
-		return
-	}
-
-	documentUUID, err := t.DocumentRepository.UploadDocument(*body)
-
+	err = t.DocumentRepository.UploadDocument(newModel)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	c.JSON(200, gin.H{"documentUUID": documentUUID})
+	c.JSON(200, gin.H{"documentUUID": newModel.Uuid})
 }
 
 func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
