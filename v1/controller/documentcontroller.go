@@ -21,14 +21,9 @@ func NewDocumentController(repository repositories.DocumentRepository) *Document
 
 // GetDocumentHandler gin handler function.
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
-	body := &requests.GetDocumentRequest{}
+	getUUID := uuid.MustParse(c.Param("id"))
 
-	if err := c.ShouldBindJSON(body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-		return
-	}
-
-	document, err := t.DocumentRepository.GetDocumentById(body.DocumentUuid)
+	document, err := t.DocumentRepository.GetDocumentById(getUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
