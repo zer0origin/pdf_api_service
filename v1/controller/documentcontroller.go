@@ -57,8 +57,24 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"documentUUID": newModel.Uuid})
 }
 
+func (t DocumentController) DeleteDocumentHandler(c *gin.Context) {
+	deleteUUID := uuid.Nil
+
+	id := c.Param("id")
+	deleteUUID = uuid.MustParse(id)
+
+	err := t.DocumentRepository.DeleteDocumentById(deleteUUID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(200, gin.H{"success": true})
+}
+
 func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
 	c.POST("/", t.UploadDocumentHandler)
 	c.PUT("/", t.UploadDocumentHandler)
 	c.GET("/:id", t.GetDocumentHandler)
+	c.DELETE("/:id", t.DeleteDocumentHandler)
 }
