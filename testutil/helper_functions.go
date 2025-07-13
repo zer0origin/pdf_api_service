@@ -47,7 +47,6 @@ func CreateTestContainerPostgres(ctx context.Context, filename string, dbUser st
 		postgres.WithInitScripts(sqlScript),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
-		//testcontainers.WithExposedPorts("5432/tcp"),
 		testcontainers.WithWaitStrategy(wait.ForLog("database system is ready to accept connections").
 			WithOccurrence(2).
 			WithStartupTimeout(30*time.Second)),

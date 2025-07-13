@@ -17,21 +17,23 @@ func TestGetDatabase(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "TestGetDatabase", dbUser, dbPassword)
-	assert.NoError(t, err)
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
+	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 
 	document := &models.Document{}
 	err = dbConfig.WithConnection(func(db *sql.DB) error {
 		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
 		row := db.QueryRow(sqlStatement, TestUUID)
 		err := row.Scan(&document.Uuid, &document.PdfBase64)
-		assert.NoError(t, err)
+		assert.Nil(t, err)
 
 		return nil
 	})
-	assert.NoError(t, err, "Error running database statement!")
+	assert.Nil(t, err)
 	assert.Equal(t, TestUUID, document.Uuid.String())
 }
