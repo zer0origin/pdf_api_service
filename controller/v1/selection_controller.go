@@ -34,7 +34,7 @@ func (t SelectionController) deleteSelectionWhereSelectionUUID(c *gin.Context) {
 		return
 	}
 
-	err = t.SelectionRepository.DeleteSelectionBySelectionUUIDFunction(uid)
+	err = t.SelectionRepository.DeleteSelectionBySelectionUUID(uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
 		return

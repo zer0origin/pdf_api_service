@@ -28,7 +28,7 @@ func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]domain.
 	return dataArr, nil
 }
 
-func (s selectionRepository) DeleteSelectionBySelectionUUIDFunction(uid uuid.UUID) error {
+func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error {
 	err := s.databaseManager.WithConnection(deleteSelectionBySelectionUUIDFunction(uid))
 
 	if err != nil {
