@@ -7,10 +7,10 @@ import (
 )
 
 type documentRepository struct {
-	databaseManager ConfigForDatabase
+	databaseManager databaseHandler
 }
 
-func NewDocumentRepository(databaseManager ConfigForDatabase) domain.DocumentRepository {
+func NewDocumentRepository(databaseManager databaseHandler) domain.DocumentRepository {
 	return documentRepository{databaseManager: databaseManager}
 }
 
