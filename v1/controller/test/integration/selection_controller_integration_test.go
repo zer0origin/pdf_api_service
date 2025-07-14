@@ -73,7 +73,7 @@ func TestDeleteSelections(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"DELETE",
-		fmt.Sprintf("/api/v1/documents/%s/selections/", "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"),
+		fmt.Sprintf("/api/v1/selections/%s", "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"),
 		nil,
 	))
 
