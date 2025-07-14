@@ -12,7 +12,11 @@ type selectionRepository struct {
 }
 
 func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
-	s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
+	err := s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
