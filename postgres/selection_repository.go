@@ -108,9 +108,6 @@ func AddNewSelectionFunction(selection domain.Selection) func(db *sql.DB) error 
 		}
 
 		selBounds := selection.SelectionBounds
-		if selBounds == nil || *selBounds == "" {
-			selBounds = func() *string { v := "{}"; return &v }()
-		}
 
 		_, err := db.Exec(sqlStatement, selUid, docUid, isComplete, settings, selBounds)
 

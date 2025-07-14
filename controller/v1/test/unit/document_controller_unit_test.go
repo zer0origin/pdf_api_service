@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	v2 "pdf_service_api/controller/v1"
+	v1 "pdf_service_api/controller/v1"
+	"pdf_service_api/controller/v1/test/unit/mock"
 	"pdf_service_api/domain"
-	"pdf_service_api/postgres/mock"
 	"strings"
 	"testing"
 )
@@ -24,9 +24,9 @@ func TestDocumentControllerUnit(t *testing.T) {
 }
 
 func pingRouter(t *testing.T) {
-	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]domain.Document)}
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	documentController := &v1.DocumentController{DocumentRepository: repo}
+	router := v1.SetupRouter(documentController)
 
 	w := httptest.NewRecorder() //creates a recorder that records its mutations for later inspection in tests.
 	req, _ := http.NewRequest("GET", "/ping", nil)
@@ -37,11 +37,11 @@ func pingRouter(t *testing.T) {
 }
 
 func uploadDocument(t *testing.T) {
-	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]domain.Document)}
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	documentController := &v1.DocumentController{DocumentRepository: repo}
+	router := v1.SetupRouter(documentController)
 
-	data := v2.UploadRequest{
+	data := v1.UploadRequest{
 		DocumentBase64String: func() *string { v := "TEMP DOCUMENT"; return &v }(),
 	}
 	documentJSON, _ := json.Marshal(data)
@@ -61,9 +61,9 @@ func uploadDocument(t *testing.T) {
 }
 
 func getDocument(t *testing.T) {
-	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]domain.Document)}
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	documentController := &v1.DocumentController{DocumentRepository: repo}
+	router := v1.SetupRouter(documentController)
 
 	ExampleUUID := uuid.New()
 	ExampleDocument := domain.Document{
@@ -73,7 +73,7 @@ func getDocument(t *testing.T) {
 	}
 	repo.Repo[ExampleUUID] = ExampleDocument
 
-	request := &v2.GetDocumentRequest{DocumentUuid: ExampleUUID}
+	request := &v1.GetDocumentRequest{DocumentUuid: ExampleUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
