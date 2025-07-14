@@ -58,3 +58,10 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 		return nil
 	}
 }
+
+func deleteSelectionBySelectionUUIDFunction(uid uuid.UUID) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+
+		return nil
+	}
+}
