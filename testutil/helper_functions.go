@@ -12,15 +12,16 @@ import (
 	"time"
 )
 
-func CreateDbConfig(ctx context.Context, ctr postgres.PostgresContainer) (pg.ConfigForDatabase, error) {
+func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (pg.DatabaseHandler, error) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		return pg.ConfigForDatabase{}, err
+		return pg.DatabaseHandler{}, err
 	}
 
-	dbConfig := pg.ConfigForDatabase{
-		ConUrl: connectionString,
-	}
+	dbConfig := pg.DatabaseHandler{
+		DbConfig: pg.ConfigForDatabase{
+			ConUrl: connectionString,
+		}}
 
 	return dbConfig, nil
 }

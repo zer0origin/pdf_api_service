@@ -12,10 +12,10 @@ type SelectionRepository interface {
 }
 
 type selectionRepository struct {
-	databaseManager ConfigForDatabase
+	databaseManager DatabaseHandler
 }
 
-func NewSelectionRepository(db ConfigForDatabase) SelectionRepository {
+func NewSelectionRepository(db DatabaseHandler) SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
 

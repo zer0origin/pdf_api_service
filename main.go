@@ -12,12 +12,12 @@ func main() {
 }
 
 func createDocumentController() *v2.DocumentController {
-	dbConfig := pg.ConfigForDatabase{}
-	repository := pg.NewSelectionRepository(dbConfig)
+	handler := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{}}
+	repository := pg.NewSelectionRepository(handler)
 	selController := &v2.SelectionController{SelectionRepository: repository}
 
 	documentController := &v2.DocumentController{
-		DocumentRepository:  pg.NewDocumentRepository(dbConfig),
+		DocumentRepository:  pg.NewDocumentRepository(handler),
 		SelectionController: selController,
 	}
 

@@ -36,7 +36,7 @@ func databaseConnection(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -66,7 +66,7 @@ func getDocumentHandler(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -109,7 +109,7 @@ func uploadDocument(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -152,7 +152,7 @@ func deleteDocument(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}

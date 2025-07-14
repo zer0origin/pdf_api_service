@@ -22,11 +22,11 @@ func TestGetDatabase(t *testing.T) {
 	}
 
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	handler, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	assert.Nil(t, err)
 
 	document := &domain.Document{}
-	err = dbConfig.WithConnection(func(db *sql.DB) error {
+	err = handler.WithConnection(func(db *sql.DB) error {
 		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
 		row := db.QueryRow(sqlStatement, TestUUID)
 		err := row.Scan(&document.Uuid, &document.PdfBase64)

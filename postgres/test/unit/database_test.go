@@ -9,31 +9,32 @@ import (
 )
 
 func TestDatabaseEmptyArgs(t *testing.T) {
-	dbConfig := pg.ConfigForDatabase{
-		Host:     "",
-		Port:     "",
-		Username: "",
-		Password: "",
-	}
+	handler := pg.DatabaseHandler{
+		DbConfig: pg.ConfigForDatabase{
+			Host:     "",
+			Port:     "",
+			Username: "",
+			Password: "",
+		}}
 
-	err := dbConfig.WithConnection(func(db *sql.DB) error {
+	err := handler.WithConnection(func(db *sql.DB) error {
 		return nil
 	})
 
 	assert.Error(t, err)
-	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", dbConfig.GetPsqlInfo())
+	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", handler.DbConfig.GetPsqlInfo())
 }
 
 func TestDatabaseEmptyCon(t *testing.T) {
-	dbConfig := pg.ConfigForDatabase{
-		ConUrl: "",
+	handler := pg.DatabaseHandler{
+		DbConfig: pg.ConfigForDatabase{ConUrl: ""},
 	}
 
-	err := dbConfig.WithConnection(func(db *sql.DB) error {
+	err := handler.WithConnection(func(db *sql.DB) error {
 		return nil
 	})
 	fmt.Println(err)
 	assert.Error(t, err)
 	assert.Error(t, err)
-	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", dbConfig.GetPsqlInfo())
+	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", handler.DbConfig.GetPsqlInfo())
 }

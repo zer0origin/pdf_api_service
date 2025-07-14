@@ -31,13 +31,13 @@ func getSelections(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	handler, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
 
-	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
-	repo := postgres.NewDocumentRepository(dbConfig)
+	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(handler)}
+	repo := postgres.NewDocumentRepository(handler)
 	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
 	router := v2.SetupRouter(documentController)
 
@@ -66,7 +66,7 @@ func deleteSelections(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -98,7 +98,7 @@ func deleteSelectionsUuidDoesNotExist(t *testing.T) {
 	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
-	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
+	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
