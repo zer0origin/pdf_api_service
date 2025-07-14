@@ -15,11 +15,13 @@ func (t SelectionController) getSelectionFromId(c *gin.Context) {
 	uid, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		return
 	}
 
 	results, err := t.SelectionRepository.GetSelectionBySelectionId(uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		return
 	}
 
 	c.JSON(200, results)

@@ -15,8 +15,8 @@ func main() {
 
 func createDocumentController() *controller.DocumentController {
 	dbConfig := database.ConfigForDatabase{}
-	repository := repositories.NewSelectionRepository()
-	selController := controller.SelectionController{SelectionRepository: repository}
+	repository := repositories.NewSelectionRepository(dbConfig)
+	selController := &controller.SelectionController{SelectionRepository: repository}
 
 	documentController := &controller.DocumentController{
 		DocumentRepository:  repositories.NewDocumentRepository(dbConfig),

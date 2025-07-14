@@ -15,8 +15,8 @@ type selectionRepository struct {
 	databaseManager database.ConfigForDatabase
 }
 
-func NewSelectionRepository() SelectionRepository {
-	return selectionRepository{}
+func NewSelectionRepository(db database.ConfigForDatabase) SelectionRepository {
+	return selectionRepository{databaseManager: db}
 }
 
 func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]models.Selection, error) {
