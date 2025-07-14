@@ -4,11 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"pdf_service_api/postgres"
+	"pdf_service_api/domain"
 )
 
 type SelectionController struct {
-	SelectionRepository postgres.SelectionRepository
+	SelectionRepository domain.SelectionRepository
 }
 
 func (t SelectionController) getSelectionFromId(c *gin.Context) {

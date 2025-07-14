@@ -6,16 +6,11 @@ import (
 	"pdf_service_api/domain"
 )
 
-type SelectionRepository interface {
-	GetSelectionBySelectionId(uid uuid.UUID) ([]domain.Selection, error)
-	DeleteSelectionBySelectionUUIDFunction(uid uuid.UUID) error
-}
-
 type selectionRepository struct {
 	databaseManager DatabaseHandler
 }
 
-func NewSelectionRepository(db DatabaseHandler) SelectionRepository {
+func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
 
