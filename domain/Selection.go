@@ -11,6 +11,6 @@ type Selection struct {
 }
 
 type SelectionRepository interface {
-	GetSelectionBySelectionId(uid uuid.UUID) ([]Selection, error)
+	GetSelectionsByDocumentId(uid uuid.UUID) ([]Selection, error)
 	DeleteSelectionBySelectionUUID(uid uuid.UUID) error
 }
