@@ -14,7 +14,7 @@ type SelectionController struct {
 func (t SelectionController) getSelectionFromId(c *gin.Context) {
 	uid, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
 		return
 	}
 
