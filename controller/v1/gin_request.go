@@ -11,7 +11,6 @@ type UploadRequest struct {
 }
 
 type AddNewSelectionRequest struct {
-	Uuid            uuid.UUID  `json:"selectionUUID"`
 	DocumentID      *uuid.UUID `json:"documentID,omitempty"`
 	IsComplete      bool       `json:"isComplete,omitempty"`
 	Settings        *string    `json:"settings,omitempty"`

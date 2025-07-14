@@ -1,6 +1,4 @@
 # API Backend Rework
-API to be reworked and written in Go. API urls to be restructured to make more senses.
-
 URL Entities:
 - /documents/
 - /selections/

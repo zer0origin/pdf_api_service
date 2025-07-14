@@ -11,7 +11,6 @@ import (
 	"net/http/httptest"
 	v2 "pdf_service_api/controller/v1"
 	"pdf_service_api/domain"
-	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
@@ -56,10 +55,11 @@ func databaseConnection(t *testing.T) {
 }
 
 func getDocumentHandler(t *testing.T) {
+	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
 
-	request := &v2.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
+	request := &v2.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -76,7 +76,7 @@ func getDocumentHandler(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
-	assert.Equal(t, TestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
+	assert.Equal(t, documentTestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
 }
 
 type UploadResponse struct {
@@ -85,7 +85,7 @@ type UploadResponse struct {
 
 func uploadDocument(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetup", dbUser, dbPassword)
 
 	request := &v2.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
@@ -113,7 +113,7 @@ type DeleteResponse struct {
 
 func deleteDocument(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

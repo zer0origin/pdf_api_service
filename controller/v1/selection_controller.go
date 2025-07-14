@@ -50,7 +50,7 @@ func (t SelectionController) addSelection(c *gin.Context) {
 	}
 
 	toCreate := domain.Selection{
-		Uuid:            uuid.UUID{},
+		Uuid:            uuid.New(),
 		DocumentID:      reqBody.DocumentID,
 		IsComplete:      reqBody.IsComplete,
 		Settings:        reqBody.Settings,
@@ -72,4 +72,5 @@ func (t SelectionController) SetupRouterAppendToDocumentGroup(c *gin.RouterGroup
 
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
 	c.DELETE("/:id", t.deleteSelectionWhereSelectionUUID)
+	c.POST("/", t.addSelection)
 }

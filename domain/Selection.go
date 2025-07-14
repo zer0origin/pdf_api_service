@@ -7,7 +7,7 @@ type Selection struct {
 	DocumentID      *uuid.UUID `json:"documentID,omitempty"`
 	IsComplete      bool       `json:"isComplete,omitempty"`
 	Settings        *string    `json:"settings,omitempty"`
-	SelectionBounds *string    `json:"selection_bounds,omitempty"`
+	SelectionBounds *string    `json:"selectionBounds,omitempty"`
 }
 
 type SelectionRepository interface {
