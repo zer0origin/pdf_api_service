@@ -7,10 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"pdf_service_api/repositories"
+	v2 "pdf_service_api/controller/v1"
+	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
-	v1 "pdf_service_api/v1"
-	"pdf_service_api/v1/controller"
 	"testing"
 )
 
@@ -37,10 +36,10 @@ func getSelections(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	selectionController := &controller.SelectionController{SelectionRepository: repositories.NewSelectionRepository(dbConfig)}
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v1.SetupRouter(documentController)
+	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
+	router := v2.SetupRouter(documentController)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -72,10 +71,10 @@ func deleteSelections(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	selectionController := &controller.SelectionController{SelectionRepository: repositories.NewSelectionRepository(dbConfig)}
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v1.SetupRouter(documentController)
+	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
+	router := v2.SetupRouter(documentController)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -104,10 +103,10 @@ func deleteSelectionsUuidDoesNotExist(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	selectionController := &controller.SelectionController{SelectionRepository: repositories.NewSelectionRepository(dbConfig)}
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v1.SetupRouter(documentController)
+	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
+	router := v2.SetupRouter(documentController)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

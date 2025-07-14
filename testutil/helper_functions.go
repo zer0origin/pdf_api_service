@@ -8,17 +8,17 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
-	"pdf_service_api/database"
+	pg "pdf_service_api/postgres"
 	"time"
 )
 
-func CreateDbConfig(ctx context.Context, ctr postgres.PostgresContainer) (database.ConfigForDatabase, error) {
+func CreateDbConfig(ctx context.Context, ctr postgres.PostgresContainer) (pg.ConfigForDatabase, error) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		return database.ConfigForDatabase{}, err
+		return pg.ConfigForDatabase{}, err
 	}
 
-	dbConfig := database.ConfigForDatabase{
+	dbConfig := pg.ConfigForDatabase{
 		ConUrl: connectionString,
 	}
 

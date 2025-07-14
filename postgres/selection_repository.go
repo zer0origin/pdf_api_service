@@ -1,28 +1,27 @@
-package repositories
+package postgres
 
 import (
 	"database/sql"
 	"github.com/google/uuid"
-	"pdf_service_api/database"
-	"pdf_service_api/models"
+	"pdf_service_api/domain"
 )
 
 type SelectionRepository interface {
-	GetSelectionBySelectionId(uid uuid.UUID) ([]models.Selection, error)
+	GetSelectionBySelectionId(uid uuid.UUID) ([]domain.Selection, error)
 	DeleteSelectionBySelectionUUIDFunction(uid uuid.UUID) error
 }
 
 type selectionRepository struct {
-	databaseManager database.ConfigForDatabase
+	databaseManager ConfigForDatabase
 }
 
-func NewSelectionRepository(db database.ConfigForDatabase) SelectionRepository {
+func NewSelectionRepository(db ConfigForDatabase) SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
 
-func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]models.Selection, error) {
-	var dataArr []models.Selection
-	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []models.Selection) {
+func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]domain.Selection, error) {
+	var dataArr []domain.Selection
+	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []domain.Selection) {
 		dataArr = data
 	})
 
@@ -44,7 +43,7 @@ func (s selectionRepository) DeleteSelectionBySelectionUUIDFunction(uid uuid.UUI
 	return nil
 }
 
-func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
+func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []domain.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Selection_bounds" FROM selection_table where "Document_UUID" = $1`
 
@@ -54,9 +53,9 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 
 		}
 
-		var dataArr []models.Selection
+		var dataArr []domain.Selection
 		for rows.Next() {
-			data := models.Selection{}
+			data := domain.Selection{}
 			err := rows.Scan(&data.Uuid, &data.DocumentID, &data.SelectionBounds)
 			if err != nil {
 				return err

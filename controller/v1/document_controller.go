@@ -1,16 +1,15 @@
-package controller
+package v1
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"pdf_service_api/models"
-	"pdf_service_api/repositories"
+	"pdf_service_api/domain"
 )
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
 type DocumentController struct {
-	DocumentRepository  repositories.DocumentRepository
+	DocumentRepository  domain.DocumentRepository
 	SelectionController *SelectionController
 }
 
@@ -29,7 +28,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 // UploadDocumentHandler gin handler function
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
-	body := &models.UploadRequest{}
+	body := &domain.UploadRequest{}
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {
@@ -37,7 +36,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 		return
 	}
 
-	newModel := models.Document{
+	newModel := domain.Document{
 		Uuid:          uuid.New(),
 		PdfBase64:     body.DocumentBase64String,
 		SelectionData: nil,

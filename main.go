@@ -1,25 +1,23 @@
 package main
 
 import (
-	"pdf_service_api/database"
-	"pdf_service_api/repositories"
-	v1 "pdf_service_api/v1"
-	"pdf_service_api/v1/controller"
+	v2 "pdf_service_api/controller/v1"
+	pg "pdf_service_api/postgres"
 )
 
 func main() {
 	documentController := createDocumentController()
-	router := v1.SetupRouter(documentController)
+	router := v2.SetupRouter(documentController)
 	_ = router.Run() // listen and serve on 0.0.0.0:8080
 }
 
-func createDocumentController() *controller.DocumentController {
-	dbConfig := database.ConfigForDatabase{}
-	repository := repositories.NewSelectionRepository(dbConfig)
-	selController := &controller.SelectionController{SelectionRepository: repository}
+func createDocumentController() *v2.DocumentController {
+	dbConfig := pg.ConfigForDatabase{}
+	repository := pg.NewSelectionRepository(dbConfig)
+	selController := &v2.SelectionController{SelectionRepository: repository}
 
-	documentController := &controller.DocumentController{
-		DocumentRepository:  repositories.NewDocumentRepository(dbConfig),
+	documentController := &v2.DocumentController{
+		DocumentRepository:  pg.NewDocumentRepository(dbConfig),
 		SelectionController: selController,
 	}
 

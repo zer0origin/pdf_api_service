@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/stretchr/testify/assert"
-	"pdf_service_api/models"
+	"pdf_service_api/domain"
 	"pdf_service_api/testutil"
 	"testing"
 )
@@ -25,7 +25,7 @@ func TestGetDatabase(t *testing.T) {
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
 	assert.Nil(t, err)
 
-	document := &models.Document{}
+	document := &domain.Document{}
 	err = dbConfig.WithConnection(func(db *sql.DB) error {
 		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
 		row := db.QueryRow(sqlStatement, TestUUID)

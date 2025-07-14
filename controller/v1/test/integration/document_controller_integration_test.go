@@ -9,11 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"pdf_service_api/models"
-	"pdf_service_api/repositories"
+	v2 "pdf_service_api/controller/v1"
+	"pdf_service_api/domain"
+	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
-	v1 "pdf_service_api/v1"
-	"pdf_service_api/v1/controller"
 	"strings"
 	"testing"
 )
@@ -52,7 +51,7 @@ func databaseConnection(t *testing.T) {
 		}
 		return nil
 	})
-	assert.NoError(t, err, "Error connecting to database")
+	assert.NoError(t, err, "Error connecting to postgres")
 	assert.True(t, databasePresent, "Database should exists")
 }
 
@@ -72,11 +71,11 @@ func getDocumentHandler(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo}
+	router := v2.SetupRouter(documentController)
 
-	request := &models.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
+	request := &domain.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -86,7 +85,7 @@ func getDocumentHandler(t *testing.T) {
 		strings.NewReader(string(requestJSON)),
 	))
 
-	responseDocument := &models.Document{}
+	responseDocument := &domain.Document{}
 	err = json.NewDecoder(w.Body).Decode(responseDocument)
 	if err != nil {
 		assert.FailNow(t, err.Error())
@@ -115,11 +114,11 @@ func uploadDocument(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo}
+	router := v2.SetupRouter(documentController)
 
-	request := &models.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	request := &domain.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -158,9 +157,9 @@ func deleteDocument(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := &controller.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	repo := postgres.NewDocumentRepository(dbConfig)
+	documentController := &v2.DocumentController{DocumentRepository: repo}
+	router := v2.SetupRouter(documentController)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

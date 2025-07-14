@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"pdf_service_api/database"
+	pg "pdf_service_api/postgres"
 	"testing"
 )
 
 func TestDatabaseEmptyArgs(t *testing.T) {
-	dbConfig := database.ConfigForDatabase{
+	dbConfig := pg.ConfigForDatabase{
 		Host:     "",
 		Port:     "",
 		Username: "",
@@ -25,7 +25,7 @@ func TestDatabaseEmptyArgs(t *testing.T) {
 }
 
 func TestDatabaseEmptyCon(t *testing.T) {
-	dbConfig := database.ConfigForDatabase{
+	dbConfig := pg.ConfigForDatabase{
 		ConUrl: "",
 	}
 

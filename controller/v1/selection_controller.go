@@ -1,14 +1,14 @@
-package controller
+package v1
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"pdf_service_api/repositories"
+	"pdf_service_api/postgres"
 )
 
 type SelectionController struct {
-	SelectionRepository repositories.SelectionRepository
+	SelectionRepository postgres.SelectionRepository
 }
 
 func (t SelectionController) getSelectionFromId(c *gin.Context) {
