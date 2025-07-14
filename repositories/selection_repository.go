@@ -9,6 +9,7 @@ import (
 
 type SelectionRepository interface {
 	GetSelectionBySelectionId(uid uuid.UUID) ([]models.Selection, error)
+	DeleteSelectionBySelectionUUIDFunction(uid uuid.UUID) error
 }
 
 type selectionRepository struct {
@@ -31,6 +32,16 @@ func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]models.
 	}
 
 	return dataArr, nil
+}
+
+func (s selectionRepository) DeleteSelectionBySelectionUUIDFunction(uid uuid.UUID) error {
+	err := s.databaseManager.WithConnection(deleteSelectionBySelectionUUIDFunction(uid))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
@@ -61,6 +72,12 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 
 func deleteSelectionBySelectionUUIDFunction(uid uuid.UUID) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
+		sqlStatement := `DELETE FROM selection_table WHERE "Selection_UUID" = $1`
+		_, err := db.Exec(sqlStatement, uid)
+
+		if err != nil {
+			return err
+		}
 
 		return nil
 	}

@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -54,6 +55,10 @@ func CreateTestContainerPostgres(ctx context.Context, filename string, dbUser st
 
 	if err != nil {
 		return nil, err
+	}
+
+	if ctr == nil {
+		return nil, errors.New("failed to create postgres container")
 	}
 
 	p, _ := ctr.MappedPort(ctx, "5432")
