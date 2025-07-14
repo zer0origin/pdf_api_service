@@ -41,7 +41,7 @@ func uploadDocument(t *testing.T) {
 	documentController := &v2.DocumentController{DocumentRepository: repo}
 	router := v2.SetupRouter(documentController)
 
-	data := domain.UploadRequest{
+	data := v2.UploadRequest{
 		DocumentBase64String: func() *string { v := "TEMP DOCUMENT"; return &v }(),
 	}
 	documentJSON, _ := json.Marshal(data)
@@ -73,7 +73,7 @@ func getDocument(t *testing.T) {
 	}
 	repo.Repo[ExampleUUID] = ExampleDocument
 
-	request := &domain.GetDocumentRequest{DocumentUuid: ExampleUUID}
+	request := &v2.GetDocumentRequest{DocumentUuid: ExampleUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()

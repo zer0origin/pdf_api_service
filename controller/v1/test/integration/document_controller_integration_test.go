@@ -75,7 +75,7 @@ func getDocumentHandler(t *testing.T) {
 	documentController := &v2.DocumentController{DocumentRepository: repo}
 	router := v2.SetupRouter(documentController)
 
-	request := &domain.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
+	request := &v2.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -118,7 +118,7 @@ func uploadDocument(t *testing.T) {
 	documentController := &v2.DocumentController{DocumentRepository: repo}
 	router := v2.SetupRouter(documentController)
 
-	request := &domain.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	request := &v2.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()

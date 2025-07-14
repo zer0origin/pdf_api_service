@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
 )
@@ -15,7 +14,7 @@ type ConfigForDatabase struct {
 	ConUrl   string
 }
 
-func (t *ConfigForDatabase) getHost() string {
+func (t *ConfigForDatabase) HostOrDefault() string {
 	if t.Host == "" {
 		fmt.Println("DATABASE_HOST environment variable not set. Using default: localhost")
 		t.Host = "localhost"
@@ -26,7 +25,7 @@ func (t *ConfigForDatabase) getHost() string {
 	return t.Host
 }
 
-func (t *ConfigForDatabase) getPort() string {
+func (t *ConfigForDatabase) PortOrDefault() string {
 	if t.Port == "" {
 		fmt.Println("DATABASE_PORT environment variable not set. Using default: 5432")
 		t.Port = "5432"
@@ -37,7 +36,7 @@ func (t *ConfigForDatabase) getPort() string {
 	return t.Port
 }
 
-func (t *ConfigForDatabase) getUser() string {
+func (t *ConfigForDatabase) UserOrDefault() string {
 	if t.Username == "" {
 		fmt.Println("DATABASE_USER environment variable not set. Using default: user")
 		t.Username = "user"
@@ -48,7 +47,7 @@ func (t *ConfigForDatabase) getUser() string {
 	return t.Username
 }
 
-func (t *ConfigForDatabase) getPassword() string {
+func (t *ConfigForDatabase) PasswordOrDefault() string {
 	if t.Password == "" {
 		fmt.Println("DATABASE_PASSWORD environment variable not set. Using default: Password")
 		t.Password = "password"
@@ -59,7 +58,7 @@ func (t *ConfigForDatabase) getPassword() string {
 	return t.Password
 }
 
-func (t *ConfigForDatabase) getDatabase() string {
+func (t *ConfigForDatabase) DatabaseOrDefault() string {
 	if t.Database == "" {
 		fmt.Println("DATABASE_DB environment variable not set. Using default: postgres")
 		t.Database = "postgres"
@@ -73,43 +72,10 @@ func (t *ConfigForDatabase) getDatabase() string {
 func (t *ConfigForDatabase) GetPsqlInfo() string {
 	if t.ConUrl == "" {
 		psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			t.getUser(), t.getPassword(), t.getHost(), t.getPort(), t.getDatabase())
+			t.UserOrDefault(), t.PasswordOrDefault(), t.HostOrDefault(), t.PortOrDefault(), t.DatabaseOrDefault())
 
 		return psqlInfo
 	}
 
 	return t.ConUrl
-}
-
-type createdCallback func(db *sql.DB) error
-
-func (t *ConfigForDatabase) WithConnection(callback createdCallback) error {
-	str := t.GetPsqlInfo()
-	db, err := sql.Open("postgres", str) //Create connection string
-	if err != nil {
-		return err
-	}
-
-	err = db.Ping() //open up a connection to the Database
-	if err != nil {
-		return err
-	}
-
-	err = callback(db)
-	if err != nil {
-		return err
-	}
-
-	defer func(db *sql.DB) { // Runs once withConnection has finished execution!
-		err := db.Close()
-		if err != nil {
-			panic(err)
-		}
-
-		if r := recover(); r != nil {
-			fmt.Printf("Recovered from panic: %v (type: %T)\n", r, r)
-		}
-	}(db)
-
-	return nil
 }

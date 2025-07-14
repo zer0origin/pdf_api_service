@@ -28,7 +28,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 // UploadDocumentHandler gin handler function
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
-	body := &domain.UploadRequest{}
+	body := &UploadRequest{}
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {
