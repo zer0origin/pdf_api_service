@@ -44,7 +44,7 @@ func getSelections(t *testing.T) {
 // /api/v1/documents/:id/selections/
 func deleteSelections(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1Router(t, dbUser, dbPassword)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
