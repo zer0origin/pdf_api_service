@@ -9,3 +9,11 @@ type GetDocumentRequest struct {
 type UploadRequest struct {
 	DocumentBase64String *string `json:"documentBase64String"`
 }
+
+type AddNewSelectionRequest struct {
+	Uuid            uuid.UUID  `json:"selectionUUID"`
+	DocumentID      *uuid.UUID `json:"documentID,omitempty"`
+	IsComplete      bool       `json:"isComplete,omitempty"`
+	Settings        *string    `json:"settings,omitempty"`
+	SelectionBounds *string    `json:"selectionBounds,omitempty"`
+}
