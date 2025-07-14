@@ -71,11 +71,4 @@ func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
 	c.PUT("/", t.UploadDocumentHandler)
 	c.GET("/:id", t.GetDocumentHandler)
 	c.DELETE("/:id", t.DeleteDocumentHandler)
-
-	if t.SelectionController == nil {
-		return
-	}
-
-	selectionGroup := c.Group("/:id/selections")
-	selectionGroup.GET("/", t.SelectionController.getSelectionFromId)
 }

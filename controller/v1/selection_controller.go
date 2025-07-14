@@ -41,7 +41,7 @@ func (t SelectionController) deleteSelectionWhereSelectionUUID(c *gin.Context) {
 	}
 }
 
-func (t SelectionController) SetupRouterAppendToDocument(c *gin.RouterGroup) {
+func (t SelectionController) SetupRouterAppendToDocumentGroup(c *gin.RouterGroup) {
 	c.GET("/", t.getSelectionFromId)
 }
 

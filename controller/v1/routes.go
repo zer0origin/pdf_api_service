@@ -15,6 +15,9 @@ func SetupRouter(documentController *DocumentController) *gin.Engine {
 	if documentController.SelectionController != nil {
 		selectionGroup := apiV1Group.Group("/selections")
 		documentController.SelectionController.SetupRouter(selectionGroup)
+
+		s := documentGroup.Group("/:id/selections/")
+		documentController.SelectionController.SetupRouterAppendToDocumentGroup(s)
 	}
 
 	return router
