@@ -93,4 +93,5 @@ func createNewSelection(t *testing.T) {
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+	assert.NotContains(t, w.Body.String(), "Error")
 }

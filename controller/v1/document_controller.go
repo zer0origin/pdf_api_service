@@ -15,7 +15,11 @@ type DocumentController struct {
 
 // GetDocumentHandler gin handler function.
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
-	getUUID := uuid.MustParse(c.Param("id"))
+	getUUID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
 
 	document, err := t.DocumentRepository.GetDocumentById(getUUID)
 	if err != nil {
@@ -52,12 +56,13 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 }
 
 func (t DocumentController) DeleteDocumentHandler(c *gin.Context) {
-	deleteUUID := uuid.Nil
+	deleteUUID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
 
-	id := c.Param("id")
-	deleteUUID = uuid.MustParse(id)
-
-	err := t.DocumentRepository.DeleteDocumentById(deleteUUID)
+	err = t.DocumentRepository.DeleteDocumentById(deleteUUID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
