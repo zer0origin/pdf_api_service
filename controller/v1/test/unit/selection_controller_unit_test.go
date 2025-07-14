@@ -14,10 +14,15 @@ import (
 )
 
 func TestSelectionUnit(t *testing.T) {
-	t.Run("TestSelectionBoundsParsing", TestSelectionBoundsParsing)
+	t.Run("SelectionBoundsParsing", SelectionBoundsParsing)
+	t.Run("NoSelectionBounds", NoSelectionBounds)
 }
 
-func TestSelectionBoundsParsing(t *testing.T) {
+type addSelectionResponse struct {
+	SelectionUUID uuid.UUID `json:"selectionUUID"`
+}
+
+func SelectionBoundsParsing(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	mm := make(map[int][]domain.SelectionBounds)
@@ -25,7 +30,6 @@ func TestSelectionBoundsParsing(t *testing.T) {
 	mm[1] = make([]domain.SelectionBounds, 2)
 
 	toCreate := domain.Selection{
-		Uuid:            uuid.New(),
 		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
 		IsComplete:      false,
 		Settings:        nil,
@@ -69,7 +73,7 @@ func TestSelectionBoundsParsing(t *testing.T) {
 		assert.FailNow(t, err.Error())
 	}
 
-	documentRepo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	documentRepo := &mock.EmptyDocumentRepository{}
 	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]domain.Selection)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: selectionRepo}
 	documentController := &v1.DocumentController{DocumentRepository: documentRepo, SelectionController: selectionCtrl}
@@ -83,5 +87,58 @@ func TestSelectionBoundsParsing(t *testing.T) {
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.NotNil(t, selectionRepo.Repo[toCreate.Uuid])
+
+	response := addSelectionResponse{}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	storedData := selectionRepo.Repo[response.SelectionUUID]
+	assert.NotEqual(t, uuid.Nil, storedData.Uuid)
+	assert.NotNil(t, storedData.SelectionBounds)
+}
+
+func NoSelectionBounds(t *testing.T) {
+	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+
+	toCreate := domain.Selection{
+		Uuid:            uuid.New(),
+		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
+		IsComplete:      false,
+		Settings:        nil,
+		SelectionBounds: nil,
+	}
+
+	jsonByteData, err := json.Marshal(toCreate)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
+
+	documentRepo := &mock.EmptyDocumentRepository{}
+	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]domain.Selection)}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: selectionRepo}
+	documentController := &v1.DocumentController{DocumentRepository: documentRepo, SelectionController: selectionCtrl}
+	router := v1.SetupRouter(documentController)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/selections/",
+		strings.NewReader(string(jsonByteData)),
+	))
+
+	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+
+	response := addSelectionResponse{}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	storedData := selectionRepo.Repo[response.SelectionUUID]
+	assert.NotEqual(t, uuid.Nil, storedData.Uuid)
+	assert.Nil(t, storedData.SelectionBounds)
 }
