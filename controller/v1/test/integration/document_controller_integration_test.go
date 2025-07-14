@@ -57,23 +57,7 @@ func databaseConnection(t *testing.T) {
 
 func getDocumentHandler(t *testing.T) {
 	t.Parallel()
-	TestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
-
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	repo := postgres.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
 
 	request := &v2.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
 	requestJSON, _ := json.Marshal(request)
@@ -86,7 +70,7 @@ func getDocumentHandler(t *testing.T) {
 	))
 
 	responseDocument := &domain.Document{}
-	err = json.NewDecoder(w.Body).Decode(responseDocument)
+	err := json.NewDecoder(w.Body).Decode(responseDocument)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -101,22 +85,7 @@ type UploadResponse struct {
 
 func uploadDocument(t *testing.T) {
 	t.Parallel()
-
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	repo := postgres.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
 
 	request := &v2.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
@@ -129,7 +98,7 @@ func uploadDocument(t *testing.T) {
 	))
 
 	response := UploadResponse{}
-	err = json.NewDecoder(w.Body).Decode(&response)
+	err := json.NewDecoder(w.Body).Decode(&response)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
@@ -144,22 +113,7 @@ type DeleteResponse struct {
 
 func deleteDocument(t *testing.T) {
 	t.Parallel()
-
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	repo := postgres.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo}
-	router := v2.SetupRouter(documentController)
+	router := testutil.CreateV1RouterAndPostgresContainer(t, dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -170,7 +124,7 @@ func deleteDocument(t *testing.T) {
 
 	fmt.Println(w.Body.String())
 	response := DeleteResponse{}
-	err = json.NewDecoder(w.Body).Decode(&response)
+	err := json.NewDecoder(w.Body).Decode(&response)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 	}
