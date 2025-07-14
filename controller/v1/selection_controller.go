@@ -41,6 +41,31 @@ func (t SelectionController) deleteSelectionWhereSelectionUUID(c *gin.Context) {
 	}
 }
 
+func (t SelectionController) addSelection(c *gin.Context) {
+	reqBody := &AddNewSelectionRequest{}
+
+	if err := c.ShouldBindJSON(reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		return
+	}
+
+	toCreate := domain.Selection{
+		Uuid:            uuid.UUID{},
+		DocumentID:      reqBody.DocumentID,
+		IsComplete:      reqBody.IsComplete,
+		Settings:        reqBody.Settings,
+		SelectionBounds: reqBody.SelectionBounds,
+	}
+
+	err := t.SelectionRepository.AddNewSelection(toCreate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		return
+	}
+
+	c.JSON(200, gin.H{"selectionUUID": toCreate.Uuid.String()})
+}
+
 func (t SelectionController) SetupRouterAppendToDocumentGroup(c *gin.RouterGroup) {
 	c.GET("/", t.getSelectionFromId)
 }

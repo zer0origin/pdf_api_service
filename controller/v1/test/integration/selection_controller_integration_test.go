@@ -24,22 +24,8 @@ func getSelections(t *testing.T) {
 	t.Parallel()
 
 	expectedJsonResponse := `[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]`
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	handler, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(handler)}
-	repo := postgres.NewDocumentRepository(handler)
-	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v2.SetupRouter(documentController)
+	t.Parallel()
+	router := testutil.CreateV1Router(t, dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -58,23 +44,7 @@ func getSelections(t *testing.T) {
 // /api/v1/documents/:id/selections/
 func deleteSelections(t *testing.T) {
 	t.Parallel()
-
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
-	repo := postgres.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v2.SetupRouter(documentController)
+	router := testutil.CreateV1Router(t, dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -90,23 +60,7 @@ func deleteSelections(t *testing.T) {
 // /api/v1/documents/:id/selections/
 func deleteSelectionsUuidDoesNotExist(t *testing.T) {
 	t.Parallel()
-
-	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
-
-	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	selectionController := &v2.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbConfig)}
-	repo := postgres.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v2.SetupRouter(documentController)
+	router := testutil.CreateV1Router(t, dbUser, dbPassword)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
