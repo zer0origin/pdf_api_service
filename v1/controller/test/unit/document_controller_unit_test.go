@@ -18,8 +18,26 @@ type UploadResponse struct {
 	DocumentUUID uuid.UUID `json:"documentUUID"`
 }
 
-func TestUploadDocument(t *testing.T) {
-	t.Parallel()
+func TestDocumentControllerUnit(t *testing.T) {
+	t.Run("pingRouter", pingRouter)
+	t.Run("uploadDocument", uploadDocument)
+	t.Run("getDocument", getDocument)
+}
+
+func pingRouter(t *testing.T) {
+	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
+	documentController := &controller.DocumentController{DocumentRepository: repo}
+	router := v1.SetupRouter(documentController)
+
+	w := httptest.NewRecorder() //creates a recorder that records its mutations for later inspection in tests.
+	req, _ := http.NewRequest("GET", "/ping", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, "{\"message\":\"pong\"}", w.Body.String())
+}
+
+func uploadDocument(t *testing.T) {
 	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
@@ -43,8 +61,7 @@ func TestUploadDocument(t *testing.T) {
 	assert.NotEqual(t, uuid.Nil, responseUUID.DocumentUUID)
 }
 
-func TestGetDocument(t *testing.T) {
-	t.Parallel()
+func getDocument(t *testing.T) {
 	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)

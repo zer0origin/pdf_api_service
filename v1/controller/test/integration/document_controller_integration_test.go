@@ -21,7 +21,15 @@ import (
 var dbUser = "user"
 var dbPassword = "password"
 
-func TestDatabaseConnection(t *testing.T) {
+func TestDocumentIntegration(t *testing.T) {
+	t.Run("databaseConnection", databaseConnection)
+	t.Run("getDocumentHandler", getDocumentHandler)
+	t.Run("uploadDocument", uploadDocument)
+	t.Run("deleteDocument", deleteDocument)
+}
+
+func databaseConnection(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
 	if err != nil {
@@ -48,7 +56,7 @@ func TestDatabaseConnection(t *testing.T) {
 	assert.True(t, databasePresent, "Database should exists")
 }
 
-func TestGetDocumentHandler(t *testing.T) {
+func getDocumentHandler(t *testing.T) {
 	t.Parallel()
 	TestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
@@ -92,7 +100,7 @@ type UploadResponse struct {
 	DocumentUUID uuid.UUID `json:"documentUUID"`
 }
 
-func TestUploadDocument(t *testing.T) {
+func uploadDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
@@ -135,7 +143,7 @@ type DeleteResponse struct {
 	Success bool `json:"success"`
 }
 
-func TestDeleteDocument(t *testing.T) {
+func deleteDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
