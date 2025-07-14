@@ -43,7 +43,7 @@ func TestGetSelections(t *testing.T) {
 	))
 
 	fmt.Println(w.Body.String())
-	assert.Equal(t, http.StatusOK, w.Result().Status)
+	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	assert.NotNil(t, w.Body.String())
 	assert.NotContains(t, w.Body.String(), "Error")
 	assert.Equal(t, expectedJsonResponse, w.Body.String())
@@ -78,5 +78,5 @@ func TestDeleteSelections(t *testing.T) {
 	))
 
 	fmt.Println(w.Body.String())
-	assert.Equal(t, http.StatusOK, w.Result().Status)
+	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 }
