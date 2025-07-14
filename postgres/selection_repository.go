@@ -25,17 +25,17 @@ func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
 }
 
 func (s selectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.Selection, error) {
-	var dataArr []domain.Selection
+	var ss []domain.Selection
 	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []domain.Selection) {
-		dataArr = data
+		ss = data
 	})
 
 	err := s.databaseManager.WithConnection(getSelection)
 	if err != nil {
-		return dataArr, err
+		return ss, err
 	}
 
-	return dataArr, nil
+	return ss, nil
 }
 
 func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error {
@@ -58,7 +58,7 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []doma
 
 		}
 
-		var dataArr []domain.Selection
+		var ss []domain.Selection
 		for rows.Next() {
 			data := domain.Selection{}
 			err := rows.Scan(&data.Uuid, &data.DocumentID, &data.SelectionBounds)
@@ -66,10 +66,10 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []doma
 				return err
 			}
 
-			dataArr = append(dataArr, data)
+			ss = append(ss, data)
 		}
 
-		callback(dataArr)
+		callback(ss)
 		return nil
 	}
 }
