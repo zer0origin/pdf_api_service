@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"pdf_service_api/domain"
 )
@@ -10,11 +11,16 @@ type selectionRepository struct {
 	databaseManager DatabaseHandler
 }
 
+func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
+	s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
+	return nil
+}
+
 func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
 
-func (s selectionRepository) GetSelectionBySelectionId(uid uuid.UUID) ([]domain.Selection, error) {
+func (s selectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.Selection, error) {
 	var dataArr []domain.Selection
 	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []domain.Selection) {
 		dataArr = data
@@ -68,6 +74,41 @@ func deleteSelectionBySelectionUUIDFunction(uid uuid.UUID) func(db *sql.DB) erro
 	return func(db *sql.DB) error {
 		sqlStatement := `DELETE FROM selection_table WHERE "Selection_UUID" = $1`
 		_, err := db.Exec(sqlStatement, uid)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func AddNewSelectionFunction(selection domain.Selection) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "isCompleted", "Settings", "Selection_bounds") values ($1, $2, $3, $4, $5);`
+
+		selUid := selection.Uuid
+		if selUid == uuid.Nil {
+			return errors.New("selection uuid cannot be nil")
+		}
+
+		docUid := selection.DocumentID
+		if *docUid == uuid.Nil {
+			return errors.New("selection uuid cannot be nil")
+		}
+
+		isComplete := selection.IsComplete
+		settings := selection.Settings
+		if settings == nil || *settings == "" {
+			settings = func() *string { v := "{}"; return &v }()
+		}
+
+		selBounds := selection.SelectionBounds
+		if selBounds == nil || *selBounds == "" {
+			selBounds = func() *string { v := "{}"; return &v }()
+		}
+
+		_, err := db.Exec(sqlStatement, selUid, docUid, isComplete, settings, selBounds)
 
 		if err != nil {
 			return err

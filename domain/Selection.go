@@ -6,11 +6,12 @@ type Selection struct {
 	Uuid            uuid.UUID  `json:"selectionUUID"`
 	DocumentID      *uuid.UUID `json:"documentID,omitempty"`
 	IsComplete      bool       `json:"isComplete,omitempty"`
-	Settings        string     `json:"settings,omitempty"`
-	SelectionBounds string     `json:"selection_bounds,omitempty"`
+	Settings        *string    `json:"settings,omitempty"`
+	SelectionBounds *string    `json:"selection_bounds,omitempty"`
 }
 
 type SelectionRepository interface {
 	GetSelectionsByDocumentId(uid uuid.UUID) ([]Selection, error)
 	DeleteSelectionBySelectionUUID(uid uuid.UUID) error
+	AddNewSelection(selection Selection) error
 }

@@ -18,7 +18,7 @@ func (t SelectionController) getSelectionFromId(c *gin.Context) {
 		return
 	}
 
-	results, err := t.SelectionRepository.GetSelectionBySelectionId(uid)
+	results, err := t.SelectionRepository.GetSelectionsByDocumentId(uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
 		return
