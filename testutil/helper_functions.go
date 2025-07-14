@@ -56,5 +56,8 @@ func CreateTestContainerPostgres(ctx context.Context, filename string, dbUser st
 		return nil, err
 	}
 
+	p, _ := ctr.MappedPort(ctx, "5432")
+	fmt.Printf("Postgres container listening to: %s", p)
+
 	return ctr, nil
 }

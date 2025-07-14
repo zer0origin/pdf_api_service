@@ -21,7 +21,7 @@ type UploadResponse struct {
 func TestUploadDocument(t *testing.T) {
 	t.Parallel()
 	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
-	documentController := controller.NewDocumentController(repo)
+	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
 
 	data := models.UploadRequest{
@@ -46,7 +46,7 @@ func TestUploadDocument(t *testing.T) {
 func TestGetDocument(t *testing.T) {
 	t.Parallel()
 	repo := &mock.MapRepository{Repo: make(map[uuid.UUID]models.Document)}
-	documentController := controller.NewDocumentController(repo)
+	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
 
 	ExampleUUID := uuid.New()

@@ -24,11 +24,15 @@ var dbPassword = "password"
 func TestDatabaseConnection(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	var databasePresent bool
 	err = dbConfig.WithConnection(func(db *sql.DB) error { //This checks that the tables from the init script were created.
@@ -50,14 +54,18 @@ func TestGetDocumentHandler(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := controller.NewDocumentController(repo)
+	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
 
 	request := &models.GetDocumentRequest{DocumentUuid: uuid.MustParse(TestUUID)}
@@ -72,7 +80,9 @@ func TestGetDocumentHandler(t *testing.T) {
 
 	responseDocument := &models.Document{}
 	err = json.NewDecoder(w.Body).Decode(responseDocument)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.Equal(t, TestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
@@ -87,14 +97,18 @@ func TestUploadDocument(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := controller.NewDocumentController(repo)
+	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
 
 	request := &models.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
@@ -109,7 +123,9 @@ func TestUploadDocument(t *testing.T) {
 
 	response := UploadResponse{}
 	err = json.NewDecoder(w.Body).Decode(&response)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.NotEqual(t, uuid.Nil, response.DocumentUUID)
@@ -124,14 +140,18 @@ func TestDeleteDocument(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDbConfig(ctx, *ctr)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	repo := repositories.NewDocumentRepository(dbConfig)
-	documentController := controller.NewDocumentController(repo)
+	documentController := &controller.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController)
 
 	w := httptest.NewRecorder()
@@ -144,7 +164,9 @@ func TestDeleteDocument(t *testing.T) {
 	fmt.Println(w.Body.String())
 	response := DeleteResponse{}
 	err = json.NewDecoder(w.Body).Decode(&response)
-	assert.NoError(t, err)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.True(t, response.Success)

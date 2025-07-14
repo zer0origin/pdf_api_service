@@ -14,11 +14,6 @@ type DocumentController struct {
 	SelectionController SelectionController
 }
 
-// NewDocumentController creates a new instance of the repository using the injected repositories.DocumentRepository
-func NewDocumentController(repository repositories.DocumentRepository) *DocumentController {
-	return &DocumentController{DocumentRepository: repository}
-}
-
 // GetDocumentHandler gin handler function.
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 	getUUID := uuid.MustParse(c.Param("id"))
