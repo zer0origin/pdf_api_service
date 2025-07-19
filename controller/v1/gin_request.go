@@ -19,3 +19,18 @@ type AddNewSelectionRequest struct {
 	Settings        *string                           `json:"settings,omitempty"`
 	SelectionBounds *map[int][]domain.SelectionBounds `json:"selectionBounds,omitempty"`
 }
+
+type AddMetaRequest struct {
+	NumberOfPages uint32
+	Height        float32
+	Width         float32
+	Images        map[uint32]string
+}
+
+type UpdateMetaRequest struct {
+	UUID          uuid.UUID
+	NumberOfPages uint32
+	Height        float32
+	Width         float32
+	Images        map[uint32]string
+}
