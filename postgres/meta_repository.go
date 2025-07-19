@@ -38,7 +38,7 @@ func (m metaRepository) UpdateMeta(data domain.MetaData) error {
 	return nil
 }
 
-func (m metaRepository) GetMetaData(uid uuid.UUID) (domain.MetaData, error) {
+func (m metaRepository) GetMeta(uid uuid.UUID) (domain.MetaData, error) {
 	returnedData := &domain.MetaData{}
 	callbackFunction := func(data domain.MetaData) error {
 		*returnedData = data

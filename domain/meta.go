@@ -6,6 +6,7 @@ type MetaRepository interface {
 	AddMeta(data MetaData) error
 	DeleteMeta(data MetaData) error
 	UpdateMeta(data MetaData) error
+	GetMeta(uid uuid.UUID) (MetaData, error)
 }
 
 type MetaData struct {
