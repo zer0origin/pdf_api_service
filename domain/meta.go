@@ -4,8 +4,8 @@ import "github.com/google/uuid"
 
 type MetaRepository interface {
 	AddMeta(data MetaData) error
-	RemoveMeta(data MetaData) error
-	UpdateMetaData(data MetaData) error
+	DeleteMeta(data MetaData) error
+	UpdateMeta(data MetaData) error
 }
 
 type MetaData struct {

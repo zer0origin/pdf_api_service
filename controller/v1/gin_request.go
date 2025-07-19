@@ -21,10 +21,10 @@ type AddNewSelectionRequest struct {
 }
 
 type AddMetaRequest struct {
-	NumberOfPages uint32
-	Height        float32
-	Width         float32
-	Images        map[uint32]string
+	NumberOfPages *uint32
+	Height        *float32
+	Width         *float32
+	Images        *map[uint32]string
 }
 
 type UpdateMetaRequest struct {
@@ -33,4 +33,8 @@ type UpdateMetaRequest struct {
 	Height        float32
 	Width         float32
 	Images        map[uint32]string
+}
+
+type DeleteMetaRequest struct {
+	UUID uuid.UUID
 }

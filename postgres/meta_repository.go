@@ -22,7 +22,7 @@ func (m metaRepository) AddMeta(data domain.MetaData) error {
 	return nil
 }
 
-func (m metaRepository) RemoveMeta(data domain.MetaData) error {
+func (m metaRepository) DeleteMeta(data domain.MetaData) error {
 	if err := m.DatabaseHandler.WithConnection(removeMetaDataFunction(data)); err != nil {
 		return err
 	}
@@ -30,7 +30,7 @@ func (m metaRepository) RemoveMeta(data domain.MetaData) error {
 	return nil
 }
 
-func (m metaRepository) UpdateMetaData(data domain.MetaData) error {
+func (m metaRepository) UpdateMeta(data domain.MetaData) error {
 	if err := m.DatabaseHandler.WithConnection(updateMetaDataFunction(data)); err != nil {
 		return err
 	}
