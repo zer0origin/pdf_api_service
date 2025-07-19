@@ -20,10 +20,10 @@ func (t MetaController) AddMeta(c *gin.Context) {
 
 	model := domain.MetaData{
 		UUID:          uuid.New(),
-		NumberOfPages: &body.NumberOfPages,
-		Height:        &body.Height,
-		Width:         &body.Width,
-		Images:        &body.Images,
+		NumberOfPages: body.NumberOfPages,
+		Height:        body.Height,
+		Width:         body.Width,
+		Images:        body.Images,
 	}
 
 	if err := t.MetaRepository.AddMeta(model); err != nil {
@@ -35,7 +35,26 @@ func (t MetaController) AddMeta(c *gin.Context) {
 }
 
 func (t MetaController) UpdateMeta(c *gin.Context) {
+	body := &UpdateMetaRequest{}
+	if err := c.ShouldBindJSON(body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		return
+	}
 
+	model := domain.MetaData{
+		UUID:          uuid.New(),
+		NumberOfPages: &body.NumberOfPages,
+		Height:        &body.Height,
+		Width:         &body.Width,
+		Images:        &body.Images,
+	}
+
+	if err := t.MetaRepository.UpdateMeta(model); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func (t MetaController) DeleteMeta(c *gin.Context) {}
