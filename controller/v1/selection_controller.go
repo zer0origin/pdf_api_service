@@ -11,23 +11,28 @@ type SelectionController struct {
 	SelectionRepository domain.SelectionRepository
 }
 
-func (t SelectionController) getSelectionFromId(c *gin.Context) {
-	uid, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+func (t SelectionController) GetSelection(c *gin.Context) {
+	if id, present := c.GetQuery("documentUUID"); present {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			return
+		}
+
+		results, err := t.SelectionRepository.GetSelectionsByDocumentId(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			return
+		}
+
+		c.JSON(200, results)
 		return
 	}
 
-	results, err := t.SelectionRepository.GetSelectionsByDocumentId(uid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
-		return
-	}
-
-	c.JSON(200, results)
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
-func (t SelectionController) deleteSelectionWhereSelectionUUID(c *gin.Context) {
+func (t SelectionController) DeleteSelectionWhereSelectionUUID(c *gin.Context) {
 	uid, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
@@ -41,7 +46,7 @@ func (t SelectionController) deleteSelectionWhereSelectionUUID(c *gin.Context) {
 	}
 }
 
-func (t SelectionController) addSelection(c *gin.Context) {
+func (t SelectionController) AddSelection(c *gin.Context) {
 	reqBody := &AddNewSelectionRequest{}
 
 	if err := c.ShouldBindJSON(reqBody); err != nil {
@@ -64,10 +69,6 @@ func (t SelectionController) addSelection(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"selectionUUID": toCreate.Uuid.String()})
-}
-
-func (t SelectionController) SetupRouterAppendToDocumentGroup(c *gin.RouterGroup) {
-	c.GET("/", t.getSelectionFromId)
 }
 
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {

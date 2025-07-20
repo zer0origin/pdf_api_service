@@ -15,7 +15,6 @@ func TestMetaIntegration(t *testing.T) {
 	t.Run("getMetaDataFromDatabase", getMetaDataFromDatabase)
 }
 
-// TODO: rename to use /meta?uuid=xxx
 func getMetaDataFromDatabase(t *testing.T) {
 	testUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	expected := "{\"UUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"NumberOfPages\":31,\"Height\":1920,\"Width\":1080,\"Images\":null}"
