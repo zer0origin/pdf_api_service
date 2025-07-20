@@ -10,8 +10,8 @@ type metaRepository struct {
 	DatabaseHandler DatabaseHandler
 }
 
-func NewMetaRepository() domain.MetaRepository {
-	return metaRepository{}
+func NewMetaRepository(db DatabaseHandler) domain.MetaRepository {
+	return metaRepository{DatabaseHandler: db}
 }
 
 func (m metaRepository) AddMeta(data domain.MetaData) error {

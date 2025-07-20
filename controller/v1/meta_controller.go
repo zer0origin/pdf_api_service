@@ -11,7 +11,7 @@ type MetaController struct {
 	MetaRepository domain.MetaRepository
 }
 
-func (t MetaController) addMeta(c *gin.Context) {
+func (t MetaController) AddMeta(c *gin.Context) {
 	body := &AddMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
@@ -34,7 +34,7 @@ func (t MetaController) addMeta(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"metaUUID": model.UUID})
 }
 
-func (t MetaController) updateMeta(c *gin.Context) {
+func (t MetaController) UpdateMeta(c *gin.Context) {
 	body := &UpdateMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
@@ -57,7 +57,7 @@ func (t MetaController) updateMeta(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func (t MetaController) deleteMeta(c *gin.Context) {
+func (t MetaController) DeleteMeta(c *gin.Context) {
 	body := &DeleteMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
@@ -76,25 +76,30 @@ func (t MetaController) deleteMeta(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func (t MetaController) getMeta(c *gin.Context) {
-	uid, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+func (t MetaController) GetMeta(c *gin.Context) {
+	if id, present := c.GetQuery("id"); present {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			return
+		}
+
+		data, err := t.MetaRepository.GetMeta(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			return
+		}
+
+		c.JSON(http.StatusOK, data)
 		return
 	}
 
-	data, err := t.MetaRepository.GetMeta(uid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
-		return
-	}
-
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No get method specified."})
 }
 
 func (t MetaController) SetupRouter(c *gin.RouterGroup) {
-	c.GET("/:id", t.getMeta)
-	c.POST("/", t.addMeta)
-	c.PUT("/", t.updateMeta)
-	c.DELETE("/", t.deleteMeta)
+	c.GET("/", t.GetMeta)
+	c.POST("/", t.AddMeta)
+	c.PUT("/", t.UpdateMeta)
+	c.DELETE("/", t.DeleteMeta)
 }
