@@ -94,7 +94,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No get method specified."})
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
 func (t MetaController) SetupRouter(c *gin.RouterGroup) {
