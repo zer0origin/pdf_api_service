@@ -71,6 +71,7 @@ func (t SelectionController) SetupRouterAppendToDocumentGroup(c *gin.RouterGroup
 }
 
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
-	c.DELETE("/:id", t.deleteSelectionWhereSelectionUUID)
-	c.POST("/", t.addSelection)
+	c.DELETE("/:id", t.DeleteSelectionWhereSelectionUUID)
+	c.POST("/", t.AddSelection)
+	c.GET("/", t.GetSelection)
 }
