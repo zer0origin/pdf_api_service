@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -8,23 +9,40 @@ import (
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
+	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
 )
 
 func TestSelectionsIntegration(t *testing.T) {
-	t.Run("getSelections", getSelections)
+	//t.Run("getSelections", getSelections)
 	t.Run("deleteSelections", deleteSelections)
 	t.Run("deleteSelectionsUuidDoesNotExist", deleteSelectionsUuidDoesNotExist)
 	t.Run("createNewSelection", createNewSelection)
 }
 
-// /api/v1/documents/:id/selections/
+// /api/v1/documents/:id/selections/ <-- Removed. TODO: Change how this gets called by the URls. Probably remap to /api/v1/selections?documentId=:id
 func getSelections(t *testing.T) {
 	expectedJsonResponse := `[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]`
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -43,7 +61,23 @@ func getSelections(t *testing.T) {
 // /api/v1/documents/:id/selections/
 func deleteSelections(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -59,7 +93,23 @@ func deleteSelections(t *testing.T) {
 // /api/v1/documents/:id/selections/
 func deleteSelectionsUuidDoesNotExist(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -75,7 +125,23 @@ func deleteSelectionsUuidDoesNotExist(t *testing.T) {
 func createNewSelection(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	request := &v1.AddNewSelectionRequest{
 		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),

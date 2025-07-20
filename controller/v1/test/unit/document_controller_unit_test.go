@@ -26,7 +26,7 @@ func TestDocumentControllerUnit(t *testing.T) {
 func pingRouter(t *testing.T) {
 	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	router := v1.SetupRouter(documentController, nil, nil)
 
 	w := httptest.NewRecorder() //creates a recorder that records its mutations for later inspection in tests.
 	req, _ := http.NewRequest("GET", "/ping", nil)
@@ -39,7 +39,7 @@ func pingRouter(t *testing.T) {
 func uploadDocument(t *testing.T) {
 	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	router := v1.SetupRouter(documentController, nil, nil)
 
 	data := v1.UploadRequest{
 		DocumentBase64String: func() *string { v := "TEMP DOCUMENT"; return &v }(),
@@ -63,7 +63,7 @@ func uploadDocument(t *testing.T) {
 func getDocument(t *testing.T) {
 	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController)
+	router := v1.SetupRouter(documentController, nil, nil)
 
 	ExampleUUID := uuid.New()
 	ExampleDocument := domain.Document{

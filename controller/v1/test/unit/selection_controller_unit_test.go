@@ -76,8 +76,8 @@ func SelectionBoundsParsing(t *testing.T) {
 	documentRepo := &mock.EmptyDocumentRepository{}
 	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]domain.Selection)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: selectionRepo}
-	documentController := &v1.DocumentController{DocumentRepository: documentRepo, SelectionController: selectionCtrl}
-	router := v1.SetupRouter(documentController)
+	documentController := &v1.DocumentController{DocumentRepository: documentRepo}
+	router := v1.SetupRouter(documentController, selectionCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -119,8 +119,8 @@ func NoSelectionBounds(t *testing.T) {
 	documentRepo := &mock.EmptyDocumentRepository{}
 	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]domain.Selection)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: selectionRepo}
-	documentController := &v1.DocumentController{DocumentRepository: documentRepo, SelectionController: selectionCtrl}
-	router := v1.SetupRouter(documentController)
+	documentController := &v1.DocumentController{DocumentRepository: documentRepo}
+	router := v1.SetupRouter(documentController, selectionCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

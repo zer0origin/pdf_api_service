@@ -57,9 +57,25 @@ func databaseConnection(t *testing.T) {
 func getDocumentHandler(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
 
-	request := &v2.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	request := &v1.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -70,8 +86,7 @@ func getDocumentHandler(t *testing.T) {
 	))
 
 	responseDocument := &domain.Document{}
-	err := json.NewDecoder(w.Body).Decode(responseDocument)
-	if err != nil {
+	if err := json.NewDecoder(w.Body).Decode(responseDocument); err != nil {
 		assert.FailNow(t, err.Error())
 	}
 
@@ -85,9 +100,24 @@ type UploadResponse struct {
 
 func uploadDocument(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetup", dbUser, dbPassword)
 
-	request := &v2.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+	request := &v1.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -98,9 +128,9 @@ func uploadDocument(t *testing.T) {
 	))
 
 	response := UploadResponse{}
-	err := json.NewDecoder(w.Body).Decode(&response)
-	if err != nil {
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
 		assert.FailNow(t, err.Error())
+		return
 	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
@@ -113,8 +143,23 @@ type DeleteResponse struct {
 
 func deleteDocument(t *testing.T) {
 	t.Parallel()
-	router := testutil.CreateV1RouterAndPostgresContainer(t, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
 
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"DELETE",
@@ -124,9 +169,9 @@ func deleteDocument(t *testing.T) {
 
 	fmt.Println(w.Body.String())
 	response := DeleteResponse{}
-	err := json.NewDecoder(w.Body).Decode(&response)
-	if err != nil {
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
 		assert.FailNow(t, err.Error())
+		return
 	}
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")

@@ -9,8 +9,7 @@ import (
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
 type DocumentController struct {
-	DocumentRepository  domain.DocumentRepository
-	SelectionController *SelectionController
+	DocumentRepository domain.DocumentRepository
 }
 
 // GetDocumentHandler gin handler function.

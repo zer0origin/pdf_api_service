@@ -4,15 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
-	v2 "pdf_service_api/controller/v1"
 	pg "pdf_service_api/postgres"
-	"testing"
 	"time"
 )
 
@@ -70,24 +66,4 @@ func CreateTestContainerPostgres(ctx context.Context, filename string, dbUser st
 	fmt.Printf("Postgres container listening to: %s\n", p)
 
 	return ctr, nil
-}
-
-func CreateV1RouterAndPostgresContainer(t *testing.T, fileName string, dbUser string, dbPassword string) *gin.Engine {
-	ctx := context.Background()
-	ctr, err := CreateTestContainerPostgres(ctx, fileName, dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-	t.Cleanup(CleanUp(ctx, *ctr))
-
-	dbConfig, err := CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
-
-	selectionController := &v2.SelectionController{SelectionRepository: pg.NewSelectionRepository(dbConfig)}
-	repo := pg.NewDocumentRepository(dbConfig)
-	documentController := &v2.DocumentController{DocumentRepository: repo, SelectionController: selectionController}
-	router := v2.SetupRouter(documentController)
-	return router
 }
