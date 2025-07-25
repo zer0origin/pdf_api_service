@@ -32,18 +32,33 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
-func (t SelectionController) DeleteSelectionWhereSelectionUUID(c *gin.Context) {
-	uid, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+func (t SelectionController) DeleteSelection(c *gin.Context) {
+	handleDeletion := func(id string, serviceFunction func(uid uuid.UUID) error) {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			return
+		}
+
+		err = serviceFunction(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			return
+		}
+
+		c.JSON(200, gin.H{"success": true})
 		return
 	}
 
-	err = t.SelectionRepository.DeleteSelectionBySelectionUUID(uid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
-		return
+	if id, present := c.GetQuery("selectionUUID"); present {
+		handleDeletion(id, t.SelectionRepository.DeleteSelectionBySelectionUUID)
 	}
+
+	if id, present := c.GetQuery("documentUUID"); present {
+		handleDeletion(id, t.SelectionRepository.DeleteSelectionByDocumentUUID)
+	}
+
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
 func (t SelectionController) AddSelection(c *gin.Context) {
