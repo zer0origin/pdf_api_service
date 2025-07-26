@@ -12,7 +12,7 @@ func (e EmptyDocumentRepository) DeleteDocumentById(id uuid.UUID) error {
 	panic("implement me")
 }
 
-func (e EmptyDocumentRepository) GetDocumentById(_ uuid.UUID) (domain.Document, error) {
+func (e EmptyDocumentRepository) GetDocumentByDocumentUUID(_ uuid.UUID) (domain.Document, error) {
 	panic("implement me")
 }
 

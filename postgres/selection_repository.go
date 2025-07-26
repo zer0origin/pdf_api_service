@@ -11,8 +11,12 @@ type selectionRepository struct {
 	databaseManager DatabaseHandler
 }
 
-func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
-	err := s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
+func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
+	return selectionRepository{databaseManager: db}
+}
+
+func (s selectionRepository) DeleteSelectionByDocumentUUID(uid uuid.UUID) error {
+	err := s.databaseManager.WithConnection(deleteSelectionByDocumentUUIDFunction(uid))
 	if err != nil {
 		return err
 	}
@@ -20,8 +24,13 @@ func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
 	return nil
 }
 
-func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
-	return selectionRepository{databaseManager: db}
+func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
+	err := s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s selectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.Selection, error) {
@@ -40,7 +49,6 @@ func (s selectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.
 
 func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error {
 	err := s.databaseManager.WithConnection(deleteSelectionBySelectionUUIDFunction(uid))
-
 	if err != nil {
 		return err
 	}
@@ -78,7 +86,18 @@ func deleteSelectionBySelectionUUIDFunction(uid uuid.UUID) func(db *sql.DB) erro
 	return func(db *sql.DB) error {
 		sqlStatement := `DELETE FROM selection_table WHERE "Selection_UUID" = $1`
 		_, err := db.Exec(sqlStatement, uid)
+		if err != nil {
+			return err
+		}
 
+		return nil
+	}
+}
+
+func deleteSelectionByDocumentUUIDFunction(uid uuid.UUID) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+		sqlStatement := `DELETE FROM selection_table WHERE "Document_UUID" = $1`
+		_, err := db.Exec(sqlStatement, uid)
 		if err != nil {
 			return err
 		}

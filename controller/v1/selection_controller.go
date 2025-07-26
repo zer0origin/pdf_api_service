@@ -12,7 +12,7 @@ type SelectionController struct {
 }
 
 func (t SelectionController) GetSelection(c *gin.Context) {
-	if id, present := c.GetQuery("documentUUID"); present {
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
@@ -47,15 +47,16 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 		}
 
 		c.JSON(200, gin.H{"success": true})
+	}
+
+	if id, isPresent := c.GetQuery("selectionUUID"); isPresent {
+		handleDeletion(id, t.SelectionRepository.DeleteSelectionBySelectionUUID)
 		return
 	}
 
-	if id, present := c.GetQuery("selectionUUID"); present {
-		handleDeletion(id, t.SelectionRepository.DeleteSelectionBySelectionUUID)
-	}
-
-	if id, present := c.GetQuery("documentUUID"); present {
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		handleDeletion(id, t.SelectionRepository.DeleteSelectionByDocumentUUID)
+		return
 	}
 
 	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
@@ -87,7 +88,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 }
 
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
-	c.DELETE("/:id", t.DeleteSelectionWhereSelectionUUID)
+	c.DELETE("/", t.DeleteSelection)
 	c.POST("/", t.AddSelection)
 	c.GET("/", t.GetSelection)
 }

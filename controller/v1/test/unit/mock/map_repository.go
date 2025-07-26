@@ -14,7 +14,7 @@ func (m *MapDocumentRepository) UploadDocument(document domain.Document) error {
 	return nil
 }
 
-func (m *MapDocumentRepository) GetDocumentById(uuid uuid.UUID) (domain.Document, error) {
+func (m *MapDocumentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (domain.Document, error) {
 	return m.Repo[uuid], nil
 }
 
@@ -26,6 +26,11 @@ func (m *MapDocumentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 
 type MapSelectionRepository struct {
 	Repo map[uuid.UUID]domain.Selection
+}
+
+func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(uid uuid.UUID) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (m *MapSelectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.Selection, error) {

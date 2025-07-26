@@ -10,6 +10,6 @@ type Document struct {
 
 type DocumentRepository interface {
 	UploadDocument(document Document) error
-	GetDocumentById(id uuid.UUID) (Document, error)
+	GetDocumentByDocumentUUID(id uuid.UUID) (Document, error)
 	DeleteDocumentById(id uuid.UUID) error
 }

@@ -79,7 +79,7 @@ func getDocument(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/"+ExampleUUID.String(),
+		"/api/v1/documents/?documentUUID="+ExampleUUID.String(),
 		strings.NewReader(string(requestJSON)),
 	))
 

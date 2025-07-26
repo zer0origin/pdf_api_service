@@ -14,6 +14,7 @@ type SelectionRepository interface {
 	GetSelectionsByDocumentId(uid uuid.UUID) ([]Selection, error)
 	DeleteSelectionBySelectionUUID(uid uuid.UUID) error
 	AddNewSelection(selection Selection) error
+	DeleteSelectionByDocumentUUID(uid uuid.UUID) error
 }
 
 type SelectionBounds struct {

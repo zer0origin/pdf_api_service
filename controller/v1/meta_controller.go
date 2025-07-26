@@ -77,7 +77,7 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 }
 
 func (t MetaController) GetMeta(c *gin.Context) {
-	if id, present := c.GetQuery("id"); present {
+	if id, isPresent := c.GetQuery("id"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": err})

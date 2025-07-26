@@ -82,7 +82,7 @@ func getDocumentHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/"+request.DocumentUuid.String(),
+		"/api/v1/documents/?documentUUID="+request.DocumentUuid.String(),
 		strings.NewReader(string(requestJSON)),
 	))
 
@@ -164,7 +164,7 @@ func deleteDocument(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"DELETE",
-		fmt.Sprintf("/api/v1/documents/%s", "b66fd223-515f-4503-80cc-2bdaa50ef474"),
+		fmt.Sprintf("/api/v1/documents/?documentUUID=%s", "b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		nil,
 	))
 

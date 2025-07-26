@@ -14,19 +14,24 @@ type DocumentController struct {
 
 // GetDocumentHandler gin handler function.
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
-	getUUID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+
+		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+
+		c.JSON(200, document)
 		return
 	}
 
-	document, err := t.DocumentRepository.GetDocumentById(getUUID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
-	}
-
-	c.JSON(200, document)
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
 // UploadDocumentHandler gin handler function
@@ -55,24 +60,29 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 }
 
 func (t DocumentController) DeleteDocumentHandler(c *gin.Context) {
-	deleteUUID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+
+		err = t.DocumentRepository.DeleteDocumentById(uid)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+
+		c.JSON(200, gin.H{"success": true})
 		return
 	}
 
-	err = t.DocumentRepository.DeleteDocumentById(deleteUUID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-		return
-	}
-
-	c.JSON(200, gin.H{"success": true})
+	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 
 func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
 	c.POST("/", t.UploadDocumentHandler)
 	c.PUT("/", t.UploadDocumentHandler)
-	c.GET("/:id", t.GetDocumentHandler)
-	c.DELETE("/:id", t.DeleteDocumentHandler)
+	c.GET("/", t.GetDocumentHandler)
+	c.DELETE("/", t.DeleteDocumentHandler)
 }

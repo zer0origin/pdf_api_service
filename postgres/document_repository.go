@@ -23,7 +23,7 @@ func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 	return nil
 }
 
-func (d documentRepository) GetDocumentById(uid uuid.UUID) (domain.Document, error) {
+func (d documentRepository) GetDocumentByDocumentUUID(uid uuid.UUID) (domain.Document, error) {
 	document := &domain.Document{}
 	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data domain.Document) {
 		*document = data
