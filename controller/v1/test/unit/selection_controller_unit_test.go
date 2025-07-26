@@ -30,7 +30,7 @@ func SelectionBoundsParsing(t *testing.T) {
 	mm[1] = make([]domain.SelectionBounds, 2)
 
 	toCreate := domain.Selection{
-		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
+		DocumentUUID:    func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
 		IsComplete:      false,
 		Settings:        nil,
 		SelectionBounds: &mm,
@@ -105,7 +105,7 @@ func NoSelectionBounds(t *testing.T) {
 
 	toCreate := domain.Selection{
 		Uuid:            uuid.New(),
-		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
+		DocumentUUID:    func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
 		IsComplete:      false,
 		Settings:        nil,
 		SelectionBounds: nil,

@@ -14,7 +14,7 @@ type UploadRequest struct {
 }
 
 type AddNewSelectionRequest struct {
-	DocumentID      *uuid.UUID                        `json:"documentID,omitempty"`
+	DocumentUUID    *uuid.UUID                        `json:"documentUUID,omitempty"`
 	IsComplete      bool                              `json:"isComplete,omitempty"`
 	Settings        *string                           `json:"settings,omitempty"`
 	SelectionBounds *map[int][]domain.SelectionBounds `json:"selectionBounds,omitempty"`

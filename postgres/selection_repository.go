@@ -79,7 +79,7 @@ func AddNewSelectionFunction(selection domain.Selection) func(db *sql.DB) error 
 			return errors.New("selection uuid cannot be nil")
 		}
 
-		docUid := selection.DocumentID
+		docUid := selection.DocumentUUID
 		if *docUid == uuid.Nil {
 			return errors.New("selection uuid cannot be nil")
 		}
@@ -116,7 +116,7 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []doma
 		ss := make([]domain.Selection, 0)
 		for rows.Next() {
 			data := domain.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentID, &data.SelectionBounds)
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds)
 			if err != nil {
 				return err
 			}
@@ -142,7 +142,7 @@ func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []dom
 		var ss []domain.Selection
 		for rows.Next() {
 			data := domain.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentID, &data.SelectionBounds)
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds)
 			if err != nil {
 				return err
 			}

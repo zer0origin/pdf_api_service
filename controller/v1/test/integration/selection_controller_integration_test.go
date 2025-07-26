@@ -30,7 +30,7 @@ func TestSelectionsIntegration(t *testing.T) {
 
 func getSelectionFromPresentSelectionUUID(t *testing.T) {
 	testDocumentUuidString := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
-	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
+	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
 	t.Parallel()
 
 	ctx := context.Background()
@@ -66,7 +66,7 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 
 func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 	testDocumentUuidString := "b66fd223-515f-4503-80cc-2bdaa50ef474"
-	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
+	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
 	t.Parallel()
 
 	ctx := context.Background()
@@ -299,7 +299,7 @@ func createNewSelection(t *testing.T) {
 	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	request := &v1.AddNewSelectionRequest{
-		DocumentID:      func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
+		DocumentUUID:    func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
 		IsComplete:      false,
 		Settings:        nil,
 		SelectionBounds: nil,
