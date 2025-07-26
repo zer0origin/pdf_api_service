@@ -28,7 +28,17 @@ type MapSelectionRepository struct {
 	Repo map[uuid.UUID]domain.Selection
 }
 
-func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(uid uuid.UUID) error {
+func (m *MapSelectionRepository) GetSelectionsByDocumentUUID(_ uuid.UUID) ([]domain.Selection, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MapSelectionRepository) GetSelectionsBySelectionUUID(_ uuid.UUID) ([]domain.Selection, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(_ uuid.UUID) error {
 	//TODO implement me
 	panic("implement me")
 }

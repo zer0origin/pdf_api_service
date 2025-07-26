@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -23,11 +25,17 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 
 		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			return
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				c.JSON(http.StatusNotFound, gin.H{"error": "Document with UUID " + uid.String() + " was found."})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			}
 		}
 
-		c.JSON(200, document)
+		c.JSON(200, gin.H{"document": document})
 		return
 	}
 

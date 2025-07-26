@@ -2,6 +2,7 @@ package unit
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -18,9 +19,9 @@ type UploadResponse struct {
 }
 
 func TestDocumentControllerUnit(t *testing.T) {
-	t.Run("pingRouter", pingRouter)
-	t.Run("uploadDocument", uploadDocument)
-	t.Run("getDocument", getDocument)
+	t.Run("Ping router", pingRouter)
+	t.Run("Upload a document", uploadDocument)
+	t.Run("Get document from present uuid", getDocumentFromPresentUUID)
 }
 
 func pingRouter(t *testing.T) {
@@ -60,7 +61,7 @@ func uploadDocument(t *testing.T) {
 	assert.NotEqual(t, uuid.Nil, responseUUID.DocumentUUID)
 }
 
-func getDocument(t *testing.T) {
+func getDocumentFromPresentUUID(t *testing.T) {
 	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
@@ -72,6 +73,7 @@ func getDocument(t *testing.T) {
 		SelectionData: nil,
 	}
 	repo.Repo[ExampleUUID] = ExampleDocument
+	expectedResponse := fmt.Sprintf(`{"document":{"documentUUID":"%s","pdfBase64":"%s"}}`, ExampleDocument.Uuid, *ExampleDocument.PdfBase64)
 
 	request := &v1.GetDocumentRequest{DocumentUuid: ExampleUUID}
 	requestJSON, _ := json.Marshal(request)
@@ -83,11 +85,6 @@ func getDocument(t *testing.T) {
 		strings.NewReader(string(requestJSON)),
 	))
 
-	responseDocument := &domain.Document{}
-	err := json.NewDecoder(w.Body).Decode(responseDocument)
-	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
-	assert.Equal(t, responseDocument.Uuid, ExampleDocument.Uuid, "Response uuid does not match")
-	assert.Equal(t, responseDocument.PdfBase64, ExampleDocument.PdfBase64, "Response PdfBase64 does not match")
-	assert.Equal(t, responseDocument.SelectionData, ExampleDocument.SelectionData, "Response SelectionData does not match")
+	assert.Equal(t, expectedResponse, w.Body.String())
 }

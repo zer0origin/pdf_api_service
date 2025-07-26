@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
-	"pdf_service_api/domain"
 	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
 	"strings"
@@ -21,10 +20,11 @@ var dbUser = "user"
 var dbPassword = "password"
 
 func TestDocumentIntegration(t *testing.T) {
-	t.Run("databaseConnection", databaseConnection)
-	t.Run("getDocumentHandler", getDocumentHandler)
-	t.Run("uploadDocument", uploadDocument)
-	t.Run("deleteDocument", deleteDocument)
+	t.Run("Test database connection", databaseConnection)
+	t.Run("Get document with present uuid", getDocumentWithPresentUUID)
+	t.Run("Get document with nonexistent uuid", documentWithNonexistentUUID)
+	t.Run("Upload new document", uploadDocument)
+	t.Run("Delete existing document", deleteDocument)
 }
 
 func databaseConnection(t *testing.T) {
@@ -55,8 +55,9 @@ func databaseConnection(t *testing.T) {
 	assert.True(t, databasePresent, "Database should exists")
 }
 
-func getDocumentHandler(t *testing.T) {
+func getDocumentWithPresentUUID(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+	expectedResponse := fmt.Sprintf(`{"document":{"documentUUID":"%s","pdfBase64":"Fake document for testing"}}`, documentTestUUID)
 	t.Parallel()
 
 	ctx := context.Background()
@@ -86,13 +87,44 @@ func getDocumentHandler(t *testing.T) {
 		strings.NewReader(string(requestJSON)),
 	))
 
-	responseDocument := &domain.Document{}
-	if err := json.NewDecoder(w.Body).Decode(responseDocument); err != nil {
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
+}
+
+func documentWithNonexistentUUID(t *testing.T) {
+	documentTestUUID := uuid.Nil.String()
+	expectedResponse := fmt.Sprintf(`{"error":"Document with UUID %s was found."}`, documentTestUUID)
+	t.Parallel()
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	if err != nil {
 		assert.FailNow(t, err.Error())
+		return
 	}
 
-	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
-	assert.Equal(t, documentTestUUID, responseDocument.Uuid.String(), "Response uuid does not match")
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		assert.FailNow(t, err.Error())
+		return
+	}
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	request := &v1.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
+	requestJSON, _ := json.Marshal(request)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/documents/?documentUUID="+request.DocumentUuid.String(),
+		strings.NewReader(string(requestJSON)),
+	))
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
 }
 
 type UploadResponse struct {

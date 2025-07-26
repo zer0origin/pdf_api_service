@@ -12,20 +12,29 @@ type SelectionController struct {
 }
 
 func (t SelectionController) GetSelection(c *gin.Context) {
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
+	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]domain.Selection, error)) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
 			return
 		}
 
-		results, err := t.SelectionRepository.GetSelectionsByDocumentId(uid)
+		results, err := passedServiceGetFunction(uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
 			return
 		}
 
-		c.JSON(200, results)
+		c.JSON(200, gin.H{"selections": results})
+	}
+
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
+		getSelection(id, t.SelectionRepository.GetSelectionsByDocumentUUID)
+		return
+	}
+
+	if id, isPresent := c.GetQuery("selectionUUID"); isPresent {
+		getSelection(id, t.SelectionRepository.GetSelectionsBySelectionUUID)
 		return
 	}
 
