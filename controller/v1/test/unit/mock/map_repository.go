@@ -28,26 +28,26 @@ type MapSelectionRepository struct {
 	Repo map[uuid.UUID]domain.Selection
 }
 
-func (m *MapSelectionRepository) GetSelectionsByDocumentUUID(_ uuid.UUID) ([]domain.Selection, error) {
-	//TODO implement me
-	panic("implement me")
+func (m *MapSelectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]domain.Selection, error) {
+	ss := make([]domain.Selection, 0)
+	ss = append(ss, m.Repo[uid])
+	return ss, nil
 }
 
-func (m *MapSelectionRepository) GetSelectionsBySelectionUUID(_ uuid.UUID) ([]domain.Selection, error) {
-	//TODO implement me
-	panic("implement me")
+func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(uid uuid.UUID) error {
+	for selUuid, selection := range m.Repo {
+		if selection.DocumentUUID != nil && *selection.DocumentUUID == uid {
+			delete(m.Repo, selUuid)
+		}
+	}
+
+	return nil
 }
 
-func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(_ uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *MapSelectionRepository) GetSelectionsByDocumentId(uid uuid.UUID) ([]domain.Selection, error) {
-	var ss []domain.Selection
-
+func (m *MapSelectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]domain.Selection, error) {
+	ss := make([]domain.Selection, 0)
 	for _, selection := range m.Repo {
-		if selection.DocumentID != nil && *selection.DocumentID == uid {
+		if selection.DocumentUUID != nil && *selection.DocumentUUID == uid {
 			ss = append(ss, selection)
 		}
 	}

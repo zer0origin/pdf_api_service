@@ -81,7 +81,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 
 	toCreate := domain.Selection{
 		Uuid:            uuid.New(),
-		DocumentID:      reqBody.DocumentID,
+		DocumentUUID:    reqBody.DocumentID,
 		IsComplete:      reqBody.IsComplete,
 		Settings:        reqBody.Settings,
 		SelectionBounds: reqBody.SelectionBounds,
