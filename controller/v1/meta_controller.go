@@ -89,10 +89,10 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 
 		model := models.Meta{
 			UUID:          body.UUID,
-			NumberOfPages: &body.NumberOfPages,
-			Height:        &body.Height,
-			Width:         &body.Width,
-			Images:        &body.Images,
+			NumberOfPages: body.NumberOfPages,
+			Height:        body.Height,
+			Width:         body.Width,
+			Images:        body.Images,
 		}
 
 		if err := t.MetaRepository.UpdateMeta(uid, model); err != nil {

@@ -29,10 +29,10 @@ type AddMetaRequest struct {
 
 type UpdateMetaRequest struct {
 	UUID          uuid.UUID
-	NumberOfPages uint32
-	Height        float32
-	Width         float32
-	Images        map[uint32]string
+	NumberOfPages *uint32
+	Height        *float32
+	Width         *float32
+	Images        *map[uint32]string
 }
 
 type DeleteMetaRequest struct {
