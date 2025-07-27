@@ -1,4 +1,4 @@
-package domain
+package models
 
 import "github.com/google/uuid"
 
@@ -19,9 +19,9 @@ type SelectionRepository interface {
 }
 
 type SelectionBounds struct {
-	SelectionMethod *string `json:"extract_method"` //TODO: This functionality isn't even implemented yet.
-	X1              float64 `json:"x1"`
-	X2              float64 `json:"x2"`
-	Y1              float64 `json:"y1"`
-	Y2              float64 `json:"y2"`
+	SelectionMethod *string `json:"extract_method" example:"None"`
+	X1              float64 `json:"x1" example:"43.122"`
+	X2              float64 `json:"x2" example:"13"`
+	Y1              float64 `json:"y1" example:"52.125"`
+	Y2              float64 `json:"y2" example:"27.853"`
 }

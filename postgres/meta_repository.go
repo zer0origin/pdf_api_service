@@ -2,19 +2,20 @@ package postgres
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/google/uuid"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 )
 
 type metaRepository struct {
 	DatabaseHandler DatabaseHandler
 }
 
-func NewMetaRepository(db DatabaseHandler) domain.MetaRepository {
+func NewMetaRepository(db DatabaseHandler) models.MetaRepository {
 	return metaRepository{DatabaseHandler: db}
 }
 
-func (m metaRepository) AddMeta(data domain.MetaData) error {
+func (m metaRepository) AddMeta(data models.Meta) error {
 	if err := m.DatabaseHandler.WithConnection(addMetaDataFunction(data)); err != nil {
 		return err
 	}
@@ -22,7 +23,7 @@ func (m metaRepository) AddMeta(data domain.MetaData) error {
 	return nil
 }
 
-func (m metaRepository) DeleteMeta(data domain.MetaData) error {
+func (m metaRepository) DeleteMeta(data models.Meta) error {
 	if err := m.DatabaseHandler.WithConnection(removeMetaDataFunction(data)); err != nil {
 		return err
 	}
@@ -30,29 +31,29 @@ func (m metaRepository) DeleteMeta(data domain.MetaData) error {
 	return nil
 }
 
-func (m metaRepository) UpdateMeta(data domain.MetaData) error {
-	if err := m.DatabaseHandler.WithConnection(updateMetaDataFunction(data)); err != nil {
+func (m metaRepository) UpdateMeta(uid uuid.UUID, data models.Meta) error {
+	if err := m.DatabaseHandler.WithConnection(updateMetaDataFunction(uid, data)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m metaRepository) GetMeta(uid uuid.UUID) (domain.MetaData, error) {
-	returnedData := &domain.MetaData{}
-	callbackFunction := func(data domain.MetaData) error {
+func (m metaRepository) GetMeta(uid uuid.UUID) (models.Meta, error) {
+	returnedData := &models.Meta{}
+	callbackFunction := func(data models.Meta) error {
 		*returnedData = data
 		return nil
 	}
 
 	if err := m.DatabaseHandler.WithConnection(getMetaDataFunction(uid, callbackFunction)); err != nil {
-		return domain.MetaData{}, err
+		return models.Meta{}, err
 	}
 
 	return *returnedData, nil
 }
 
-func addMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
+func addMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `INSERT INTO documentmeta_table ("Document_UUID", "Number_Of_Pages", "Height", "Width", "Images") values ($1, $2, $3, $4, $5)`
 		if _, err := db.Exec(SqlStatement, data.UUID, data.NumberOfPages, data.Height, data.Width, data.Images); err != nil {
@@ -63,7 +64,7 @@ func addMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
 	}
 }
 
-func removeMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
+func removeMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `DELETE FROM documentmeta_table WHERE "Document_UUID" = $1`
 		if _, err := db.Exec(SqlStatement, data.UUID); err != nil {
@@ -74,10 +75,15 @@ func removeMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
 	}
 }
 
-func updateMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
+func updateMetaDataFunction(uid uuid.UUID, data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `UPDATE documentmeta_table SET "Number_Of_Pages" = COALESCE($1, "Number_Of_Pages"), "Height" = COALESCE($2, "Height"), "Width" = COALESCE($3, "Width"), "Images" = COALESCE($4, "Images") where "Document_UUID" = $5`
-		if _, err := db.Exec(SqlStatement, data.NumberOfPages, data.Height, data.Width, data.Images, data.UUID); err != nil {
+		bytes, err := json.Marshal(data.Images)
+		if err != nil {
+			return err
+		}
+
+		if _, err := db.Exec(SqlStatement, data.NumberOfPages, data.Height, data.Width, string(bytes), uid); err != nil {
 			return err
 		}
 
@@ -85,9 +91,9 @@ func updateMetaDataFunction(data domain.MetaData) func(db *sql.DB) error {
 	}
 }
 
-func getMetaDataFunction(uid uuid.UUID, callback func(data domain.MetaData) error) func(db *sql.DB) error {
+func getMetaDataFunction(uid uuid.UUID, callback func(data models.Meta) error) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		meta := &domain.MetaData{}
+		meta := &models.Meta{}
 		SqlStatement := `SELECT "Document_UUID", "Number_Of_Pages", "Height", "Width", "Images" FROM documentmeta_table where "Document_UUID" = $1`
 
 		row := db.QueryRow(SqlStatement, uid)

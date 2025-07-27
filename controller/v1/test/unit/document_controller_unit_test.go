@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/controller/v1/test/unit/mock"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 	"strings"
 	"testing"
 )
@@ -25,7 +25,7 @@ func TestDocumentControllerUnit(t *testing.T) {
 }
 
 func pingRouter(t *testing.T) {
-	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
 
@@ -38,7 +38,7 @@ func pingRouter(t *testing.T) {
 }
 
 func uploadDocument(t *testing.T) {
-	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
 
@@ -62,12 +62,12 @@ func uploadDocument(t *testing.T) {
 }
 
 func getDocumentFromPresentUUID(t *testing.T) {
-	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]domain.Document)}
+	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
 
 	ExampleUUID := uuid.New()
-	ExampleDocument := domain.Document{
+	ExampleDocument := models.Document{
 		Uuid:          ExampleUUID,
 		PdfBase64:     func() *string { v := "TEMP DOCUMENT"; return &v }(),
 		SelectionData: nil,

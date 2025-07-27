@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/google/uuid"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 )
 
 type GetDocumentRequest struct {
@@ -17,7 +17,7 @@ type AddNewSelectionRequest struct {
 	DocumentUUID    *uuid.UUID                        `json:"documentUUID,omitempty"`
 	IsComplete      bool                              `json:"isComplete,omitempty"`
 	Settings        *string                           `json:"settings,omitempty"`
-	SelectionBounds *map[int][]domain.SelectionBounds `json:"selectionBounds,omitempty"`
+	SelectionBounds *map[int][]models.SelectionBounds `json:"selectionBounds,omitempty"`
 }
 
 type AddMetaRequest struct {

@@ -1,15 +1,15 @@
-package domain
+package models
 
 import "github.com/google/uuid"
 
 type MetaRepository interface {
-	AddMeta(data MetaData) error
-	DeleteMeta(data MetaData) error
-	UpdateMeta(data MetaData) error
-	GetMeta(uid uuid.UUID) (MetaData, error)
+	AddMeta(data Meta) error
+	DeleteMeta(data Meta) error
+	UpdateMeta(uid uuid.UUID, data Meta) error
+	GetMeta(uid uuid.UUID) (Meta, error)
 }
 
-type MetaData struct {
+type Meta struct {
 	UUID          uuid.UUID
 	NumberOfPages *uint32
 	Height        *float32

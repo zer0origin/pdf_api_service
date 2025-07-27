@@ -3,14 +3,14 @@ package postgres
 import (
 	"database/sql"
 	"github.com/google/uuid"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 )
 
 type documentRepository struct {
 	databaseManager DatabaseHandler
 }
 
-func NewDocumentRepository(databaseManager DatabaseHandler) domain.DocumentRepository {
+func NewDocumentRepository(databaseManager DatabaseHandler) models.DocumentRepository {
 	return documentRepository{databaseManager: databaseManager}
 }
 
@@ -23,20 +23,20 @@ func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 	return nil
 }
 
-func (d documentRepository) GetDocumentByDocumentUUID(uid uuid.UUID) (domain.Document, error) {
-	document := &domain.Document{}
-	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data domain.Document) {
+func (d documentRepository) GetDocumentByDocumentUUID(uid uuid.UUID) (models.Document, error) {
+	document := &models.Document{}
+	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data models.Document) {
 		*document = data
 	}))
 
 	if err != nil {
-		return domain.Document{}, err
+		return models.Document{}, err
 	}
 
 	return *document, nil
 }
 
-func (d documentRepository) UploadDocument(document domain.Document) error {
+func (d documentRepository) UploadDocument(document models.Document) error {
 	uploadDocumentSQL := createUploadDocumentSqlDatabase(&document) //create callback
 	err := d.databaseManager.WithConnection(uploadDocumentSQL)
 	if err != nil {
@@ -46,7 +46,7 @@ func (d documentRepository) UploadDocument(document domain.Document) error {
 	return nil
 }
 
-func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data domain.Document)) func(db *sql.DB) error {
+func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
 		rows := db.QueryRow(sqlStatement, uid)
@@ -54,7 +54,7 @@ func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data domain.Document
 			return rows.Err()
 		}
 
-		document := &domain.Document{}
+		document := &models.Document{}
 		err := rows.Scan(&document.Uuid, &document.PdfBase64)
 		if err != nil {
 			return err
@@ -65,7 +65,7 @@ func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data domain.Document
 	}
 }
 
-func createUploadDocumentSqlDatabase(document *domain.Document) func(db *sql.DB) error {
+func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`
 		_, err := db.Exec(sqlStatement, document.Uuid, document.PdfBase64)

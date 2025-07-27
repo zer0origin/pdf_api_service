@@ -2,19 +2,19 @@ package mock
 
 import (
 	"github.com/google/uuid"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 )
 
 type MapDocumentRepository struct {
-	Repo map[uuid.UUID]domain.Document
+	Repo map[uuid.UUID]models.Document
 }
 
-func (m *MapDocumentRepository) UploadDocument(document domain.Document) error {
+func (m *MapDocumentRepository) UploadDocument(document models.Document) error {
 	m.Repo[document.Uuid] = document
 	return nil
 }
 
-func (m *MapDocumentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (domain.Document, error) {
+func (m *MapDocumentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (models.Document, error) {
 	return m.Repo[uuid], nil
 }
 
@@ -25,11 +25,11 @@ func (m *MapDocumentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 }
 
 type MapSelectionRepository struct {
-	Repo map[uuid.UUID]domain.Selection
+	Repo map[uuid.UUID]models.Selection
 }
 
-func (m *MapSelectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]domain.Selection, error) {
-	ss := make([]domain.Selection, 0)
+func (m *MapSelectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]models.Selection, error) {
+	ss := make([]models.Selection, 0)
 	ss = append(ss, m.Repo[uid])
 	return ss, nil
 }
@@ -44,8 +44,8 @@ func (m *MapSelectionRepository) DeleteSelectionByDocumentUUID(uid uuid.UUID) er
 	return nil
 }
 
-func (m *MapSelectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]domain.Selection, error) {
-	ss := make([]domain.Selection, 0)
+func (m *MapSelectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]models.Selection, error) {
+	ss := make([]models.Selection, 0)
 	for _, selection := range m.Repo {
 		if selection.DocumentUUID != nil && *selection.DocumentUUID == uid {
 			ss = append(ss, selection)
@@ -60,7 +60,7 @@ func (m *MapSelectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) e
 	return nil
 }
 
-func (m *MapSelectionRepository) AddNewSelection(selection domain.Selection) error {
+func (m *MapSelectionRepository) AddNewSelection(selection models.Selection) error {
 	m.Repo[selection.Uuid] = selection
 	return nil
 }

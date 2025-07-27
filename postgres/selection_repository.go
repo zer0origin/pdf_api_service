@@ -4,18 +4,18 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/google/uuid"
-	"pdf_service_api/domain"
+	"pdf_service_api/models"
 )
 
 type selectionRepository struct {
 	databaseManager DatabaseHandler
 }
 
-func NewSelectionRepository(db DatabaseHandler) domain.SelectionRepository {
+func NewSelectionRepository(db DatabaseHandler) models.SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
 
-func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
+func (s selectionRepository) AddNewSelection(selection models.Selection) error {
 	err := s.databaseManager.WithConnection(AddNewSelectionFunction(selection))
 	if err != nil {
 		return err
@@ -24,9 +24,9 @@ func (s selectionRepository) AddNewSelection(selection domain.Selection) error {
 	return nil
 }
 
-func (s selectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]domain.Selection, error) {
-	var ss []domain.Selection
-	getSelection := getSelectionBySelectionUUIDFunction(uid, func(data []domain.Selection) {
+func (s selectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]models.Selection, error) {
+	var ss []models.Selection
+	getSelection := getSelectionBySelectionUUIDFunction(uid, func(data []models.Selection) {
 		ss = data
 	})
 
@@ -38,9 +38,9 @@ func (s selectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]doma
 	return ss, nil
 }
 
-func (s selectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]domain.Selection, error) {
-	ss := make([]domain.Selection, 0)
-	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []domain.Selection) {
+func (s selectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]models.Selection, error) {
+	ss := make([]models.Selection, 0)
+	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []models.Selection) {
 		ss = data
 	})
 
@@ -70,7 +70,7 @@ func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error
 	return nil
 }
 
-func AddNewSelectionFunction(selection domain.Selection) func(db *sql.DB) error {
+func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "isCompleted", "Settings", "Selection_bounds") values ($1, $2, $3, $4, $5);`
 
@@ -102,7 +102,7 @@ func AddNewSelectionFunction(selection domain.Selection) func(db *sql.DB) error 
 	}
 }
 
-func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []domain.Selection)) func(db *sql.DB) error {
+func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Selection_bounds" FROM selection_table where "Document_UUID" = $1`
 
@@ -112,10 +112,10 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []doma
 
 		}
 
-		//var ss []domain.Selection
-		ss := make([]domain.Selection, 0)
+		//var ss []models.Selection
+		ss := make([]models.Selection, 0)
 		for rows.Next() {
-			data := domain.Selection{}
+			data := models.Selection{}
 			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds)
 			if err != nil {
 				return err
@@ -129,7 +129,7 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []doma
 	}
 }
 
-func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []domain.Selection)) func(db *sql.DB) error {
+func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Selection_bounds" FROM selection_table where "Selection_UUID" = $1`
 
@@ -139,9 +139,9 @@ func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []dom
 
 		}
 
-		var ss []domain.Selection
+		var ss []models.Selection
 		for rows.Next() {
-			data := domain.Selection{}
+			data := models.Selection{}
 			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds)
 			if err != nil {
 				return err
