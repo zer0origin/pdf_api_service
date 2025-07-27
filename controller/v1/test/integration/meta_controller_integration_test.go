@@ -128,6 +128,7 @@ func updateMetaPresentUUID(t *testing.T) {
 
 func updateImageMetaPresentUUID(t *testing.T) {
 	testUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+	expectedStr := `{"0":"Image0","1":"Image1","2":"Image2"}`
 	t.Parallel()
 
 	ctx := context.Background()
@@ -198,7 +199,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 		assert.EqualValues(t, height, 1920)
 		assert.NotNil(t, width)
 		assert.EqualValues(t, width, 1080)
-		assert.Equal(t, images, `{"0":"Image0","1":"Image1","2":"Image2"}`)
+		assert.Equal(t, images, expectedStr)
 
 		return nil
 	})
