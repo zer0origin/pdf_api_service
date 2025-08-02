@@ -14,6 +14,46 @@ type ConfigForDatabase struct {
 	ConUrl   string
 }
 
+func (t *ConfigForDatabase) GetHost() string {
+	if len(t.Host) == 0 {
+		panic("Host variable not set for database!")
+	}
+
+	return t.Host
+}
+
+func (t *ConfigForDatabase) GetPort() string {
+	if len(t.Port) == 0 {
+		panic("Host variable not set for database!")
+	}
+
+	return t.Port
+}
+
+func (t *ConfigForDatabase) GetUsername() string {
+	if len(t.Username) == 0 {
+		panic("Host variable not set for database!")
+	}
+
+	return t.Username
+}
+
+func (t *ConfigForDatabase) GetPassword() string {
+	if len(t.Password) == 0 {
+		panic("Host variable not set for database!")
+	}
+
+	return t.Password
+}
+
+func (t *ConfigForDatabase) GetDatabase() string {
+	if len(t.Database) == 0 {
+		panic("Host variable not set for database!")
+	}
+
+	return t.Database
+}
+
 func (t *ConfigForDatabase) HostOrDefault() string {
 	if t.Host == "" {
 		fmt.Println("DATABASE_HOST environment variable not set. Using default: localhost")
