@@ -17,8 +17,10 @@ func TestDatabaseEmptyArgs(t *testing.T) {
 			Password: "",
 		}}
 
-	err := handler.WithConnection(func(db *sql.DB) error {
-		return nil
+	assert.Panics(t, func() {
+		_ = handler.WithConnection(func(db *sql.DB) error {
+			return nil
+		})
 	})
 
 	assert.Error(t, err)
