@@ -72,7 +72,7 @@ func (t *ConfigForDatabase) DatabaseOrDefault() string {
 func (t *ConfigForDatabase) GetPsqlInfo() string {
 	if t.ConUrl == "" {
 		psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			t.UserOrDefault(), t.PasswordOrDefault(), t.HostOrDefault(), t.PortOrDefault(), t.DatabaseOrDefault())
+			t.GetUsername(), t.GetPassword(), t.GetHost(), t.GetPort(), t.GetDatabase())
 
 		return psqlInfo
 	}
