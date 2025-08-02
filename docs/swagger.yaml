@@ -1,0 +1,399 @@
+definitions:
+  models.Document:
+    properties:
+      documentUUID:
+        example: ba3ca973-5052-4030-a528-39b49736d8ad
+        type: string
+      pdfBase64:
+        type: string
+      selectionData:
+        items:
+          $ref: '#/definitions/models.Selection'
+        type: array
+    type: object
+  models.Meta:
+    properties:
+      height:
+        format: float32
+        type: number
+      images:
+        additionalProperties:
+          type: string
+        type: object
+      numberOfPages:
+        format: int32
+        type: integer
+      uuid:
+        type: string
+      width:
+        format: float32
+        type: number
+    type: object
+  models.Selection:
+    properties:
+      documentUUID:
+        type: string
+      isComplete:
+        type: boolean
+      selectionBounds:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/models.SelectionBounds'
+          type: array
+        type: object
+      selectionUUID:
+        type: string
+      settings:
+        type: string
+    type: object
+  models.SelectionBounds:
+    properties:
+      extract_method:
+        example: None
+        type: string
+      x1:
+        example: 43.122
+        type: number
+      x2:
+        example: 13
+        type: number
+      y1:
+        example: 52.125
+        type: number
+      y2:
+        example: 27.853
+        type: number
+    type: object
+  v1.AddMetaRequest:
+    properties:
+      height:
+        format: float32
+        type: number
+      images:
+        additionalProperties:
+          type: string
+        type: object
+      numberOfPages:
+        format: int32
+        type: integer
+      width:
+        format: float32
+        type: number
+    type: object
+  v1.AddNewSelectionRequest:
+    properties:
+      documentUUID:
+        type: string
+      isComplete:
+        type: boolean
+      selectionBounds:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/models.SelectionBounds'
+          type: array
+        type: object
+      settings:
+        type: string
+    type: object
+  v1.DeleteMetaRequest:
+    properties:
+      uuid:
+        type: string
+    type: object
+  v1.UpdateMetaRequest:
+    properties:
+      height:
+        format: float32
+        type: number
+      images:
+        additionalProperties:
+          type: string
+        type: object
+      numberOfPages:
+        format: int32
+        type: integer
+      uuid:
+        type: string
+      width:
+        format: float32
+        type: number
+    type: object
+  v1.UploadRequest:
+    properties:
+      documentBase64String:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /documents:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a document based on the provided document UUID.
+      parameters:
+      - description: The UUID of the document to delete
+        in: query
+        name: documentUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful deletion
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad request, typically due to missing/invalid UUID or deletion
+            failure
+      summary: Delete a document
+      tags:
+      - documents
+    get:
+      consumes:
+      - application/json
+      description: get document details by its UUID
+      parameters:
+      - description: Document UUID
+        in: query
+        name: documentUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Document'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a document by UUID
+      tags:
+      - documents
+    post:
+      consumes:
+      - application/json
+      description: Uploads a document by receiving its base64 encoded string in the
+        request body.
+      parameters:
+      - description: Document upload request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful upload, returns the document UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request, typically due to invalid input or upload failure
+      summary: Upload a new document
+      tags:
+      - documents
+  /meta:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes metadata based on the provided UUID in the request body.
+      parameters:
+      - description: Metadata deletion request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteMetaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful deletion
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad request, typically due to invalid input
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Delete metadata by UUID
+      tags:
+      - meta
+    get:
+      consumes:
+      - application/json
+      description: Retrieves metadata associated with a given UUID.
+      parameters:
+      - description: The UUID of the metadata to retrieve
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of metadata
+          schema:
+            $ref: '#/definitions/models.Meta'
+        "400":
+          description: Bad request, typically due to missing/invalid UUID
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Get metadata by UUID
+      tags:
+      - meta
+    post:
+      consumes:
+      - application/json
+      description: Creates new metadata with a generated UUID.
+      parameters:
+      - description: Metadata creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddMetaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful creation, returns the metadata UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request, typically due to invalid input
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Add new metadata
+      tags:
+      - meta
+    put:
+      consumes:
+      - application/json
+      description: Updates specific fields of an existing metadata entry.
+      parameters:
+      - description: Metadata update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateMetaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful update
+        "400":
+          description: Bad request, typically due to invalid input
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Update existing metadata
+      tags:
+      - meta
+  /selections:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes selections based on a specific selection UUID or all selections
+        associated with a document UUID.
+      parameters:
+      - description: The UUID of the specific selection to delete
+        in: query
+        name: selectionUUID
+        type: string
+      - description: The UUID of the document whose selections are to be deleted
+        in: query
+        name: documentUUID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful deletion
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad request, typically due to missing/invalid UUID parameter
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Delete selections by selection or document UUID
+      tags:
+      - selections
+    get:
+      consumes:
+      - application/json
+      description: Retrieves selections based on either a document's UUID or a specific
+        selection's UUID.
+      parameters:
+      - description: The UUID of the document to retrieve selections for
+        in: query
+        name: documentUUID
+        type: string
+      - description: The UUID of the specific selection to retrieve
+        in: query
+        name: selectionUUID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of selections
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/models.Selection'
+              type: array
+            type: object
+        "400":
+          description: Bad request, typically due to missing/invalid UUID parameter
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Get selections by document or selection UUID
+      tags:
+      - selections
+    post:
+      consumes:
+      - application/json
+      description: Creates a new selection associated with a document.
+      parameters:
+      - description: Selection creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddNewSelectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful creation, returns the selection UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request, typically due to invalid input
+        "500":
+          description: Internal server error, typically due to database issues
+      summary: Add a new selection
+      tags:
+      - selections
+swagger: "2.0"

@@ -12,3 +12,5 @@ These will be the root entities and will MUST be the root of the controllers.
 - DELETE 200    /documents/:id	Delete a document.
 
 In the example above, this request is handled by the document controller as that is the main entity.
+
+Documentation can be created by using swag init.

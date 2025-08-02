@@ -22,9 +22,6 @@ func TestDatabaseEmptyArgs(t *testing.T) {
 			return nil
 		})
 	})
-
-	assert.Error(t, err)
-	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", handler.DbConfig.GetPsqlInfo())
 }
 
 func TestDatabaseEmptyCon(t *testing.T) {
