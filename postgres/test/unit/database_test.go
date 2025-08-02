@@ -2,7 +2,6 @@ package unit
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	pg "pdf_service_api/postgres"
 	"testing"
@@ -29,11 +28,9 @@ func TestDatabaseEmptyCon(t *testing.T) {
 		DbConfig: pg.ConfigForDatabase{ConUrl: ""},
 	}
 
-	err := handler.WithConnection(func(db *sql.DB) error {
-		return nil
+	assert.Panics(t, func() {
+		_ = handler.WithConnection(func(db *sql.DB) error {
+			return nil
+		})
 	})
-	fmt.Println(err)
-	assert.Error(t, err)
-	assert.Error(t, err)
-	assert.Equal(t, "postgres://user:password@localhost:5432/postgres?sslmode=disable", handler.DbConfig.GetPsqlInfo())
 }
