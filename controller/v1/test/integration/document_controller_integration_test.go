@@ -61,7 +61,7 @@ func getDocumentWithPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -97,7 +97,7 @@ func documentWithNonexistentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -150,7 +150,7 @@ func uploadDocument(t *testing.T) {
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
-	request := &v1.UploadRequest{DocumentBase64String: func() *string { v := "THIS IS A TEST DOCUMENT"; return &v }()}
+	request := &v1.UploadRequest{DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
@@ -178,7 +178,7 @@ func deleteDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return

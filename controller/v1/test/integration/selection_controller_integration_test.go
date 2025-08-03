@@ -34,7 +34,7 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -70,7 +70,7 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -105,7 +105,7 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -140,7 +140,7 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -174,7 +174,7 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -206,7 +206,7 @@ func deleteSelectionsByDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -250,7 +250,7 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -282,7 +282,7 @@ func createNewSelection(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return

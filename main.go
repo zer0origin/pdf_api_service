@@ -8,14 +8,19 @@ import (
 )
 
 var (
-	dbUser     string = os.Getenv("DATABASE_USER")
-	dbPassword string = os.Getenv("DATABASE_PASSWORD")
-	dbPort     string = os.Getenv("DATABASE_PORT")
-	dbHost     string = os.Getenv("DATABASE_HOST")
-	dbDatabase string = os.Getenv("DATABASE_DB")
+	dbUser     = os.Getenv("DATABASE_USER")
+	dbPassword = os.Getenv("DATABASE_PASSWORD")
+	dbPort     = os.Getenv("DATABASE_PORT")
+	dbHost     = os.Getenv("DATABASE_HOST")
+	dbDatabase = os.Getenv("DATABASE_DB")
 )
 
 func main() {
+	errHandleFunction := func(str string) {
+		panic("Database login credentials must be present.")
+	}
+	mustNotBeEmpty(errHandleFunction, dbUser, dbPassword, dbPort, dbHost, dbDatabase)
+
 	dbHandler := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{
 		Host:     dbHost,
 		Port:     dbPort,
@@ -30,4 +35,12 @@ func main() {
 
 	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl)
 	log.Fatal(router.Run(":8080"))
+}
+
+func mustNotBeEmpty(errorHandle func(string), a ...string) {
+	for _, s := range a {
+		if len(s) == 0 {
+			errorHandle(s)
+		}
+	}
 }

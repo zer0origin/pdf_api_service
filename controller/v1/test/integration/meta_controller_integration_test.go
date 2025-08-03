@@ -28,7 +28,7 @@ func getMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -60,7 +60,7 @@ func updateMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return
@@ -132,7 +132,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetupWithOneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
 	if err != nil {
 		assert.FailNow(t, err.Error())
 		return

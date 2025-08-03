@@ -10,7 +10,7 @@ type GetDocumentRequest struct {
 }
 
 type UploadRequest struct {
-	DocumentBase64String *string `json:"documentBase64String"`
+	DocumentBase64String string `json:"documentBase64String"`
 }
 
 type AddNewSelectionRequest struct {
