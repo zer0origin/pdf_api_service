@@ -53,7 +53,7 @@ func databaseConnection(t *testing.T) {
 }
 
 func getDocumentWithPresentUUID(t *testing.T) {
-	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
 	expectedResponse := fmt.Sprintf(`{"document":{"documentUUID":"%s","pdfBase64":"Fake document for testing"}}`, documentTestUUID)
 	t.Parallel()
 
@@ -68,13 +68,13 @@ func getDocumentWithPresentUUID(t *testing.T) {
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
-	request := &v1.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
+	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/?documentUUID="+request.DocumentUuid.String(),
+		"/api/v1/documents/?documentUUID="+request.DocumentUUID.String(),
 		strings.NewReader(string(requestJSON)),
 	))
 
@@ -83,7 +83,7 @@ func getDocumentWithPresentUUID(t *testing.T) {
 }
 
 func documentWithNonexistentUUID(t *testing.T) {
-	documentTestUUID := uuid.Nil.String()
+	documentTestUUID := uuid.MustParse(uuid.Nil.String())
 	expectedResponse := fmt.Sprintf(`{"error":"Document with UUID %s was found."}`, documentTestUUID)
 	t.Parallel()
 
@@ -98,13 +98,13 @@ func documentWithNonexistentUUID(t *testing.T) {
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
-	request := &v1.GetDocumentRequest{DocumentUuid: uuid.MustParse(documentTestUUID)}
+	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/?documentUUID="+request.DocumentUuid.String(),
+		"/api/v1/documents/?documentUUID="+request.DocumentUUID.String(),
 		strings.NewReader(string(requestJSON)),
 	))
 
@@ -140,10 +140,8 @@ func uploadDocument(t *testing.T) {
 	))
 
 	response := UploadResponse{}
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
 	assert.NotEqual(t, uuid.Nil, response.DocumentUUID)

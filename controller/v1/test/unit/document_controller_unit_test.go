@@ -75,7 +75,7 @@ func getDocumentFromPresentUUID(t *testing.T) {
 	repo.Repo[ExampleUUID] = ExampleDocument
 	expectedResponse := fmt.Sprintf(`{"document":{"documentUUID":"%s","pdfBase64":"%s"}}`, ExampleDocument.Uuid, *ExampleDocument.PdfBase64)
 
-	request := &v1.GetDocumentRequest{DocumentUuid: ExampleUUID}
+	request := &v1.GetDocumentRequest{DocumentUUID: &ExampleUUID}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()

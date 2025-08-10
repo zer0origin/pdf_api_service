@@ -56,6 +56,10 @@ func getMetaPresentUUID(t *testing.T) {
 	assert.Equal(t, w.Body.String(), string(bytes))
 }
 
+func getMetaPresentOwnerUUID(t *testing.T) {
+
+}
+
 func updateMetaPresentUUID(t *testing.T) {
 	testUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()

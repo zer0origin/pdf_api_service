@@ -6,11 +6,14 @@ import (
 )
 
 type GetDocumentRequest struct {
-	DocumentUuid uuid.UUID `json:"document_uuid"`
+	DocumentUUID *uuid.UUID `json:"document_uuid"`
+	OwnerUUID    *uuid.UUID `json:"ownerUUID"`
 }
 
 type CreateRequest struct {
 	DocumentBase64String string `json:"documentBase64String"`
+	OwnerUUID            *uuid.UUID
+	OwnerType            *string
 }
 
 type AddNewSelectionRequest struct {
@@ -25,8 +28,6 @@ type AddMetaRequest struct {
 	Height        *float32
 	Width         *float32
 	Images        *map[uint32]string
-	OwnerUUID     *uuid.UUID
-	OwnerType     *string
 }
 
 type UpdateMetaRequest struct {
@@ -35,8 +36,6 @@ type UpdateMetaRequest struct {
 	Height        *float32
 	Width         *float32
 	Images        *map[uint32]string
-	OwnerUUID     *uuid.UUID
-	OwnerType     *string
 }
 
 type DeleteMetaRequest struct {
