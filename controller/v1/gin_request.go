@@ -25,6 +25,8 @@ type AddMetaRequest struct {
 	Height        *float32
 	Width         *float32
 	Images        *map[uint32]string
+	OwnerUUID     *uuid.UUID
+	OwnerType     *string
 }
 
 type UpdateMetaRequest struct {
@@ -33,6 +35,8 @@ type UpdateMetaRequest struct {
 	Height        *float32
 	Width         *float32
 	Images        *map[uint32]string
+	OwnerUUID     *uuid.UUID
+	OwnerType     *string
 }
 
 type DeleteMetaRequest struct {
