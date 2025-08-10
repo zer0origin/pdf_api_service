@@ -35,18 +35,19 @@ func CleanUp(ctx context.Context, ctr postgres.PostgresContainer) func() {
 	}
 }
 
-func CreateTestContainerPostgres(ctx context.Context, filename string, dbUser string, dbPassword string) (ctr *postgres.PostgresContainer, err error) {
+func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string, filename string) (ctr *postgres.PostgresContainer, err error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
+	basicScript := wd + "/test-container/sql/BasicSetup.sql"
 	sqlScript := wd + "/test-container/sql/" + filename + ".sql"
 
 	ctr, err = postgres.Run(
 		ctx,
 		"postgres:16-alpine",
-		postgres.WithInitScripts(sqlScript),
+		postgres.WithOrderedInitScripts(basicScript, sqlScript),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
 		testcontainers.WithWaitStrategy(wait.ForLog("database system is ready to accept connections").

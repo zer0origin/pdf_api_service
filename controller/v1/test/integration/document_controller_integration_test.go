@@ -31,7 +31,7 @@ func TestDocumentIntegration(t *testing.T) {
 func databaseConnection(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "BasicSetup")
 	require.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
@@ -58,7 +58,7 @@ func getDocumentWithPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -88,7 +88,7 @@ func documentWithNonexistentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -120,7 +120,7 @@ func uploadDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "BasicSetup")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -155,7 +155,7 @@ func deleteDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")

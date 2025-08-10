@@ -35,7 +35,7 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -65,7 +65,7 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -94,7 +94,7 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -123,7 +123,7 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -151,7 +151,7 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -177,7 +177,7 @@ func deleteSelectionsByDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -215,7 +215,7 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -241,7 +241,7 @@ func createNewSelection(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
