@@ -35,7 +35,7 @@ func getMetaPresentUUID(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -61,7 +61,7 @@ func updateMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -124,7 +124,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")

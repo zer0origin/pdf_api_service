@@ -41,7 +41,7 @@ func databaseConnection(t *testing.T) {
 
 	t.Parallel()
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "BasicSetup")
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	require.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
@@ -68,7 +68,7 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -95,7 +95,7 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -125,7 +125,7 @@ func getDocumentWithOwnerUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "UserTable")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -154,7 +154,7 @@ func uploadDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "BasicSetup")
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
@@ -189,7 +189,7 @@ func deleteDocument(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
 	dbHandle, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)

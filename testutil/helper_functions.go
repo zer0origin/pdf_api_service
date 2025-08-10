@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/testcontainers/testcontainers-go"
@@ -41,19 +42,16 @@ func CleanUp(ctx context.Context, ctr postgres.PostgresContainer) func() {
 	}
 }
 
-func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string, filename string) (ctr *postgres.PostgresContainer, err error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
+var basicScriptSqlContents string
 
-	basicScript := wd + "/test-container/sql/BasicSetup.sql"
-	sqlScript := wd + "/test-container/sql/" + filename + ".sql"
+func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string) (ctr *postgres.PostgresContainer, err error) {
+	return CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "")
+}
+func CreateTestContainerPostgresWithInitFileName(ctx context.Context, dbUser string, dbPassword string, initScript string) (ctr *postgres.PostgresContainer, err error) {
 
 	ctr, err = postgres.Run(
 		ctx,
 		"postgres:16-alpine",
-		postgres.WithOrderedInitScripts(basicScript, sqlScript),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
 		testcontainers.WithWaitStrategy(wait.ForLog("database system is ready to accept connections").
@@ -72,5 +70,35 @@ func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword 
 	p, _ := ctr.MappedPort(ctx, "5432")
 	fmt.Printf("Postgres container listening to: %s\n", p)
 
-	return ctr, nil
+	databaseHandler, err := CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = databaseHandler.RunInitScript()
+	if err != nil {
+		return nil, err
+	}
+
+	if initScript == "" {
+		return ctr, nil
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	sqlScript := wd + "/test-container/sql/" + initScript + ".sql"
+	bytes, err := os.ReadFile(sqlScript)
+	if err != nil {
+		return nil, err
+	}
+
+	err = databaseHandler.WithConnection(func(db *sql.DB) error {
+		_, err := db.Exec(string(bytes))
+		return err
+	})
+
+	return ctr, err
 }
