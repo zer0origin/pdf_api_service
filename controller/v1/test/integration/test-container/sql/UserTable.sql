@@ -1,0 +1,3 @@
+insert into document_table values (uuid('b66fd223-515f-4503-80cc-2bdaa50ef474'), 'Fake document for testing', uuid('4ce6af41-6cb5-4b02-a671-9fce16ea688d'), 1);
+insert into document_table values (uuid('489fc81f-a087-457e-b8b4-ef9ad571d954'), '2', uuid('4ce6af41-6cb5-4b02-a671-9fce16ea688d'), 1);
+insert into document_table values (uuid('b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b'), '3', uuid('4ce6af41-6cb5-4b02-a671-9fce16ea688d'), 1);
