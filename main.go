@@ -29,6 +29,11 @@ func main() {
 		Database: dbDatabase,
 	}}
 
+	err := dbHandler.RunInitScript()
+	if err != nil {
+		panic(err)
+	}
+
 	documentCtrl := &v1.DocumentController{DocumentRepository: pg.NewDocumentRepository(dbHandler)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: pg.NewSelectionRepository(dbHandler)}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandler)}

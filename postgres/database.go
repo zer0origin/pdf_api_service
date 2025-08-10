@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	_ "embed"
 	"fmt"
 )
 
@@ -40,4 +41,20 @@ func (t *DatabaseHandler) WithConnection(callback createdCallback) error {
 	}(db)
 
 	return nil
+}
+
+//go:embed SqlScripts/BasicSetup.sql
+var sqlScript string
+
+func (t *DatabaseHandler) RunInitScript() error {
+	err := t.WithConnection(func(db *sql.DB) error {
+		_, err := db.Exec(sqlScript)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return err
 }

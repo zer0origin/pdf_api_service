@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/postgres"
 	"pdf_service_api/testutil"
@@ -30,6 +32,13 @@ func TestDocumentIntegration(t *testing.T) {
 }
 
 func databaseConnection(t *testing.T) {
+	wd, err := os.Getwd()
+	rd, err := os.Executable()
+	dir := filepath.Dir(rd)
+	fmt.Printf("%s", wd)
+	fmt.Printf("%s", rd)
+	fmt.Printf("%s", dir)
+
 	t.Parallel()
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "BasicSetup")
@@ -183,10 +192,9 @@ func deleteDocument(t *testing.T) {
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 
-	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	dbHandle, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 	w := httptest.NewRecorder()

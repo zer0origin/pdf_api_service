@@ -23,6 +23,12 @@ func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.Pos
 			ConUrl: connectionString,
 		}}
 
+	err = dbConfig.RunInitScript()
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(err)
+	}
+
 	return dbConfig, nil
 }
 
