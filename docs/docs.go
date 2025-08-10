@@ -33,15 +33,23 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Document UUID",
                         "name": "documentUUID",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Owner UUID",
+                        "name": "ownerUUID",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Document"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Document"
+                            }
                         }
                     },
                     "400": {
@@ -74,7 +82,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadRequest"
+                            "$ref": "#/definitions/v1.CreateRequest"
                         }
                     }
                 ],
@@ -428,6 +436,12 @@ const docTemplate = `{
                     "type": "string",
                     "example": "ba3ca973-5052-4030-a528-39b49736d8ad"
                 },
+                "ownerType": {
+                    "type": "string"
+                },
+                "ownerUUID": {
+                    "type": "string"
+                },
                 "pdfBase64": {
                     "type": "string"
                 },
@@ -455,6 +469,12 @@ const docTemplate = `{
                 "numberOfPages": {
                     "type": "integer",
                     "format": "int32"
+                },
+                "ownerType": {
+                    "type": "string"
+                },
+                "ownerUUID": {
+                    "type": "string"
                 },
                 "uuid": {
                     "type": "string"
@@ -562,6 +582,20 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.CreateRequest": {
+            "type": "object",
+            "properties": {
+                "documentBase64String": {
+                    "type": "string"
+                },
+                "ownerType": {
+                    "type": "string"
+                },
+                "ownerUUID": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.DeleteMetaRequest": {
             "type": "object",
             "properties": {
@@ -593,14 +627,6 @@ const docTemplate = `{
                 "width": {
                     "type": "number",
                     "format": "float32"
-                }
-            }
-        },
-        "v1.UploadRequest": {
-            "type": "object",
-            "properties": {
-                "documentBase64String": {
-                    "type": "string"
                 }
             }
         }

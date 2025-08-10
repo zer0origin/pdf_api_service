@@ -20,8 +20,9 @@ type DocumentController struct {
 // @Tags documents
 // @Accept json
 // @Produce json
-// @Param documentUUID query string true "Document UUID"
-// @Success 200 {object} models.Document // Assuming you have a Document struct defined for your response
+// @Param documentUUID query string false "Document UUID"
+// @Param ownerUUID query string false "Owner UUID"
+// @Success 200 {object} []models.Document
 // @Failure 400 "Bad Request"
 // @Failure 404 "Not Found"
 // @Failure 500 "Internal Server Error"
@@ -46,7 +47,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			}
 		}
 
-		c.JSON(200, gin.H{"document": document})
+		c.JSON(200, gin.H{"documents": []models.Document{document}})
 		return
 	}
 
@@ -69,7 +70,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			}
 		}
 
-		c.JSON(200, gin.H{"document": documents})
+		c.JSON(200, gin.H{"documents": documents})
 		return
 	}
 

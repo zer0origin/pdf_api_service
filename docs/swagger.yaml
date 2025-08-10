@@ -4,6 +4,10 @@ definitions:
       documentUUID:
         example: ba3ca973-5052-4030-a528-39b49736d8ad
         type: string
+      ownerType:
+        type: string
+      ownerUUID:
+        type: string
       pdfBase64:
         type: string
       selectionData:
@@ -23,6 +27,10 @@ definitions:
       numberOfPages:
         format: int32
         type: integer
+      ownerType:
+        type: string
+      ownerUUID:
+        type: string
       uuid:
         type: string
       width:
@@ -95,6 +103,15 @@ definitions:
       settings:
         type: string
     type: object
+  v1.CreateRequest:
+    properties:
+      documentBase64String:
+        type: string
+      ownerType:
+        type: string
+      ownerUUID:
+        type: string
+    type: object
   v1.DeleteMetaRequest:
     properties:
       uuid:
@@ -117,11 +134,6 @@ definitions:
       width:
         format: float32
         type: number
-    type: object
-  v1.UploadRequest:
-    properties:
-      documentBase64String:
-        type: string
     type: object
 info:
   contact: {}
@@ -160,7 +172,10 @@ paths:
       - description: Document UUID
         in: query
         name: documentUUID
-        required: true
+        type: string
+      - description: Owner UUID
+        in: query
+        name: ownerUUID
         type: string
       produces:
       - application/json
@@ -168,7 +183,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Document'
+            items:
+              $ref: '#/definitions/models.Document'
+            type: array
         "400":
           description: Bad Request
         "404":
@@ -189,7 +206,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.UploadRequest'
+          $ref: '#/definitions/v1.CreateRequest'
       produces:
       - application/json
       responses:

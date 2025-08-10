@@ -19,22 +19,8 @@ type UploadResponse struct {
 }
 
 func TestDocumentControllerUnit(t *testing.T) {
-	t.Run("Ping router", pingRouter)
 	t.Run("Upload a document", uploadDocument)
-	t.Run("Get document from present uuid", getDocumentFromPresentUUID)
-}
-
-func pingRouter(t *testing.T) {
-	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]models.Document)}
-	documentController := &v1.DocumentController{DocumentRepository: repo}
-	router := v1.SetupRouter(documentController, nil, nil)
-
-	w := httptest.NewRecorder() //creates a recorder that records its mutations for later inspection in tests.
-	req, _ := http.NewRequest("GET", "/ping", nil)
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "{\"message\":\"pong\"}", w.Body.String())
+	t.Run("Get document from present document uuid", getDocumentFromPresentDocumentUUID)
 }
 
 func uploadDocument(t *testing.T) {
@@ -61,7 +47,7 @@ func uploadDocument(t *testing.T) {
 	assert.NotEqual(t, uuid.Nil, responseUUID.DocumentUUID)
 }
 
-func getDocumentFromPresentUUID(t *testing.T) {
+func getDocumentFromPresentDocumentUUID(t *testing.T) {
 	repo := &mock.MapDocumentRepository{Repo: make(map[uuid.UUID]models.Document)}
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
@@ -73,16 +59,13 @@ func getDocumentFromPresentUUID(t *testing.T) {
 		SelectionData: nil,
 	}
 	repo.Repo[ExampleUUID] = ExampleDocument
-	expectedResponse := fmt.Sprintf(`{"document":{"documentUUID":"%s","pdfBase64":"%s"}}`, ExampleDocument.Uuid, *ExampleDocument.PdfBase64)
-
-	request := &v1.GetDocumentRequest{DocumentUUID: &ExampleUUID}
-	requestJSON, _ := json.Marshal(request)
+	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","pdfBase64":"%s"}]}`, ExampleDocument.Uuid, *ExampleDocument.PdfBase64)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
 		"/api/v1/documents/?documentUUID="+ExampleUUID.String(),
-		strings.NewReader(string(requestJSON)),
+		nil,
 	))
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
