@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
@@ -35,16 +36,10 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -71,16 +66,10 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -106,16 +95,10 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -141,16 +124,10 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -175,16 +152,10 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -207,16 +178,10 @@ func deleteSelectionsByDocumentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -251,16 +216,10 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}
@@ -283,16 +242,10 @@ func createNewSelection(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryAndTwoSelections", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandle)}

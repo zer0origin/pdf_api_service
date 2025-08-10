@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
@@ -29,16 +30,10 @@ func getMetaPresentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
@@ -61,16 +56,10 @@ func updateMetaPresentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
@@ -85,10 +74,7 @@ func updateMetaPresentUUID(t *testing.T) {
 	}
 
 	requestJSON, err := json.Marshal(newData)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -133,16 +119,10 @@ func updateImageMetaPresentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
@@ -162,10 +142,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	}
 
 	requestJSON, err := json.Marshal(newData)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
@@ -69,9 +70,7 @@ func SelectionBoundsParsing(t *testing.T) {
 	}
 
 	jsonByteData, err := json.Marshal(toCreate)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
+	require.NoError(t, err)
 
 	documentRepo := &mock.EmptyDocumentRepository{}
 	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]models.Selection)}
@@ -90,10 +89,7 @@ func SelectionBoundsParsing(t *testing.T) {
 
 	response := addSelectionResponse{}
 	err = json.NewDecoder(w.Body).Decode(&response)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	storedData := selectionRepo.Repo[response.SelectionUUID]
 	assert.NotEqual(t, uuid.Nil, storedData.Uuid)
@@ -112,9 +108,7 @@ func NoSelectionBounds(t *testing.T) {
 	}
 
 	jsonByteData, err := json.Marshal(toCreate)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
+	require.NoError(t, err)
 
 	documentRepo := &mock.EmptyDocumentRepository{}
 	selectionRepo := &mock.MapSelectionRepository{Repo: make(map[uuid.UUID]models.Selection)}
@@ -133,10 +127,7 @@ func NoSelectionBounds(t *testing.T) {
 
 	response := addSelectionResponse{}
 	err = json.NewDecoder(w.Body).Decode(&response)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	storedData := selectionRepo.Repo[response.SelectionUUID]
 	assert.NotEqual(t, uuid.Nil, storedData.Uuid)

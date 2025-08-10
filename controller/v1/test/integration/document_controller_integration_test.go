@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
@@ -31,15 +32,11 @@ func databaseConnection(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
+	require.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-	}
+	require.NoError(t, err)
 
 	var databasePresent bool
 	err = dbConfig.WithConnection(func(db *sql.DB) error { //This checks that the tables from the init script were created.
@@ -62,16 +59,10 @@ func getDocumentWithPresentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
@@ -98,16 +89,10 @@ func documentWithNonexistentUUID(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
@@ -136,16 +121,10 @@ func uploadDocument(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "BasicSetup", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
@@ -179,16 +158,10 @@ func deleteDocument(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntry", dbUser, dbPassword)
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		assert.FailNow(t, err.Error())
-		return
-	}
+	require.NoError(t, err)
 
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
