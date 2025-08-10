@@ -6,14 +6,14 @@ import (
 )
 
 type GetDocumentRequest struct {
-	DocumentUUID *uuid.UUID `json:"document_uuid"`
+	DocumentUUID *uuid.UUID `json:"documentUUID"`
 	OwnerUUID    *uuid.UUID `json:"ownerUUID"`
 }
 
 type CreateRequest struct {
-	DocumentBase64String string `json:"documentBase64String"`
-	OwnerUUID            *uuid.UUID
-	OwnerType            *string
+	DocumentBase64String string     `json:"documentBase64String"`
+	OwnerUUID            *uuid.UUID `json:"ownerUUID"`
+	OwnerType            *string    `json:"ownerType"`
 }
 
 type AddNewSelectionRequest struct {

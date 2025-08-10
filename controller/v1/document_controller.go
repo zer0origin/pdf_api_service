@@ -50,6 +50,29 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		return
 	}
 
+	if id, isPresent := c.GetQuery("ownerUUID"); isPresent {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+
+		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid)
+		if err != nil {
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				c.JSON(http.StatusNotFound, gin.H{"error": "Document with UUID " + uid.String() + " was found."})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			}
+		}
+
+		c.JSON(200, gin.H{"document": document})
+		return
+	}
+
 	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
 }
 

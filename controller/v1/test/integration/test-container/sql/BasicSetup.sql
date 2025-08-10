@@ -4,8 +4,8 @@ create table if not exists document_table
         constraint "Document_Table_pk"
             primary key,
     "Document_Base64" text not null,
-    "OwnerUUID"       uuid,
-    "OwnerType"       int2
+    "Owner_UUID"       uuid,
+    "Owner_Type"       int2
 );
 
 create table if not exists documentmeta_table

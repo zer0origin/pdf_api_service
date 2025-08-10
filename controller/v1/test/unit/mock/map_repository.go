@@ -9,6 +9,17 @@ type MapDocumentRepository struct {
 	Repo map[uuid.UUID]models.Document
 }
 
+func (m *MapDocumentRepository) GetDocumentByOwnerUUID(uid uuid.UUID) ([]models.Document, error) {
+	ss := make([]models.Document, 0)
+	for _, selection := range m.Repo {
+		if selection.OwnerUUID != nil && *selection.OwnerUUID == uid {
+			ss = append(ss, selection)
+		}
+	}
+
+	return ss, nil
+}
+
 func (m *MapDocumentRepository) UploadDocument(document models.Document) error {
 	m.Repo[document.Uuid] = document
 	return nil

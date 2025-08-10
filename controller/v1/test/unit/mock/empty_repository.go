@@ -8,6 +8,11 @@ import (
 type EmptyDocumentRepository struct {
 }
 
+func (e EmptyDocumentRepository) GetDocumentByOwnerUUID(id uuid.UUID) ([]models.Document, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (e EmptyDocumentRepository) DeleteDocumentById(_ uuid.UUID) error {
 	panic("implement me")
 }

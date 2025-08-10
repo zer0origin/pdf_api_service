@@ -23,9 +23,21 @@ func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 	return nil
 }
 
-func (d documentRepository) GetDocumentByDocumentUUID(uid uuid.UUID) (models.Document, error) {
+func (d documentRepository) GetDocumentByOwnerUUID(uuid uuid.UUID) ([]models.Document, error) {
+	ss := make([]models.Document, 0)
+	err := d.databaseManager.WithConnection(getDocumentByOwnerUUIDFunction(uuid, func(data []models.Document) {
+		ss = data
+	}))
+	if err != nil {
+		return ss, err
+	}
+
+	return ss, nil
+}
+
+func (d documentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (models.Document, error) {
 	document := &models.Document{}
-	err := d.databaseManager.WithConnection(getDocumentByUUIDFunction(uid, func(data models.Document) {
+	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(uuid, func(data models.Document) {
 		*document = data
 	}))
 
@@ -46,21 +58,46 @@ func (d documentRepository) UploadDocument(document models.Document) error {
 	return nil
 }
 
-func getDocumentByUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
+func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Base64" FROM document_table WHERE "Document_UUID" = $1`
+		sqlStatement := `SELECT "Document_UUID", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Document_UUID" = $1`
 		rows := db.QueryRow(sqlStatement, uid)
 		if rows.Err() != nil {
 			return rows.Err()
 		}
 
-		document := &models.Document{}
-		err := rows.Scan(&document.Uuid, &document.PdfBase64)
+		document := models.Document{}
+		err := rows.Scan(&document.Uuid, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
 		if err != nil {
 			return err
 		}
 
-		callback(*document)
+		callback(document)
+		return nil
+	}
+}
+
+func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.Document)) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+		sqlStatement := `SELECT "Document_UUID", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1`
+		rows, err := db.Query(sqlStatement, uid)
+		if err != nil {
+			return rows.Err()
+		}
+
+		dd := make([]models.Document, 0)
+
+		for rows.Next() {
+			document := models.Document{}
+			err := rows.Scan(&document.Uuid, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
+			if err != nil {
+				return err
+			}
+
+			dd = append(dd, document)
+		}
+
+		callback(dd)
 		return nil
 	}
 }
