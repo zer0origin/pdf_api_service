@@ -38,7 +38,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
-				c.JSON(http.StatusNotFound, gin.H{"error": "Document with UUID " + uid.String() + " was found."})
+				c.JSON(http.StatusNotFound, gin.H{"error": "Document with Document UUID " + uid.String() + " was found."})
 				return
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -57,11 +57,11 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			return
 		}
 
-		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid)
+		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
-				c.JSON(http.StatusNotFound, gin.H{"error": "Document with UUID " + uid.String() + " was found."})
+				c.JSON(http.StatusNotFound, gin.H{"error": "Document with Owner UUID " + uid.String() + " was found."})
 				return
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -69,7 +69,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			}
 		}
 
-		c.JSON(200, gin.H{"document": document})
+		c.JSON(200, gin.H{"document": documents})
 		return
 	}
 
