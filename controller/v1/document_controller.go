@@ -54,7 +54,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 }
 
 // UploadDocumentHandler handles the HTTP POST request to upload a new document.
-// It expects a JSON request body conforming to the UploadRequest struct,
+// It expects a JSON request body conforming to the CreateRequest struct,
 // which should contain the document's base64 encoded string.
 //
 // Upon successful upload, it returns a 200 OK status with the UUID of the
@@ -66,12 +66,12 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 // @Tags documents
 // @Accept  json
 // @Produce  json
-// @Param   request body v1.UploadRequest true "Document upload request"
+// @Param   request body v1.CreateRequest true "Document upload request"
 // @Success 200 {object} map[string]string "Successful upload, returns the document UUID"
 // @Failure 400 "Bad request, typically due to invalid input or upload failure"
 // @Router /documents [post]
 func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
-	body := &UploadRequest{}
+	body := &CreateRequest{}
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {

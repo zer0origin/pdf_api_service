@@ -42,7 +42,7 @@ func uploadDocument(t *testing.T) {
 	documentController := &v1.DocumentController{DocumentRepository: repo}
 	router := v1.SetupRouter(documentController, nil, nil)
 
-	data := v1.UploadRequest{
+	data := v1.CreateRequest{
 		DocumentBase64String: "TEMP DOCUMENT",
 	}
 	documentJSON, _ := json.Marshal(data)

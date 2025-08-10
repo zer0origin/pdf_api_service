@@ -129,7 +129,7 @@ func uploadDocument(t *testing.T) {
 	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
-	request := &v1.UploadRequest{DocumentBase64String: "THIS IS A TEST DOCUMENT"}
+	request := &v1.CreateRequest{DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
 
 	w := httptest.NewRecorder()

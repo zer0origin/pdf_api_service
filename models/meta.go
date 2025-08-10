@@ -15,4 +15,6 @@ type Meta struct {
 	Height        *float32
 	Width         *float32
 	Images        *map[uint32]string
+	OwnerUUID     *uuid.UUID
+	OwnerType     *string
 }

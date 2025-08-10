@@ -24,9 +24,15 @@ func TestMetaIntegration(t *testing.T) {
 }
 
 func getMetaPresentUUID(t *testing.T) {
-	testUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
-	expected := "{\"UUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"NumberOfPages\":31,\"Height\":1920,\"Width\":1080,\"Images\":null}"
 	t.Parallel()
+	expectedObj := models.Meta{
+		UUID:          uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
+		NumberOfPages: func() *uint32 { v := uint32(31); return &v }(),
+		Height:        func() *float32 { v := float32(1920); return &v }(),
+		Width:         func() *float32 { v := float32(1080); return &v }(),
+	}
+	bytes, err := json.Marshal(expectedObj)
+	require.NoError(t, err)
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, "OneDocumentTableEntryTwoSelectionsAndMetaData", dbUser, dbPassword)
@@ -42,12 +48,12 @@ func getMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/meta/?metaUUID="+testUUID,
+		"/api/v1/meta/?metaUUID="+expectedObj.UUID.String(),
 		nil,
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.Equal(t, w.Body.String(), expected)
+	assert.Equal(t, w.Body.String(), string(bytes))
 }
 
 func updateMetaPresentUUID(t *testing.T) {
