@@ -105,6 +105,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	newModel := models.Document{
 		Uuid:          uuid.New(),
+		DocumentTitle: body.DocumentTitle,
 		PdfBase64:     &body.DocumentBase64String,
 		SelectionData: nil,
 	}
