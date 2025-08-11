@@ -42,8 +42,6 @@ func CleanUp(ctx context.Context, ctr postgres.PostgresContainer) func() {
 	}
 }
 
-var basicScriptSqlContents string
-
 func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string) (ctr *postgres.PostgresContainer, err error) {
 	return CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "")
 }
