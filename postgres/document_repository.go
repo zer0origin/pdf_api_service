@@ -104,7 +104,7 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.D
 
 func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `insert into document_table values ($1, $2) returning "Document_UUID"`
+		sqlStatement := `insert into document_table("Document_UUID", "Document_Base64") values ($1, $2) returning "Document_UUID"`
 		_, err := db.Exec(sqlStatement, document.Uuid, document.PdfBase64)
 
 		if err != nil {
