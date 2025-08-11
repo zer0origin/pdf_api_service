@@ -15,7 +15,7 @@ type DocumentController struct {
 }
 
 // GetDocumentHandler godoc
-// @Summary Get a document by UUID
+// @Summary Get documents
 // @Description get document details by its UUID
 // @Tags documents
 // @Accept json

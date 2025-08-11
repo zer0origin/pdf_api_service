@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	v1 "pdf_service_api/controller/v1"
@@ -31,6 +32,7 @@ func main() {
 
 	err := dbHandler.RunInitScript()
 	if err != nil {
+		err = fmt.Errorf("failed to run init script: %s", err)
 		panic(err)
 	}
 
