@@ -3,10 +3,11 @@ create table if not exists document_table
     "Document_UUID"   uuid not null
         constraint "Document_Table_pk"
             primary key,
-    "Document_Title" text,
+    "Document_Title"  text,
     "Document_Base64" text not null,
-    "Owner_UUID"       uuid,
-    "Owner_Type"       int2
+    "Owner_UUID"      uuid,
+    "Owner_Type"      smallint,
+    "Time_Created"      timestamp default now()
 );
 
 create table if not exists documentmeta_table
