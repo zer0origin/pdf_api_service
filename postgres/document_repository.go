@@ -60,14 +60,14 @@ func (d documentRepository) UploadDocument(document models.Document) error {
 
 func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Document_UUID" = $1`
+		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Document_UUID" = $1`
 		rows := db.QueryRow(sqlStatement, uid)
 		if rows.Err() != nil {
 			return rows.Err()
 		}
 
 		document := models.Document{}
-		err := rows.Scan(&document.Uuid, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
+		err := rows.Scan(&document.Uuid, &document.DocumentTitle, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
 		if err != nil {
 			return err
 		}
@@ -79,7 +79,7 @@ func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.
 
 func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1`
+		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1`
 		rows, err := db.Query(sqlStatement, uid)
 		if err != nil {
 			return rows.Err()
@@ -89,7 +89,7 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.D
 
 		for rows.Next() {
 			document := models.Document{}
-			err := rows.Scan(&document.Uuid, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
+			err := rows.Scan(&document.Uuid, &document.DocumentTitle, &document.PdfBase64, &document.OwnerUUID, &document.OwnerType)
 			if err != nil {
 				return err
 			}

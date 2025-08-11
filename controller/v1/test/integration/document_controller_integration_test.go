@@ -27,7 +27,8 @@ func TestDocumentIntegration(t *testing.T) {
 	t.Run("Get document with present document uuid", getDocumentWithDocumentUUID)
 	t.Run("Get document with present owner uuid", getDocumentWithOwnerUUID)
 	t.Run("Get document with nonexistent document uuid", getDocumentWithNonexistentDocumentUUID)
-	t.Run("Upload new document", uploadDocument)
+	t.Run("Upload a new document", uploadDocument)
+	t.Run("Upload a new document with document title", uploadDocumentWithTitle)
 	t.Run("Delete existing document", deleteDocument)
 }
 
@@ -121,7 +122,7 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 
 func getDocumentWithOwnerUUID(t *testing.T) {
 	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
-	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"2\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"3\"}]}"
+	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"2\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"3\"}]}"
 	t.Parallel()
 
 	ctx := context.Background()
@@ -175,6 +176,46 @@ func uploadDocument(t *testing.T) {
 
 	response := UploadResponse{}
 	err = json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
+	assert.NotEqual(t, uuid.Nil, response.DocumentUUID)
+}
+
+func uploadDocumentWithTitle(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
+	require.NoError(t, err)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+	request := &v1.CreateRequest{DocumentTitle: func() *string { v := "Document Title"; return &v }(), DocumentBase64String: "THIS IS A TEST DOCUMENT"}
+	requestJSON, _ := json.Marshal(request)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/documents/",
+		strings.NewReader(string(requestJSON)),
+	))
+
+	response := UploadResponse{}
+	err = json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
+
+	err = dbHandle.WithConnection(func(db *sql.DB) error {
+		row := db.QueryRow(`SELECT 1 FROM document_table WHERE "Document_Title" = $1`, "Document Title")
+
+		var number int8
+		err := row.Scan(&number)
+		return err
+	})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, w.Code, "Response should be 200")
