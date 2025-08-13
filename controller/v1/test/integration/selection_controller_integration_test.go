@@ -30,9 +30,9 @@ func TestSelectionsIntegration(t *testing.T) {
 }
 
 func getSelectionFromPresentSelectionUUID(t *testing.T) {
+	t.Parallel()
 	testDocumentUuidString := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
 	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -60,9 +60,9 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 }
 
 func getSelectionsFromPresentDocumentUUID(t *testing.T) {
+	t.Parallel()
 	testDocumentUuidString := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -89,9 +89,9 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 }
 
 func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
+	t.Parallel()
 	testDocumentUuidString := uuid.Nil.String()
 	expectedJsonResponse := `{"selections":[]}`
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -118,9 +118,9 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 }
 
 func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
+	t.Parallel()
 	testDocumentUuidString := uuid.New().String()
 	expectedJsonResponse := `{"selections":[]}`
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -173,8 +173,8 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 }
 
 func deleteSelectionsByDocumentUUID(t *testing.T) {
-	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()
+	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -237,8 +237,8 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 }
 
 func createNewSelection(t *testing.T) {
-	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	t.Parallel()
+	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")

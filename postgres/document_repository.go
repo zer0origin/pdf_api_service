@@ -79,7 +79,7 @@ func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.
 
 func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Time_Created", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1`
+		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Time_Created", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created"`
 		rows, err := db.Query(sqlStatement, uid)
 		if err != nil {
 			return rows.Err()

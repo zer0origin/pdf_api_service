@@ -33,6 +33,7 @@ func TestDocumentIntegration(t *testing.T) {
 }
 
 func databaseConnection(t *testing.T) {
+	t.Parallel()
 	wd, err := os.Getwd()
 	rd, err := os.Executable()
 	dir := filepath.Dir(rd)
@@ -40,7 +41,6 @@ func databaseConnection(t *testing.T) {
 	fmt.Printf("%s", rd)
 	fmt.Printf("%s", dir)
 
-	t.Parallel()
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	require.NoError(t, err)
@@ -64,9 +64,9 @@ func databaseConnection(t *testing.T) {
 }
 
 func getDocumentWithDocumentUUID(t *testing.T) {
+	t.Parallel()
 	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
 	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","timeCreated":"2022-10-10T11:30:30Z","pdfBase64":"Fake document for testing"}]}`, documentTestUUID)
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
@@ -91,9 +91,9 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 }
 
 func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
+	t.Parallel()
 	documentTestUUID := uuid.MustParse(uuid.Nil.String())
 	expectedResponse := fmt.Sprintf(`{"error":"Document with documentUUID %s was not found."}`, documentTestUUID)
-	t.Parallel()
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
@@ -121,9 +121,9 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 }
 
 func getDocumentWithOwnerUUID(t *testing.T) {
-	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
-	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"2\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"3\"}]}"
 	t.Parallel()
+	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
+	expectedResponse := "{\"documents\":[{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"timeCreated\":\"2022-10-10T11:30:29Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"2\"},{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"3\"}]}"
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
