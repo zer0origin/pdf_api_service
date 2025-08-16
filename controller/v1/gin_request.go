@@ -14,7 +14,7 @@ type CreateRequest struct {
 	DocumentBase64String string     `json:"documentBase64String"`
 	DocumentTitle        *string    `json:"documentTitle"`
 	OwnerUUID            *uuid.UUID `json:"ownerUUID"`
-	OwnerType            *string    `json:"ownerType"`
+	OwnerType            *int       `json:"ownerType"`
 }
 
 type AddNewSelectionRequest struct {

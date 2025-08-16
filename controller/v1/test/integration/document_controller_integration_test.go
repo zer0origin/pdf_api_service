@@ -123,7 +123,7 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 func getDocumentWithOwnerUUID(t *testing.T) {
 	t.Parallel()
 	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
-	expectedResponse := "{\"documents\":[{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"timeCreated\":\"2022-10-10T11:30:29Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"2\"},{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":\"1\",\"pdfBase64\":\"3\"}]}"
+	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"Fake document for testing\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"3\"},{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"timeCreated\":\"2022-10-10T11:30:29Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"2\"}]}"
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")

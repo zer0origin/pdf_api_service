@@ -49,7 +49,7 @@ func (d documentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (models.Do
 }
 
 func (d documentRepository) UploadDocument(document models.Document) error {
-	uploadDocumentSQL := createUploadDocumentSqlDatabase(&document) //create callback
+	uploadDocumentSQL := createDocumentFunction(&document) //create callback
 	err := d.databaseManager.WithConnection(uploadDocumentSQL)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.
 
 func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Time_Created", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created"`
+		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Time_Created", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created" DESC`
 		rows, err := db.Query(sqlStatement, uid)
 		if err != nil {
 			return rows.Err()
@@ -102,10 +102,10 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, callback func(data []models.D
 	}
 }
 
-func createUploadDocumentSqlDatabase(document *models.Document) func(db *sql.DB) error {
+func createDocumentFunction(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `insert into document_table("Document_UUID", "Document_Title", "Document_Base64") values ($1, $2, $3) returning "Document_UUID"`
-		_, err := db.Exec(sqlStatement, document.Uuid, document.DocumentTitle, document.PdfBase64)
+		sqlStatement := `insert into document_table("Document_UUID", "Document_Title", "Document_Base64", "Owner_UUID", "Owner_Type") values ($1, $2, $3, $4, $5) returning "Document_UUID"`
+		_, err := db.Exec(sqlStatement, document.Uuid, document.DocumentTitle, document.PdfBase64, document.OwnerUUID, document.OwnerType)
 
 		if err != nil {
 			return err
