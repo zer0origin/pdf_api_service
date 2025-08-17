@@ -34,7 +34,7 @@ type MetaController struct {
 func (t MetaController) AddMeta(c *gin.Context) {
 	body := &AddMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -47,7 +47,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 	}
 
 	if err := t.MetaRepository.AddMeta(model); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -78,12 +78,12 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 	if id, isPresent := c.GetQuery("metaUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		body := &UpdateMetaRequest{}
 		if err := c.ShouldBindJSON(body); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -96,7 +96,7 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 		}
 
 		if err := t.MetaRepository.UpdateMeta(uid, model); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -129,7 +129,7 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 func (t MetaController) DeleteMeta(c *gin.Context) {
 	body := &DeleteMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -138,7 +138,7 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 	}
 
 	if err := t.MetaRepository.DeleteMeta(model); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -166,13 +166,13 @@ func (t MetaController) GetMeta(c *gin.Context) {
 	if id, isPresent := c.GetQuery("metaUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		data, err := t.MetaRepository.GetMeta(uid)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 

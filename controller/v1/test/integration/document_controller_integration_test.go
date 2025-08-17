@@ -25,6 +25,7 @@ var dbPassword = "password"
 func TestDocumentIntegration(t *testing.T) {
 	t.Run("Test database connection", databaseConnection)
 	t.Run("Get document with present document uuid", getDocumentWithDocumentUUID)
+	t.Run("Get document with present document uuid with an exclude param", getDocumentWithDocumentUUIDExcludeBase64)
 	t.Run("Get document with present owner uuid", getDocumentWithOwnerUUID)
 	t.Run("Get document with nonexistent document uuid", getDocumentWithNonexistentDocumentUUID)
 	t.Run("Upload a new document", uploadDocument)
@@ -66,7 +67,7 @@ func databaseConnection(t *testing.T) {
 func getDocumentWithDocumentUUID(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
-	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","timeCreated":"2022-10-10T11:30:30Z","pdfBase64":"Fake document for testing"}]}`, documentTestUUID)
+	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","documentTitle":"Fake Title","timeCreated":"2022-10-10T11:30:30Z","pdfBase64":"Fake document for testing"}]}`, documentTestUUID)
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
@@ -83,6 +84,33 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
 		"/api/v1/documents/?documentUUID="+documentTestUUID.String(),
+		nil,
+	))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
+}
+
+func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
+	t.Parallel()
+	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
+	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","documentTitle":"Fake Title"}]}`, documentTestUUID)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
+	require.NoError(t, err)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/documents/?exclude=pdfBase64&exclude=timeCreated&exclude=ownerUUID&exclude=ownerType&exclude=pdfBase64&documentUUID="+documentTestUUID.String(),
 		nil,
 	))
 

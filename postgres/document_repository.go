@@ -1,9 +1,12 @@
 package postgres
 
 import (
+	"bytes"
 	"database/sql"
+	"fmt"
 	"github.com/google/uuid"
 	"pdf_service_api/models"
+	"text/template"
 )
 
 type documentRepository struct {
@@ -35,9 +38,9 @@ func (d documentRepository) GetDocumentByOwnerUUID(uuid uuid.UUID) ([]models.Doc
 	return ss, nil
 }
 
-func (d documentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (models.Document, error) {
+func (d documentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID, excludes map[string]bool) (models.Document, error) {
 	document := &models.Document{}
-	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(uuid, func(data models.Document) {
+	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(uuid, excludes, func(data models.Document) {
 		*document = data
 	}))
 
@@ -58,16 +61,51 @@ func (d documentRepository) UploadDocument(document models.Document) error {
 	return nil
 }
 
-func getDocumentByDocumentUUIDFunction(uid uuid.UUID, callback func(data models.Document)) func(db *sql.DB) error {
+func getDocumentByDocumentUUIDFunction(uid uuid.UUID, excludes map[string]bool, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Document_UUID", "Document_Title", "Document_Base64", "Time_Created", "Owner_UUID", "Owner_Type" FROM document_table WHERE "Document_UUID" = $1`
-		rows := db.QueryRow(sqlStatement, uid)
+		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Document_UUID" = $1`
+
+		templ, err := template.New("documentQuery").Parse(sqlStatement)
+		var buffer bytes.Buffer
+		err = templ.Execute(&buffer, excludes)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		generatedSQL := buffer.String()
+		fmt.Println("Generated SQL:")
+		fmt.Println(generatedSQL)
+
+		rows := db.QueryRow(generatedSQL, uid)
 		if rows.Err() != nil {
 			return rows.Err()
 		}
 
 		document := models.Document{}
-		err := rows.Scan(&document.Uuid, &document.DocumentTitle, &document.PdfBase64, &document.TimeCreated, &document.OwnerUUID, &document.OwnerType)
+
+		scanDestinations := make([]any, 0)
+		if !excludes["documentTitle"] {
+			scanDestinations = append(scanDestinations, &document.DocumentTitle)
+		}
+
+		if !excludes["pdfBase64"] {
+			scanDestinations = append(scanDestinations, &document.PdfBase64)
+		}
+
+		if !excludes["timeCreated"] {
+			scanDestinations = append(scanDestinations, &document.TimeCreated)
+		}
+
+		if !excludes["ownerUUID"] {
+			scanDestinations = append(scanDestinations, &document.OwnerUUID)
+		}
+
+		if !excludes["ownerType"] {
+			scanDestinations = append(scanDestinations, &document.OwnerType)
+		}
+		scanDestinations = append(scanDestinations, &document.Uuid)
+
+		err = rows.Scan(scanDestinations...)
 		if err != nil {
 			return err
 		}

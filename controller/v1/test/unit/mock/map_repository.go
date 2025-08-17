@@ -25,7 +25,7 @@ func (m *MapDocumentRepository) UploadDocument(document models.Document) error {
 	return nil
 }
 
-func (m *MapDocumentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID) (models.Document, error) {
+func (m *MapDocumentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID, exclude map[string]bool) (models.Document, error) {
 	return m.Repo[uuid], nil
 }
 

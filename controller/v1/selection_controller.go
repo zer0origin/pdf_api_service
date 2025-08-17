@@ -37,13 +37,13 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		results, err := passedServiceGetFunction(uid)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -90,13 +90,13 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 	handleDeletion := func(id string, serviceFunction func(uid uuid.UUID) error) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		err = serviceFunction(uid)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -141,7 +141,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 	reqBody := &AddNewSelectionRequest{}
 
 	if err := c.ShouldBindJSON(reqBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -155,7 +155,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 
 	err := t.SelectionRepository.AddNewSelection(toCreate)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

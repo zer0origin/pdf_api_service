@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"pdf_service_api/models"
+	"slices"
 )
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
@@ -28,21 +29,44 @@ type DocumentController struct {
 // @Failure 500 "Internal Server Error"
 // @Router /documents [get]
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
+	exclude := make(map[string]bool, 0)
+	if values, present := c.GetQueryArray("exclude"); present {
+		if slices.Contains(values, "documentTitle") {
+			exclude["documentTitle"] = true
+		}
+
+		if slices.Contains(values, "timeCreated") {
+			exclude["timeCreated"] = true
+		}
+
+		if slices.Contains(values, "ownerUUID") {
+			exclude["ownerUUID"] = true
+		}
+
+		if slices.Contains(values, "ownerType") {
+			exclude["ownerType"] = true
+		}
+
+		if slices.Contains(values, "pdfBase64") {
+			exclude["pdfBase64"] = true
+		}
+	}
+
 	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid)
+		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid, exclude)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				c.JSON(http.StatusNotFound, gin.H{"error": "Document with documentUUID " + uid.String() + " was not found."})
 				return
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
 		}
@@ -54,7 +78,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 	if id, isPresent := c.GetQuery("ownerUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -65,7 +89,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Document with ownerUUID " + uid.String() + " was not found."})
 				return
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
 		}
@@ -99,7 +123,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	err := c.ShouldBindJSON(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -114,7 +138,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	err = t.DocumentRepository.UploadDocument(newModel)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -142,13 +166,13 @@ func (t DocumentController) DeleteDocumentHandler(c *gin.Context) {
 	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		err = t.DocumentRepository.DeleteDocumentById(uid)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

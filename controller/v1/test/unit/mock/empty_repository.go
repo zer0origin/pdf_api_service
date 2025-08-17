@@ -17,7 +17,7 @@ func (e EmptyDocumentRepository) DeleteDocumentById(_ uuid.UUID) error {
 	panic("implement me")
 }
 
-func (e EmptyDocumentRepository) GetDocumentByDocumentUUID(_ uuid.UUID) (models.Document, error) {
+func (e EmptyDocumentRepository) GetDocumentByDocumentUUID(_ uuid.UUID, _ map[string]bool) (models.Document, error) {
 	panic("implement me")
 }
 
