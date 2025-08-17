@@ -9,7 +9,7 @@ type MapDocumentRepository struct {
 	Repo map[uuid.UUID]models.Document
 }
 
-func (m *MapDocumentRepository) GetDocumentByOwnerUUID(uid uuid.UUID) ([]models.Document, error) {
+func (m *MapDocumentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, excludes map[string]bool) ([]models.Document, error) {
 	ss := make([]models.Document, 0)
 	for _, selection := range m.Repo {
 		if selection.OwnerUUID != nil && *selection.OwnerUUID == uid {

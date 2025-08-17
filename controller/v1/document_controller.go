@@ -82,7 +82,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			return
 		}
 
-		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid)
+		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid, exclude)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):

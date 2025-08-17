@@ -18,6 +18,6 @@ type Document struct {
 type DocumentRepository interface {
 	UploadDocument(document Document) error
 	GetDocumentByDocumentUUID(id uuid.UUID, excludes map[string]bool) (Document, error)
-	GetDocumentByOwnerUUID(id uuid.UUID) ([]Document, error)
+	GetDocumentByOwnerUUID(id uuid.UUID, excludes map[string]bool) ([]Document, error)
 	DeleteDocumentById(id uuid.UUID) error
 }
