@@ -32,6 +32,8 @@ func TestDocumentIntegration(t *testing.T) {
 	t.Run("Get document with present owner uuid with limit 1 and offset 1 set", getDocumentWithOwnerUUIDWithLimit1AndOffset1)
 	t.Run("Get document with present owner uuid with limit 1 and offset 2 set", getDocumentWithOwnerUUIDWithLimit1AndOffset2)
 	t.Run("Get document with present owner uuid with limit 1 and offset 10 set", getDocumentWithOwnerUUIDWithLimit1AndOffset10)
+	t.Run("Get document with present owner uuid with limit 2 and offset 0 set", getDocumentWithOwnerUUIDWithLimit2AndOffset0)
+	t.Run("Get document with present owner uuid with limit 2 and offset 1 set", getDocumentWithOwnerUUIDWithLimit2AndOffset1)
 	t.Run("Get document with present owner uuid with excludes params", getDocumentWithOwnerUUIDWithExcludes)
 	t.Run("Get document with nonexistent document uuid", getDocumentWithNonexistentDocumentUUID)
 	t.Run("Upload a new document", uploadDocument)
@@ -282,6 +284,60 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset10(t *testing.T) {
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
 		"/api/v1/documents/?limit=1&offset=10&ownerUUID="+ownerTestUUID.String(),
+		nil,
+	))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
+}
+
+func getDocumentWithOwnerUUIDWithLimit2AndOffset0(t *testing.T) {
+	t.Parallel()
+	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
+	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b66fd223-515f-4503-80cc-2bdaa50ef474\",\"documentTitle\":\"Fake Title\",\"timeCreated\":\"2022-10-10T11:30:31Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"1\"},{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"2\"}]}"
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
+	require.NoError(t, err)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/documents/?limit=2&offset=0&ownerUUID="+ownerTestUUID.String(),
+		nil,
+	))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
+}
+
+func getDocumentWithOwnerUUIDWithLimit2AndOffset1(t *testing.T) {
+	t.Parallel()
+	ownerTestUUID := uuid.MustParse("4ce6af41-6cb5-4b02-a671-9fce16ea688d")
+	expectedResponse := "{\"documents\":[{\"documentUUID\":\"b5b7f18e-aed3-4eb7-aca8-79bcedf03d1b\",\"timeCreated\":\"2022-10-10T11:30:30Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"2\"},{\"documentUUID\":\"489fc81f-a087-457e-b8b4-ef9ad571d954\",\"timeCreated\":\"2022-10-10T11:30:29Z\",\"ownerUUID\":\"4ce6af41-6cb5-4b02-a671-9fce16ea688d\",\"ownerType\":1,\"pdfBase64\":\"3\"}]}"
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
+	require.NoError(t, err)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/documents/?limit=2&offset=1&ownerUUID="+ownerTestUUID.String(),
 		nil,
 	))
 

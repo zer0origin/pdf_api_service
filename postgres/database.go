@@ -19,11 +19,6 @@ func (t *DatabaseHandler) WithConnection(callback createdCallback) error {
 		return err
 	}
 
-	err = db.Ping() //open up a connection to the Database
-	if err != nil {
-		return err
-	}
-
 	err = callback(db)
 	if err != nil {
 		return err
