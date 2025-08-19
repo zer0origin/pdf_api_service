@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"pdf_service_api/models"
 	"slices"
+	"strconv"
 )
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
@@ -15,21 +16,23 @@ type DocumentController struct {
 	DocumentRepository models.DocumentRepository
 }
 
-// GetDocumentHandler godoc
+// GetDocumentHandler
 // @Summary Get documents
-// @Description get document details by its UUID
+// @Description Retrieves document details. Documents can be fetched either by their unique Document UUID or by an Owner UUID.
+// @Description Optional exclusion parameters can be used to omit specific fields from the response.
 // @Tags documents
 // @Accept json
 // @Produce json
-// @Param documentUUID query string false "Document UUID"
-// @Param ownerUUID query string false "Owner UUID"
-// @Success 200 {object} []models.Document
-// @Failure 400 "Bad Request"
-// @Failure 404 "Not Found"
-// @Failure 500 "Internal Server Error"
+// @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided, `ownerUUID` will be ignored."
+// @Param ownerUUID query string false "The unique identifier of the owner whose documents are to be retrieved. Only used if `documentUUID` is not provided."
+// @Param exclude query []string false "Fields to exclude from the response. Allowed values: `documentTitle`, `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`." collectionFormat(multi)
+// @Success 200 {object} object{documents=[]models.Document} "Successfully retrieved document(s)."
+// @Failure 400 {object} object{error=string} "Bad Request: Invalid UUID format or no valid parameters specified."
+// @Failure 404 {object} object{error=string} "Not Found: No document(s) found for the given UUID."
+// @Failure 500 {object} object{error=string} "Internal Server Error: An unexpected error occurred on the server."
 // @Router /documents [get]
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
-	exclude := make(map[string]bool, 0)
+	exclude := make(map[string]bool)
 	if values, present := c.GetQueryArray("exclude"); present {
 		if slices.Contains(values, "documentTitle") {
 			exclude["documentTitle"] = true
@@ -50,6 +53,26 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		if slices.Contains(values, "pdfBase64") {
 			exclude["pdfBase64"] = true
 		}
+	}
+
+	var limit int8 = 100
+	if values, present := c.GetQuery("limit"); present {
+		number, err := strconv.ParseInt(values, 10, 8)
+		if err != nil {
+			return
+		}
+
+		limit = int8(number)
+	}
+
+	var offset int8 = 0
+	if values, present := c.GetQuery("offset"); present {
+		number, err := strconv.ParseInt(values, 10, 8)
+		if err != nil {
+			return
+		}
+
+		offset = int8(number)
 	}
 
 	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
@@ -82,7 +105,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			return
 		}
 
-		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid, exclude)
+		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid, limit, offset, exclude)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):

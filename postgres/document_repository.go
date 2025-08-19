@@ -3,6 +3,7 @@ package postgres
 import (
 	"bytes"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"pdf_service_api/models"
@@ -26,9 +27,13 @@ func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
 	return nil
 }
 
-func (d documentRepository) GetDocumentByOwnerUUID(uuid uuid.UUID, excludes map[string]bool) ([]models.Document, error) {
+func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, offset int8, excludes map[string]bool) ([]models.Document, error) {
+	if limit <= 0 || offset < 0 {
+		return make([]models.Document, 0), errors.New("limit or offset were invalid")
+	}
+
 	ss := make([]models.Document, 0)
-	err := d.databaseManager.WithConnection(getDocumentByOwnerUUIDFunction(uuid, excludes, func(data []models.Document) {
+	err := d.databaseManager.WithConnection(getDocumentByOwnerUUIDFunction(uid, limit, offset, excludes, func(data []models.Document) {
 		ss = data
 	}))
 	if err != nil {
@@ -111,9 +116,9 @@ func getDocumentByDocumentUUIDFunction(uid uuid.UUID, excludes map[string]bool, 
 	}
 }
 
-func getDocumentByOwnerUUIDFunction(uid uuid.UUID, excludes map[string]bool, callback func(data []models.Document)) func(db *sql.DB) error {
+func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit int8, offset int8, excludes map[string]bool, callback func(data []models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created" DESC`
+		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created" DESC limit $2 offset $3`
 		templ, err := template.New("documentQuery").Parse(sqlStatement)
 		var buffer bytes.Buffer
 		err = templ.Execute(&buffer, excludes)
@@ -122,7 +127,7 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, excludes map[string]bool, cal
 		}
 
 		generatedSQL := buffer.String()
-		rows, err := db.Query(generatedSQL, uid)
+		rows, err := db.Query(generatedSQL, uid, limit, offset)
 		if err != nil {
 			return rows.Err()
 		}

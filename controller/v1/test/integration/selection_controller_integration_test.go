@@ -19,6 +19,7 @@ import (
 )
 
 func TestSelectionsIntegration(t *testing.T) {
+	t.Parallel()
 	t.Run("Get selection from a present document uuid", getSelectionsFromPresentDocumentUUID)
 	t.Run("Get selection from a nonexistent document uuid", getSelectionsFromInvalidDocumentUUID)
 	t.Run("Get selection from a present selection uuid", getSelectionFromPresentSelectionUUID)

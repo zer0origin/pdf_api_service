@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/documents": {
             "get": {
-                "description": "get document details by its UUID",
+                "description": "Retrieves document details. Documents can be fetched either by their unique Document UUID or by an Owner UUID.\nOptional exclusion parameters can be used to omit specific fields from the response.",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,39 +27,78 @@ const docTemplate = `{
                 "tags": [
                     "documents"
                 ],
-                "summary": "Get a document by UUID",
+                "summary": "Get documents",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Document UUID",
+                        "description": "The unique identifier of the document to retrieve. If provided, ` + "`" + `ownerUUID` + "`" + ` will be ignored.",
                         "name": "documentUUID",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Owner UUID",
+                        "description": "The unique identifier of the owner whose documents are to be retrieved. Only used if ` + "`" + `documentUUID` + "`" + ` is not provided.",
                         "name": "ownerUUID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Fields to exclude from the response. Allowed values: ` + "`" + `documentTitle` + "`" + `, ` + "`" + `timeCreated` + "`" + `, ` + "`" + `ownerUUID` + "`" + `, ` + "`" + `ownerType` + "`" + `, ` + "`" + `pdfBase64` + "`" + `.",
+                        "name": "exclude",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved document(s).",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Document"
+                            "type": "object",
+                            "properties": {
+                                "documents": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/models.Document"
+                                    }
+                                }
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request: Invalid UUID format or no valid parameters specified.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Not Found: No document(s) found for the given UUID.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error: An unexpected error occurred on the server.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -432,12 +471,15 @@ const docTemplate = `{
         "models.Document": {
             "type": "object",
             "properties": {
+                "documentTitle": {
+                    "type": "string"
+                },
                 "documentUUID": {
                     "type": "string",
                     "example": "ba3ca973-5052-4030-a528-39b49736d8ad"
                 },
                 "ownerType": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "ownerUUID": {
                     "type": "string"
@@ -450,6 +492,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.Selection"
                     }
+                },
+                "timeCreated": {
+                    "type": "string"
                 }
             }
         },
@@ -588,8 +633,11 @@ const docTemplate = `{
                 "documentBase64String": {
                     "type": "string"
                 },
-                "ownerType": {
+                "documentTitle": {
                     "type": "string"
+                },
+                "ownerType": {
+                    "type": "integer"
                 },
                 "ownerUUID": {
                     "type": "string"

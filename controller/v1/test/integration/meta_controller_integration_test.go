@@ -18,6 +18,7 @@ import (
 )
 
 func TestMetaIntegration(t *testing.T) {
+	t.Parallel()
 	t.Run("get meta using a present uuid", getMetaPresentUUID)
 	t.Run("update meta using a present uuid", updateMetaPresentUUID)
 	t.Run("update meta using a present uuid with new images", updateImageMetaPresentUUID)

@@ -8,7 +8,7 @@ import (
 type EmptyDocumentRepository struct {
 }
 
-func (e EmptyDocumentRepository) GetDocumentByOwnerUUID(id uuid.UUID, excludes map[string]bool) ([]models.Document, error) {
+func (e EmptyDocumentRepository) GetDocumentByOwnerUUID(id uuid.UUID, limit int8, offset int8, excludes map[string]bool) ([]models.Document, error) {
 	panic("implement me")
 }
 

@@ -1,11 +1,13 @@
 definitions:
   models.Document:
     properties:
+      documentTitle:
+        type: string
       documentUUID:
         example: ba3ca973-5052-4030-a528-39b49736d8ad
         type: string
       ownerType:
-        type: string
+        type: integer
       ownerUUID:
         type: string
       pdfBase64:
@@ -14,6 +16,8 @@ definitions:
         items:
           $ref: '#/definitions/models.Selection'
         type: array
+      timeCreated:
+        type: string
     type: object
   models.Meta:
     properties:
@@ -107,8 +111,10 @@ definitions:
     properties:
       documentBase64String:
         type: string
-      ownerType:
+      documentTitle:
         type: string
+      ownerType:
+        type: integer
       ownerUUID:
         type: string
     type: object
@@ -167,32 +173,63 @@ paths:
     get:
       consumes:
       - application/json
-      description: get document details by its UUID
+      description: |-
+        Retrieves document details. Documents can be fetched either by their unique Document UUID or by an Owner UUID.
+        Optional exclusion parameters can be used to omit specific fields from the response.
       parameters:
-      - description: Document UUID
+      - description: The unique identifier of the document to retrieve. If provided,
+          `ownerUUID` will be ignored.
         in: query
         name: documentUUID
         type: string
-      - description: Owner UUID
+      - description: The unique identifier of the owner whose documents are to be
+          retrieved. Only used if `documentUUID` is not provided.
         in: query
         name: ownerUUID
         type: string
+      - collectionFormat: multi
+        description: 'Fields to exclude from the response. Allowed values: `documentTitle`,
+          `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`.'
+        in: query
+        items:
+          type: string
+        name: exclude
+        type: array
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved document(s).
           schema:
-            items:
-              $ref: '#/definitions/models.Document'
-            type: array
+            properties:
+              documents:
+                items:
+                  $ref: '#/definitions/models.Document'
+                type: array
+            type: object
         "400":
-          description: Bad Request
+          description: 'Bad Request: Invalid UUID format or no valid parameters specified.'
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
         "404":
-          description: Not Found
+          description: 'Not Found: No document(s) found for the given UUID.'
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
         "500":
-          description: Internal Server Error
-      summary: Get a document by UUID
+          description: 'Internal Server Error: An unexpected error occurred on the
+            server.'
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get documents
       tags:
       - documents
     post:
