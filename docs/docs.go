@@ -9,7 +9,16 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -31,15 +40,16 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "The unique identifier of the document to retrieve. If provided, ` + "`" + `ownerUUID` + "`" + ` will be ignored.",
+                        "description": "The unique identifier of the document to retrieve. If provided",
                         "name": "documentUUID",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "The unique identifier of the owner whose documents are to be retrieved. Only used if ` + "`" + `documentUUID` + "`" + ` is not provided.",
+                        "description": "The unique identifier of the owner whose documents are to be retrieved.",
                         "name": "ownerUUID",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "array",
@@ -157,6 +167,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "The UUID of the document to delete",
                         "name": "documentUUID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "The UUID of the owner of the document that is getting deleted",
+                        "name": "ownerUUID",
                         "in": "query",
                         "required": true
                     }
@@ -501,32 +518,35 @@ const docTemplate = `{
         "models.Meta": {
             "type": "object",
             "properties": {
-                "height": {
+                "Height": {
                     "type": "number",
-                    "format": "float32"
+                    "example": 1080
+                },
+                "NumberOfPages": {
+                    "type": "integer",
+                    "example": 31
+                },
+                "OwnerType": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "OwnerUUID": {
+                    "type": "string",
+                    "example": "34906041-2d68-45a2-9671-9f0ba89f31a9"
+                },
+                "UUID": {
+                    "type": "string",
+                    "example": "ba3ca973-5052-4030-a528-39b49736d8ad"
+                },
+                "Width": {
+                    "type": "number",
+                    "example": 1920
                 },
                 "images": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
-                },
-                "numberOfPages": {
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "ownerType": {
-                    "type": "string"
-                },
-                "ownerUUID": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "number",
-                    "format": "float32"
                 }
             }
         },
@@ -678,17 +698,21 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Go Backend API",
+	Description:      "The API documentation for the golang backend server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
