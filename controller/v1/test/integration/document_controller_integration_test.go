@@ -26,6 +26,7 @@ func TestDocumentIntegration(t *testing.T) {
 	t.Parallel()
 	t.Run("Test database connection", databaseConnection)
 	t.Run("Get document with present document uuid", getDocumentWithDocumentUUID)
+	t.Run("Get document with present document uuid and no owner uuid", getDocumentWithNoOwnerUuid)
 	t.Run("Get document with present document uuid with excludes param", getDocumentWithDocumentUUIDExcludeBase64)
 	t.Run("Get document with present owner uuid", getDocumentWithOwnerUUID)
 	t.Run("Get document with present owner uuid with limit 1 and offset 0 set", getDocumentWithOwnerUUIDWithLimit1AndOffset0)
@@ -75,7 +76,8 @@ func databaseConnection(t *testing.T) {
 func getDocumentWithDocumentUUID(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
-	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","documentTitle":"Fake Title","timeCreated":"2022-10-10T11:30:30Z","pdfBase64":"Fake document for testing"}]}`, documentTestUUID)
+	ownerTestUUID := uuid.MustParse("ea167a48-c1b3-46c4-911b-090e807132fc")
+	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","documentTitle":"Fake Title","timeCreated":"2022-10-10T11:30:30Z","ownerUUID":"ea167a48-c1b3-46c4-911b-090e807132fc","ownerType":1,"pdfBase64":"Fake document for testing"}]}`, documentTestUUID)
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
@@ -91,7 +93,7 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/?documentUUID="+documentTestUUID.String(),
+		fmt.Sprintf("/api/v1/documents/?documentUUID=%s&ownerUUID=%s", documentTestUUID.String(), ownerTestUUID.String()),
 		nil,
 	))
 
@@ -102,6 +104,7 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474")
+	ownerTestUUID := uuid.MustParse("ea167a48-c1b3-46c4-911b-090e807132fc")
 	expectedResponse := fmt.Sprintf(`{"documents":[{"documentUUID":"%s","documentTitle":"Fake Title"}]}`, documentTestUUID)
 
 	ctx := context.Background()
@@ -118,7 +121,7 @@ func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/documents/?exclude=pdfBase64&exclude=timeCreated&exclude=ownerUUID&exclude=ownerType&exclude=pdfBase64&documentUUID="+documentTestUUID.String(),
+		fmt.Sprintf("/api/v1/documents/?exclude=timeCreated&exclude=ownerUUID&exclude=ownerType&exclude=pdfBase64&documentUUID=%s&ownerUUID=%s", documentTestUUID.String(), ownerTestUUID.String()),
 		nil,
 	))
 
@@ -126,10 +129,10 @@ func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
 	assert.Equal(t, expectedResponse, w.Body.String())
 }
 
-func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
+func getDocumentWithNoOwnerUuid(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := uuid.MustParse(uuid.Nil.String())
-	expectedResponse := fmt.Sprintf(`{"error":"Document with documentUUID %s was not found."}`, documentTestUUID)
+	expectedResponse := "{\"error\":\"Required OwnerUuid is missing\"}"
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
@@ -149,6 +152,38 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
 		"/api/v1/documents/?documentUUID="+request.DocumentUUID.String(),
+		strings.NewReader(string(requestJSON)),
+	))
+
+	fmt.Println(w.Body.String())
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, expectedResponse, w.Body.String())
+}
+
+func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
+	t.Parallel()
+	documentTestUUID := uuid.MustParse(uuid.Nil.String())
+	ownerTestUUID := uuid.MustParse("ea167a48-c1b3-46c4-911b-090e807132fc")
+	expectedResponse := fmt.Sprintf(`{"error":"Document with documentUUID %s was not found."}`, documentTestUUID)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
+	require.NoError(t, err)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(documentCtrl, nil, nil)
+
+	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
+	requestJSON, _ := json.Marshal(request)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/documents/?documentUUID="+request.DocumentUUID.String()+"&ownerUUID="+ownerTestUUID.String(),
 		strings.NewReader(string(requestJSON)),
 	))
 
@@ -466,7 +501,7 @@ func deleteDocument(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"DELETE",
-		fmt.Sprintf("/api/v1/documents/?documentUUID=%s", "b66fd223-515f-4503-80cc-2bdaa50ef474"),
+		fmt.Sprintf("/api/v1/documents/?documentUUID=%s&ownerUUID=%s", "b66fd223-515f-4503-80cc-2bdaa50ef474", "ea167a48-c1b3-46c4-911b-090e807132fc"),
 		nil,
 	))
 
