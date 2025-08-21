@@ -27,7 +27,7 @@ func TestMetaIntegration(t *testing.T) {
 func getMetaPresentUUID(t *testing.T) {
 	t.Parallel()
 	expectedObj := models.Meta{
-		UUID:          uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
+		DocumentUUID:  uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		NumberOfPages: func() *uint32 { v := uint32(31); return &v }(),
 		Height:        func() *float32 { v := float32(1920); return &v }(),
 		Width:         func() *float32 { v := float32(1080); return &v }(),
@@ -49,7 +49,7 @@ func getMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/meta/?metaUUID="+expectedObj.UUID.String(),
+		"/api/v1/meta/?metaUUID="+expectedObj.DocumentUUID.String(),
 		nil,
 	))
 
@@ -73,7 +73,7 @@ func updateMetaPresentUUID(t *testing.T) {
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	newData := models.Meta{
-		UUID:          uuid.MustParse(testUUID),
+		DocumentUUID:  uuid.MustParse(testUUID),
 		NumberOfPages: func() *uint32 { v := new(uint32); *v = 43; return v }(),
 		Height:        func() *float32 { v := new(float32); *v = 36.2; return v }(),
 		Width:         func() *float32 { v := new(float32); *v = 29.5; return v }(),
@@ -107,7 +107,7 @@ func updateMetaPresentUUID(t *testing.T) {
 			return err
 		}
 
-		assert.Equal(t, newData.UUID.String(), uid)
+		assert.Equal(t, newData.DocumentUUID.String(), uid)
 		assert.EqualValues(t, *newData.NumberOfPages, noPages)
 		assert.EqualValues(t, *newData.Height, height)
 		assert.EqualValues(t, *newData.Width, width)
@@ -141,7 +141,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	strArr[2] = "Image2"
 
 	newData := models.Meta{
-		UUID:          uuid.MustParse(testUUID),
+		DocumentUUID:  uuid.MustParse(testUUID),
 		NumberOfPages: nil,
 		Height:        nil,
 		Width:         nil,
@@ -176,7 +176,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 			return err
 		}
 
-		assert.Equal(t, newData.UUID.String(), uid)
+		assert.Equal(t, newData.DocumentUUID.String(), uid)
 		assert.EqualValues(t, noPages, 31)
 		assert.NotNil(t, noPages)
 		assert.NotNil(t, height)

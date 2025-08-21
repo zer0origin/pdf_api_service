@@ -39,7 +39,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 	}
 
 	model := models.Meta{
-		UUID:          uuid.New(),
+		DocumentUUID:  uuid.New(),
 		NumberOfPages: body.NumberOfPages,
 		Height:        body.Height,
 		Width:         body.Width,
@@ -51,7 +51,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"metaUUID": model.UUID})
+	c.JSON(http.StatusOK, gin.H{"metaUUID": model.DocumentUUID})
 }
 
 // UpdateMeta handles the HTTP PUT request to update existing metadata.
@@ -88,7 +88,7 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 		}
 
 		model := models.Meta{
-			UUID:          body.UUID,
+			DocumentUUID:  body.UUID,
 			NumberOfPages: body.NumberOfPages,
 			Height:        body.Height,
 			Width:         body.Width,
@@ -134,7 +134,7 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 	}
 
 	model := models.Meta{
-		UUID: body.UUID,
+		DocumentUUID: body.UUID,
 	}
 
 	if err := t.MetaRepository.DeleteMeta(model); err != nil {

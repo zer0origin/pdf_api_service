@@ -56,7 +56,7 @@ func (m metaRepository) GetMeta(uid uuid.UUID) (models.Meta, error) {
 func addMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `INSERT INTO documentmeta_table ("Document_UUID", "Number_Of_Pages", "Height", "Width", "Images") values ($1, $2, $3, $4, $5)`
-		if _, err := db.Exec(SqlStatement, data.UUID, data.NumberOfPages, data.Height, data.Width, data.Images); err != nil {
+		if _, err := db.Exec(SqlStatement, data.DocumentUUID, data.NumberOfPages, data.Height, data.Width, data.Images); err != nil {
 			return err
 		}
 
@@ -67,7 +67,7 @@ func addMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 func removeMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `DELETE FROM documentmeta_table WHERE "Document_UUID" = $1`
-		if _, err := db.Exec(SqlStatement, data.UUID); err != nil {
+		if _, err := db.Exec(SqlStatement, data.DocumentUUID); err != nil {
 			return err
 		}
 
@@ -97,7 +97,7 @@ func getMetaDataFunction(uid uuid.UUID, callback func(data models.Meta) error) f
 		SqlStatement := `SELECT "Document_UUID", "Number_Of_Pages", "Height", "Width", "Images" FROM documentmeta_table where "Document_UUID" = $1`
 
 		row := db.QueryRow(SqlStatement, uid)
-		err := row.Scan(&meta.UUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &meta.Images)
+		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &meta.Images)
 		if err != nil {
 			return err
 		}
