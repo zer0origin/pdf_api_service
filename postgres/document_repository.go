@@ -18,8 +18,8 @@ func NewDocumentRepository(databaseManager DatabaseHandler) models.DocumentRepos
 	return documentRepository{databaseManager: databaseManager}
 }
 
-func (d documentRepository) DeleteDocumentById(uuid uuid.UUID) error {
-	err := d.databaseManager.WithConnection(deleteDocumentSqlDatabase(uuid))
+func (d documentRepository) DeleteDocumentById(documentUuid, ownerUuid uuid.UUID) error {
+	err := d.databaseManager.WithConnection(deleteDocumentSqlDatabase(documentUuid, ownerUuid))
 	if err != nil {
 		return err
 	}
@@ -43,9 +43,9 @@ func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, of
 	return ss, nil
 }
 
-func (d documentRepository) GetDocumentByDocumentUUID(uuid uuid.UUID, excludes map[string]bool) (models.Document, error) {
+func (d documentRepository) GetDocumentByDocumentUUID(documentUid, ownerUid uuid.UUID, excludes map[string]bool) (models.Document, error) {
 	document := &models.Document{}
-	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(uuid, excludes, func(data models.Document) {
+	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(documentUid, ownerUid, excludes, func(data models.Document) {
 		*document = data
 	}))
 
@@ -66,9 +66,9 @@ func (d documentRepository) UploadDocument(document models.Document) error {
 	return nil
 }
 
-func getDocumentByDocumentUUIDFunction(uid uuid.UUID, excludes map[string]bool, callback func(data models.Document)) func(db *sql.DB) error {
+func getDocumentByDocumentUUIDFunction(uid, ownerUid uuid.UUID, excludes map[string]bool, callback func(data models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Document_UUID" = $1`
+		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Document_UUID" = $1 and "Owner_UUID" = $2`
 		templ, err := template.New("documentQuery").Parse(sqlStatement)
 		var buffer bytes.Buffer
 		err = templ.Execute(&buffer, excludes)
@@ -77,7 +77,7 @@ func getDocumentByDocumentUUIDFunction(uid uuid.UUID, excludes map[string]bool, 
 		}
 
 		generatedSQL := buffer.String()
-		rows := db.QueryRow(generatedSQL, uid)
+		rows := db.QueryRow(generatedSQL, uid.String(), ownerUid.String())
 		if rows.Err() != nil {
 			return rows.Err()
 		}
@@ -184,10 +184,10 @@ func createDocumentFunction(document *models.Document) func(db *sql.DB) error {
 	}
 }
 
-func deleteDocumentSqlDatabase(uuid uuid.UUID) func(db *sql.DB) error {
+func deleteDocumentSqlDatabase(documentUuid, ownerUuid uuid.UUID) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `DELETE FROM document_table where "Document_UUID" = $1`
-		_, err := db.Exec(sqlStatement, uuid)
+		sqlStatement := `DELETE FROM document_table where "Document_UUID" = $1 and "Owner_UUID" = $2`
+		_, err := db.Exec(sqlStatement, documentUuid.String(), ownerUuid.String())
 
 		if err != nil {
 			return err

@@ -23,8 +23,8 @@ type DocumentController struct {
 // @Tags documents
 // @Accept json
 // @Produce json
-// @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided, `ownerUUID` will be ignored."
-// @Param ownerUUID query string false "The unique identifier of the owner whose documents are to be retrieved. Only used if `documentUUID` is not provided."
+// @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided"
+// @Param ownerUUID query string true "The unique identifier of the owner whose documents are to be retrieved."
 // @Param exclude query []string false "Fields to exclude from the response. Allowed values: `documentTitle`, `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`." collectionFormat(multi)
 // @Success 200 {object} object{documents=[]models.Document} "Successfully retrieved document(s)."
 // @Failure 400 {object} object{error=string} "Bad Request: Invalid UUID format or no valid parameters specified."
@@ -75,18 +75,32 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		offset = int8(number)
 	}
 
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
-		uid, err := uuid.Parse(id)
+	documentUidStr, isDocumentUuidPresent := c.GetQuery("documentUUID")
+	ownerUidStr, isOwnerUuidPresent := c.GetQuery("ownerUUID")
+
+	if !isOwnerUuidPresent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Required OwnerUuid is missing"})
+		return
+	}
+
+	ownerUid, err := uuid.Parse(ownerUidStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if isDocumentUuidPresent {
+		documentUid, err := uuid.Parse(documentUidStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(uid, exclude)
+		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(documentUid, ownerUid, exclude)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
-				c.JSON(http.StatusNotFound, gin.H{"error": "Document with documentUUID " + uid.String() + " was not found."})
+				c.JSON(http.StatusNotFound, gin.H{"error": "Document with documentUUID " + documentUid.String() + " was not found."})
 				return
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -98,30 +112,20 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		return
 	}
 
-	if id, isPresent := c.GetQuery("ownerUUID"); isPresent {
-		uid, err := uuid.Parse(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(ownerUid, limit, offset, exclude)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			c.JSON(http.StatusNotFound, gin.H{"error": "Document with ownerUUID " + ownerUid.String() + " was not found."})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
-		documents, err := t.DocumentRepository.GetDocumentByOwnerUUID(uid, limit, offset, exclude)
-		if err != nil {
-			switch {
-			case errors.Is(err, sql.ErrNoRows):
-				c.JSON(http.StatusNotFound, gin.H{"error": "Document with ownerUUID " + uid.String() + " was not found."})
-				return
-			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-		}
-
-		c.JSON(200, gin.H{"documents": documents})
-		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	c.JSON(200, gin.H{"documents": documents})
+	return
 }
 
 // UploadDocumentHandler handles the HTTP POST request to upload a new document.
@@ -182,28 +186,43 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param   documentUUID query string true "The UUID of the document to delete"
+// @Param   ownerUUID query string true "The UUID of the owner of the document that is getting deleted"
 // @Success 200 {object} map[string]bool "Successful deletion"
 // @Failure 400 "Bad request, typically due to missing/invalid UUID or deletion failure"
 // @Router /documents [delete]
 func (t DocumentController) DeleteDocumentHandler(c *gin.Context) {
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
-		uid, err := uuid.Parse(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		err = t.DocumentRepository.DeleteDocumentById(uid)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(200, gin.H{"success": true})
+	ownerUuidStr, isPresent := c.GetQuery("ownerUUID")
+	if !isPresent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ownerUUID was not present"})
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	documentUuidStr, isPresent := c.GetQuery("documentUUID")
+	if !isPresent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "documentUUID was not present"})
+		return
+	}
+
+	ownerUuid, err := uuid.Parse(ownerUuidStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	documentUuid, err := uuid.Parse(documentUuidStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = t.DocumentRepository.DeleteDocumentById(documentUuid, ownerUuid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"success": true})
+	return
 }
 
 func (t DocumentController) SetupRouter(c *gin.RouterGroup) {
