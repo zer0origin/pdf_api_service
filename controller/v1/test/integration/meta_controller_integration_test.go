@@ -49,7 +49,7 @@ func getMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/meta/?metaUUID="+expectedObj.DocumentUUID.String(),
+		"/api/v1/meta/?documentUUID="+expectedObj.DocumentUUID.String(),
 		nil,
 	))
 
@@ -86,7 +86,7 @@ func updateMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"PUT",
-		"/api/v1/meta/?metaUUID="+testUUID,
+		"/api/v1/meta/?documentUUID="+testUUID,
 		strings.NewReader(string(requestJSON)),
 	))
 
@@ -154,7 +154,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"PUT",
-		"/api/v1/meta/?metaUUID="+testUUID,
+		"/api/v1/meta/?documentUUID="+testUUID,
 		strings.NewReader(string(requestJSON)),
 	))
 

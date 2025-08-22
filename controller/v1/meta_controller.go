@@ -75,7 +75,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [put]
 func (t MetaController) UpdateMeta(c *gin.Context) {
-	if id, isPresent := c.GetQuery("metaUUID"); isPresent {
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -157,13 +157,13 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Tags meta
 // @Accept  json
 // @Produce  json
-// @Param   id query string true "The UUID of the metadata to retrieve"
+// @Param   documentUUID query string true "The UUID of the metadata to retrieve"
 // @Success 200 {object} models.Meta "Successful retrieval of metadata"
 // @Failure 400 "Bad request, typically due to missing/invalid UUID"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
-	if id, isPresent := c.GetQuery("metaUUID"); isPresent {
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

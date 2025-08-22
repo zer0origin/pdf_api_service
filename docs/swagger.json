@@ -512,35 +512,35 @@
         "models.Meta": {
             "type": "object",
             "properties": {
-                "Height": {
-                    "type": "number",
-                    "example": 1080
-                },
-                "NumberOfPages": {
-                    "type": "integer",
-                    "example": 31
-                },
-                "OwnerType": {
-                    "type": "string",
-                    "example": "1"
-                },
-                "OwnerUUID": {
-                    "type": "string",
-                    "example": "34906041-2d68-45a2-9671-9f0ba89f31a9"
-                },
-                "UUID": {
+                "documentUUID": {
                     "type": "string",
                     "example": "ba3ca973-5052-4030-a528-39b49736d8ad"
                 },
-                "Width": {
+                "height": {
                     "type": "number",
-                    "example": 1920
+                    "example": 1080
                 },
                 "images": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
+                },
+                "numberOfPages": {
+                    "type": "integer",
+                    "example": 31
+                },
+                "ownerType": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "ownerUUID": {
+                    "type": "string",
+                    "example": "34906041-2d68-45a2-9671-9f0ba89f31a9"
+                },
+                "width": {
+                    "type": "number",
+                    "example": 1920
                 }
             }
         },

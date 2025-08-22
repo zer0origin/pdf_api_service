@@ -22,28 +22,28 @@ definitions:
     type: object
   models.Meta:
     properties:
-      Height:
-        example: 1080
-        type: number
-      NumberOfPages:
-        example: 31
-        type: integer
-      OwnerType:
-        example: "1"
-        type: string
-      OwnerUUID:
-        example: 34906041-2d68-45a2-9671-9f0ba89f31a9
-        type: string
-      UUID:
+      documentUUID:
         example: ba3ca973-5052-4030-a528-39b49736d8ad
         type: string
-      Width:
-        example: 1920
+      height:
+        example: 1080
         type: number
       images:
         additionalProperties:
           type: string
         type: object
+      numberOfPages:
+        example: 31
+        type: integer
+      ownerType:
+        example: "1"
+        type: string
+      ownerUUID:
+        example: 34906041-2d68-45a2-9671-9f0ba89f31a9
+        type: string
+      width:
+        example: 1920
+        type: number
     type: object
   models.Selection:
     properties:
