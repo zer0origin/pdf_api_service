@@ -316,7 +316,7 @@ paths:
       parameters:
       - description: The UUID of the metadata to retrieve
         in: query
-        name: id
+        name: documentUUID
         required: true
         type: string
       produces:

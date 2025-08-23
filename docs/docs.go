@@ -211,7 +211,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "The UUID of the metadata to retrieve",
-                        "name": "id",
+                        "name": "documentUUID",
                         "in": "query",
                         "required": true
                     }
