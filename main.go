@@ -15,7 +15,7 @@ var (
 	dbHost         = os.Getenv("DATABASE_HOST")
 	dbDatabase     = os.Getenv("DATABASE_DB")
 	appPort        = os.Getenv("APP_PORT")
-	dataServiceUrl = os.Getenv("Data_Service_Url")
+	dataServiceUrl = os.Getenv("DATA_SERVICE_URL")
 )
 
 // @title           Go Backend API
@@ -61,6 +61,10 @@ func main() {
 	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler)}
 
 	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl)
+
+	if appPort == "" {
+		appPort = "8080"
+	}
 
 	log.Fatal(router.Run(":" + appPort))
 }
