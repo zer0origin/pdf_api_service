@@ -9,18 +9,18 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
-	pg "pdf_service_api/postgres"
+	postgres2 "pdf_service_api/service/postgres"
 	"time"
 )
 
-func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (pg.DatabaseHandler, error) {
+func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (postgres2.DatabaseHandler, error) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		return pg.DatabaseHandler{}, err
+		return postgres2.DatabaseHandler{}, err
 	}
 
-	dbConfig := pg.DatabaseHandler{
-		DbConfig: pg.ConfigForDatabase{
+	dbConfig := postgres2.DatabaseHandler{
+		DbConfig: postgres2.ConfigForDatabase{
 			ConUrl: connectionString,
 		}}
 
@@ -46,7 +46,6 @@ func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword 
 	return CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "")
 }
 func CreateTestContainerPostgresWithInitFileName(ctx context.Context, dbUser string, dbPassword string, initScript string) (ctr *postgres.PostgresContainer, err error) {
-
 	ctr, err = postgres.Run(
 		ctx,
 		"postgres:16-alpine",
