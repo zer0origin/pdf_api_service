@@ -29,7 +29,7 @@ type MetaController struct {
 // @Param   request body v1.AddMetaRequest true "Metadata creation request"
 // @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the metadata UUID"
 // @Failure 400 "Bad request, typically due to invalid input"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [post]
 func (t MetaController) AddMeta(c *gin.Context) {
 	body := &AddMetaRequest{}
@@ -72,7 +72,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 // @Param   request body UpdateMetaRequest true "Metadata update request"
 // @Success 200 "Successful update"
 // @Failure 400 "Bad request, typically due to invalid input"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [put]
 func (t MetaController) UpdateMeta(c *gin.Context) {
 	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
@@ -124,7 +124,7 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 // @Param   request body v1.DeleteMetaRequest true "Metadata deletion request"
 // @Success 200 {object} map[string]bool "Successful deletion"
 // @Failure 400 "Bad request, typically due to invalid input"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [delete]
 func (t MetaController) DeleteMeta(c *gin.Context) {
 	body := &DeleteMetaRequest{}
@@ -160,7 +160,7 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Param   documentUUID query string true "The UUID of the metadata to retrieve"
 // @Success 200 {object} models.Meta "Successful retrieval of metadata"
 // @Failure 400 "Bad request, typically due to missing/invalid UUID"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
 	if id, isPresent := c.GetQuery("documentUUID"); isPresent {

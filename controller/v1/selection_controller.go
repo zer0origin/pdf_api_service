@@ -31,7 +31,7 @@ type SelectionController struct {
 // @Param   selectionUUID query string false "The UUID of the specific selection to retrieve"
 // @Success 200 {object} map[string][]models.Selection "Successful retrieval of selections"
 // @Failure 400 "Bad request, typically due to missing/invalid UUID parameter"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [get]
 func (t SelectionController) GetSelection(c *gin.Context) {
 	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
@@ -84,7 +84,7 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 // @Param   documentUUID query string false "The UUID of the document whose selections are to be deleted"
 // @Success 200 {object} map[string]bool "Successful deletion"
 // @Failure 400 "Bad request, typically due to missing/invalid UUID parameter"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [delete]
 func (t SelectionController) DeleteSelection(c *gin.Context) {
 	handleDeletion := func(id string, serviceFunction func(uid uuid.UUID) error) {
@@ -135,7 +135,7 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 // @Param   request body v1.AddNewSelectionRequest true "Selection creation request"
 // @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the selection UUID"
 // @Failure 400 "Bad request, typically due to invalid input"
-// @Failure 500 "Internal server error, "
+// @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [post]
 func (t SelectionController) AddSelection(c *gin.Context) {
 	reqBody := &AddNewSelectionRequest{}

@@ -11,7 +11,7 @@ type Document struct {
 	TimeCreated   *time.Time   `json:"timeCreated,omitempty"`
 	OwnerUUID     *uuid.UUID   `json:"ownerUUID,omitempty"`
 	OwnerType     *int         `json:"ownerType,omitempty"`
-	Base64        *string      `json:"base64,omitempty"`
+	PdfBase64     *string      `json:"pdfBase64,omitempty"`
 	SelectionData *[]Selection `json:"selectionData,omitempty"`
 }
 

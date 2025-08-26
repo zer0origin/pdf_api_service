@@ -2,8 +2,6 @@ basePath: /api/v1
 definitions:
   models.Document:
     properties:
-      base64:
-        type: string
       documentTitle:
         type: string
       documentUUID:
@@ -12,6 +10,8 @@ definitions:
       ownerType:
         type: integer
       ownerUUID:
+        type: string
+      pdfBase64:
         type: string
       selectionData:
         items:
@@ -113,7 +113,7 @@ definitions:
     type: object
   v1.CreateRequest:
     properties:
-      base64:
+      documentBase64String:
         type: string
       documentTitle:
         type: string
@@ -212,7 +212,7 @@ paths:
         type: string
       - collectionFormat: multi
         description: 'Fields to exclude from the response. Allowed values: `documentTitle`,
-          `timeCreated`, `ownerUUID`, `ownerType`, `base64`.'
+          `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`.'
         in: query
         items:
           type: string
@@ -281,31 +281,6 @@ paths:
       summary: Upload a new document
       tags:
       - documents
-  /generatemeta:
-    post:
-      consumes:
-      - application/json
-      description: Retrieves metadata associated with a given UUID.
-      parameters:
-      - description: The base64 of the document
-        in: query
-        name: base64
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful creation of metadata
-          schema:
-            $ref: '#/definitions/models.Meta'
-        "400":
-          description: Bad request, typically due to missing param
-        "500":
-          description: Internal server error
-      summary: Get metadata by UUID
-      tags:
-      - meta
   /meta:
     delete:
       consumes:
@@ -330,7 +305,7 @@ paths:
         "400":
           description: Bad request, typically due to invalid input
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Delete metadata by UUID
       tags:
       - meta
@@ -354,7 +329,7 @@ paths:
         "400":
           description: Bad request, typically due to missing/invalid UUID
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Get metadata by UUID
       tags:
       - meta
@@ -381,7 +356,7 @@ paths:
         "400":
           description: Bad request, typically due to invalid input
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Add new metadata
       tags:
       - meta
@@ -404,7 +379,7 @@ paths:
         "400":
           description: Bad request, typically due to invalid input
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Update existing metadata
       tags:
       - meta
@@ -435,7 +410,7 @@ paths:
         "400":
           description: Bad request, typically due to missing/invalid UUID parameter
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Delete selections by selection or document UUID
       tags:
       - selections
@@ -467,7 +442,7 @@ paths:
         "400":
           description: Bad request, typically due to missing/invalid UUID parameter
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Get selections by document or selection UUID
       tags:
       - selections
@@ -494,7 +469,7 @@ paths:
         "400":
           description: Bad request, typically due to invalid input
         "500":
-          description: 'Internal server error, '
+          description: Internal server error, typically due to database issues
       summary: Add a new selection
       tags:
       - selections

@@ -57,7 +57,7 @@ const docTemplate = `{
                             "type": "string"
                         },
                         "collectionFormat": "multi",
-                        "description": "Fields to exclude from the response. Allowed values: ` + "`" + `documentTitle` + "`" + `, ` + "`" + `timeCreated` + "`" + `, ` + "`" + `ownerUUID` + "`" + `, ` + "`" + `ownerType` + "`" + `, ` + "`" + `base64` + "`" + `.",
+                        "description": "Fields to exclude from the response. Allowed values: ` + "`" + `documentTitle` + "`" + `, ` + "`" + `timeCreated` + "`" + `, ` + "`" + `ownerUUID` + "`" + `, ` + "`" + `ownerType` + "`" + `, ` + "`" + `pdfBase64` + "`" + `.",
                         "name": "exclude",
                         "in": "query"
                     }
@@ -194,44 +194,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/generatemeta": {
-            "post": {
-                "description": "Retrieves metadata associated with a given UUID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "meta"
-                ],
-                "summary": "Get metadata by UUID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "The base64 of the document",
-                        "name": "base64",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful creation of metadata",
-                        "schema": {
-                            "$ref": "#/definitions/models.Meta"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request, typically due to missing param"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
         "/meta": {
             "get": {
                 "description": "Retrieves metadata associated with a given UUID.",
@@ -265,7 +227,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to missing/invalid UUID"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             },
@@ -300,7 +262,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to invalid input"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             },
@@ -341,7 +303,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to invalid input"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             },
@@ -382,7 +344,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to invalid input"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             }
@@ -431,7 +393,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to missing/invalid UUID parameter"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             },
@@ -472,7 +434,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to invalid input"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             },
@@ -516,7 +478,7 @@ const docTemplate = `{
                         "description": "Bad request, typically due to missing/invalid UUID parameter"
                     },
                     "500": {
-                        "description": "Internal server error, "
+                        "description": "Internal server error, typically due to database issues"
                     }
                 }
             }
@@ -526,9 +488,6 @@ const docTemplate = `{
         "models.Document": {
             "type": "object",
             "properties": {
-                "base64": {
-                    "type": "string"
-                },
                 "documentTitle": {
                     "type": "string"
                 },
@@ -540,6 +499,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "ownerUUID": {
+                    "type": "string"
+                },
+                "pdfBase64": {
                     "type": "string"
                 },
                 "selectionData": {
@@ -688,7 +650,7 @@ const docTemplate = `{
         "v1.CreateRequest": {
             "type": "object",
             "properties": {
-                "base64": {
+                "documentBase64String": {
                     "type": "string"
                 },
                 "documentTitle": {

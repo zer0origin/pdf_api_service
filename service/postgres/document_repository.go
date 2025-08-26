@@ -90,7 +90,7 @@ func getDocumentByDocumentUUIDFunction(uid, ownerUid uuid.UUID, excludes map[str
 		}
 
 		if !excludes["pdfBase64"] {
-			scanDestinations = append(scanDestinations, &document.Base64)
+			scanDestinations = append(scanDestinations, &document.PdfBase64)
 		}
 
 		if !excludes["timeCreated"] {
@@ -142,7 +142,7 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit int8, offset int8, excl
 			}
 
 			if !excludes["pdfBase64"] {
-				scanDestinations = append(scanDestinations, &document.Base64)
+				scanDestinations = append(scanDestinations, &document.PdfBase64)
 			}
 
 			if !excludes["timeCreated"] {
@@ -174,7 +174,7 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit int8, offset int8, excl
 func createDocumentFunction(document *models.Document) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into document_table("Document_UUID", "Document_Title", "Document_Base64", "Owner_UUID", "Owner_Type") values ($1, $2, $3, $4, $5) returning "Document_UUID"`
-		_, err := db.Exec(sqlStatement, document.Uuid, document.DocumentTitle, document.Base64, document.OwnerUUID, document.OwnerType)
+		_, err := db.Exec(sqlStatement, document.Uuid, document.DocumentTitle, document.PdfBase64, document.OwnerUUID, document.OwnerType)
 
 		if err != nil {
 			return err
