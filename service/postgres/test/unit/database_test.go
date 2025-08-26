@@ -3,13 +3,13 @@ package unit
 import (
 	"database/sql"
 	"github.com/stretchr/testify/assert"
-	pg "pdf_service_api/postgres"
+	"pdf_service_api/service/postgres"
 	"testing"
 )
 
 func TestDatabaseEmptyArgs(t *testing.T) {
-	handler := pg.DatabaseHandler{
-		DbConfig: pg.ConfigForDatabase{
+	handler := postgres.DatabaseHandler{
+		DbConfig: postgres.ConfigForDatabase{
 			Host:     "",
 			Port:     "",
 			Username: "",
@@ -24,8 +24,8 @@ func TestDatabaseEmptyArgs(t *testing.T) {
 }
 
 func TestDatabaseEmptyCon(t *testing.T) {
-	handler := pg.DatabaseHandler{
-		DbConfig: pg.ConfigForDatabase{ConUrl: ""},
+	handler := postgres.DatabaseHandler{
+		DbConfig: postgres.ConfigForDatabase{ConUrl: ""},
 	}
 
 	assert.Panics(t, func() {
