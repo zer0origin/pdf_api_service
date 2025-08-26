@@ -7,11 +7,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/models"
-	"pdf_service_api/postgres"
+	postgres2 "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
@@ -38,12 +39,13 @@ func getMetaPresentUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	w := httptest.NewRecorder()
@@ -64,12 +66,13 @@ func updateMetaPresentUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	newData := models.Meta{
@@ -127,12 +130,13 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	strArr := make(map[uint32]string, 0)

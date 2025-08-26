@@ -8,12 +8,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	v1 "pdf_service_api/controller/v1"
-	"pdf_service_api/postgres"
+	postgres2 "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
@@ -53,6 +54,7 @@ func databaseConnection(t *testing.T) {
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
+	defer testcontainers.TerminateContainer(ctr)
 	require.NoError(t, err)
 	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
@@ -82,12 +84,13 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -110,12 +113,13 @@ func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -137,12 +141,13 @@ func getDocumentWithNoOwnerUuid(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
@@ -169,12 +174,13 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
@@ -199,12 +205,13 @@ func getDocumentWithOwnerUUID(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -226,12 +233,13 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset0(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -253,12 +261,13 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset1(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -280,12 +289,13 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset2(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -307,12 +317,13 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset10(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -334,12 +345,13 @@ func getDocumentWithOwnerUUIDWithLimit2AndOffset0(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -361,12 +373,13 @@ func getDocumentWithOwnerUUIDWithLimit2AndOffset1(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -388,12 +401,13 @@ func getDocumentWithOwnerUUIDWithExcludes(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "UserTable")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -417,12 +431,13 @@ func uploadDocument(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 	request := &v1.CreateRequest{DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
@@ -448,12 +463,13 @@ func uploadDocumentWithTitle(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{ConUrl: connectionString}}
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 	request := &v1.CreateRequest{DocumentTitle: func() *string { v := "Document Title"; return &v }(), DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
@@ -492,11 +508,12 @@ func deleteDocument(t *testing.T) {
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
 
 	dbHandle, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	require.NoError(t, err)
 
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandle)}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
 	router := v1.SetupRouter(documentCtrl, nil, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
