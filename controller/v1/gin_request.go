@@ -11,10 +11,10 @@ type GetDocumentRequest struct {
 }
 
 type CreateRequest struct {
-	DocumentBase64String string     `json:"documentBase64String"`
-	DocumentTitle        *string    `json:"documentTitle"`
-	OwnerUUID            *uuid.UUID `json:"ownerUUID"`
-	OwnerType            *int       `json:"ownerType"`
+	Base64        string     `json:"base64"`
+	DocumentTitle *string    `json:"documentTitle"`
+	OwnerUUID     *uuid.UUID `json:"ownerUUID"`
+	OwnerType     *int       `json:"ownerType"`
 }
 
 type AddNewSelectionRequest struct {
@@ -41,4 +41,8 @@ type UpdateMetaRequest struct {
 
 type DeleteMetaRequest struct {
 	UUID uuid.UUID
+}
+
+type GenerateMetaRequest struct {
+	Base64 string `json:"base64"`
 }

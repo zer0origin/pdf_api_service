@@ -25,7 +25,7 @@ type DocumentController struct {
 // @Produce json
 // @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided"
 // @Param ownerUUID query string true "The unique identifier of the owner whose documents are to be retrieved."
-// @Param exclude query []string false "Fields to exclude from the response. Allowed values: `documentTitle`, `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`." collectionFormat(multi)
+// @Param exclude query []string false "Fields to exclude from the response. Allowed values: `documentTitle`, `timeCreated`, `ownerUUID`, `ownerType`, `base64`." collectionFormat(multi)
 // @Success 200 {object} object{documents=[]models.Document} "Successfully retrieved document(s)."
 // @Failure 400 {object} object{error=string} "Bad Request: Invalid UUID format or no valid parameters specified."
 // @Failure 404 {object} object{error=string} "Not Found: No document(s) found for the given UUID."
@@ -50,7 +50,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			exclude["ownerType"] = true
 		}
 
-		if slices.Contains(values, "pdfBase64") {
+		if slices.Contains(values, "base64") {
 			exclude["pdfBase64"] = true
 		}
 	}
@@ -156,7 +156,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 
 	newModel := models.Document{
 		Uuid:          uuid.New(),
-		PdfBase64:     &body.DocumentBase64String,
+		Base64:        &body.Base64,
 		DocumentTitle: body.DocumentTitle,
 		OwnerUUID:     body.OwnerUUID,
 		OwnerType:     body.OwnerType,
