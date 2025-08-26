@@ -5,20 +5,17 @@ import (
 	"log"
 	"os"
 	v1 "pdf_service_api/controller/v1"
-	"pdf_service_api/eureka"
-	pg "pdf_service_api/postgres"
-	"strconv"
+	"pdf_service_api/service/postgres"
 )
 
 var (
-	dbUser        = os.Getenv("DATABASE_USER")
-	dbPassword    = os.Getenv("DATABASE_PASSWORD")
-	dbPort        = os.Getenv("DATABASE_PORT")
-	dbHost        = os.Getenv("DATABASE_HOST")
-	dbDatabase    = os.Getenv("DATABASE_DB")
-	eurekaAppIp   = os.Getenv("EUREKA_APP_IP")
-	eurekaAppName = os.Getenv("EUREKA_APP_NAME")
-	appPort       = os.Getenv("APP_PORT")
+	dbUser         = os.Getenv("DATABASE_USER")
+	dbPassword     = os.Getenv("DATABASE_PASSWORD")
+	dbPort         = os.Getenv("DATABASE_PORT")
+	dbHost         = os.Getenv("DATABASE_HOST")
+	dbDatabase     = os.Getenv("DATABASE_DB")
+	appPort        = os.Getenv("APP_PORT")
+	dataServiceUrl = os.Getenv("Data_Service_Url")
 )
 
 // @title           Go Backend API
@@ -45,7 +42,7 @@ func main() {
 	}
 	mustNotBeEmpty(errHandleFunction, dbUser, dbPassword, dbPort, dbHost, dbDatabase)
 
-	dbHandler := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{
+	dbHandler := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{
 		Host:     dbHost,
 		Port:     dbPort,
 		Username: dbUser,
@@ -59,34 +56,13 @@ func main() {
 		panic(err)
 	}
 
-	documentCtrl := &v1.DocumentController{DocumentRepository: pg.NewDocumentRepository(dbHandler)}
-	selectionCtrl := &v1.SelectionController{SelectionRepository: pg.NewSelectionRepository(dbHandler)}
-	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandler)}
+	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandler)}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandler)}
+	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler)}
 
 	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl)
 
-	if eurekaAppIp != "" && appPort != "" {
-		eurekaAppPort, err := strconv.Atoi(appPort)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		var appName = eurekaAppName
-		var appHostname = eurekaAppName
-		appHostname, _ = os.Hostname()
-
-		if appName == "" {
-			appName = appHostname
-		}
-
-		e := eureka.Eureka{}
-		err = e.JoinEureka(appHostname, eurekaAppIp, appName, eurekaAppPort)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-
-	log.Fatal(router.Run(":8080"))
+	log.Fatal(router.Run(":" + appPort))
 }
 
 func mustNotBeEmpty(errorHandle func(string), a ...string) {
