@@ -15,17 +15,14 @@ import (
 )
 
 func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (pg.DatabaseHandler, error) {
-	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		return pg.DatabaseHandler{}, err
-	}
+	connectionString := ctr.MustConnectionString(ctx, "sslmode=disable")
 
 	dbConfig := pg.DatabaseHandler{
 		DbConfig: pg.ConfigForDatabase{
 			ConUrl: connectionString,
 		}}
 
-	err = dbConfig.RunInitScript()
+	err := dbConfig.RunInitScript()
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
@@ -33,16 +30,6 @@ func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.Pos
 
 	return dbConfig, nil
 }
-
-func CleanUp(ctx context.Context, ctr postgres.PostgresContainer) func() {
-	return func() {
-		err := ctr.Terminate(ctx)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-}
-
 func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string) (ctr *postgres.PostgresContainer, err error) {
 	return CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "")
 }
@@ -113,6 +100,6 @@ func CreateDataApiTestContainer() (nat.Port, *testcontainers.DockerContainer, er
 
 	fmt.Printf("Container started!\n")
 	p, err := ctr.MappedPort(ctx, "8080")
-	fmt.Printf("Postgres container listening to: %s\n", p)
+	fmt.Printf("pdf_service_data container listening to: %s\n", p)
 	return p, ctr, err
 }

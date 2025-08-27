@@ -16,5 +16,5 @@ type Meta struct {
 	Height        *float32  `json:"height" example:"1080"`
 	Images        *map[uint32]string
 	OwnerUUID     *uuid.UUID `json:"ownerUUID" example:"34906041-2d68-45a2-9671-9f0ba89f31a9"`
-	OwnerType     *string    `json:"ownerType" example:"1"`
+	OwnerType     *int       `json:"ownerType" example:"1"`
 }

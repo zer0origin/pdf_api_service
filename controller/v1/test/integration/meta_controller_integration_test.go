@@ -3,7 +3,9 @@ package integration
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,6 +14,7 @@ import (
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/models"
+	"pdf_service_api/service/dataapi"
 	postgres2 "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
 	"strings"
@@ -23,6 +26,7 @@ func TestMetaIntegration(t *testing.T) {
 	t.Run("get meta using a present uuid", getMetaPresentUUID)
 	t.Run("update meta using a present uuid", updateMetaPresentUUID)
 	t.Run("update meta using a present uuid with new images", updateImageMetaPresentUUID)
+	t.Run("Add meta using the DataApi to generate the meta data", addMeta)
 }
 
 func getMetaPresentUUID(t *testing.T) {
@@ -195,4 +199,46 @@ func updateImageMetaPresentUUID(t *testing.T) {
 		return
 	}
 
+}
+
+func addMeta(t *testing.T) {
+	if *testutil.SkipDataApiIntegrationTest {
+		t.Skip("Skipping test due to flags")
+	}
+
+	documentUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+	ownerUUID := "ea167a48-c1b3-46c4-911b-090e807132fc"
+
+	p, ctr, err := testutil.CreateDataApiTestContainer()
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	ctx := context.Background()
+	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithRealDocument")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(pgCtr)
+
+	dbHandle, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *pgCtr)
+	require.NoError(t, err)
+
+	srv := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
+	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: postgres2.NewMetaRepository(dbHandle)}
+	router := v1.SetupRouter(nil, nil, metaCtrl)
+
+	request := v1.AddMetaRequest{
+		DocumentUUID:         uuid.MustParse(documentUUID),
+		OwnerUUID:            uuid.MustParse(ownerUUID),
+		DocumentBase64String: func() *string { return &testutil.HundredPagesPdfInBase64 }(),
+	}
+	bytes, err := json.Marshal(request)
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/meta/",
+		strings.NewReader(string(bytes)),
+	))
+
+	assert.Equal(t, http.StatusOK, w.Code)
 }

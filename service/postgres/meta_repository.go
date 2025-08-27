@@ -56,7 +56,13 @@ func (m metaRepository) GetMeta(uid uuid.UUID) (models.Meta, error) {
 func addMetaDataFunction(data models.Meta) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		SqlStatement := `INSERT INTO documentmeta_table ("Document_UUID", "Number_Of_Pages", "Height", "Width", "Images") values ($1, $2, $3, $4, $5)`
-		if _, err := db.Exec(SqlStatement, data.DocumentUUID, data.NumberOfPages, data.Height, data.Width, data.Images); err != nil {
+
+		imagesJson, err := json.Marshal(data.Images)
+		if err != nil {
+			return err
+		}
+
+		if _, err := db.Exec(SqlStatement, data.DocumentUUID, data.NumberOfPages, data.Height, data.Width, imagesJson); err != nil {
 			return err
 		}
 

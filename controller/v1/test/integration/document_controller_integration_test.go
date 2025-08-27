@@ -47,7 +47,6 @@ func databaseConnection(t *testing.T) {
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	defer testcontainers.TerminateContainer(ctr)
 	require.NoError(t, err)
-	t.Cleanup(testutil.CleanUp(ctx, *ctr))
 
 	dbConfig, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *ctr)
 	require.NoError(t, err)

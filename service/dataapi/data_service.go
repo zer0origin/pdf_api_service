@@ -12,11 +12,11 @@ import (
 )
 
 type DataService struct {
-	baseUrl string
+	BaseUrl string
 }
 
 func (t DataService) SendMetaRequest(base64 string) (models.Meta, error) {
-	url := fmt.Sprintf("%s/meta", t.baseUrl)
+	url := fmt.Sprintf("%s/meta", t.BaseUrl)
 	method := "POST"
 	payload := strings.NewReader(fmt.Sprintf(`{"base64": "%s"}`, base64))
 

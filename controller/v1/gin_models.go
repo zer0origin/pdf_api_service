@@ -24,9 +24,10 @@ type AddNewSelectionRequest struct {
 	SelectionBounds *map[int][]models.SelectionBounds `json:"selectionBounds,omitempty"`
 }
 
-type AddMetaRequestGenerated struct {
+type AddMetaRequest struct {
 	DocumentUUID         uuid.UUID `json:"documentUUID" `
 	OwnerUUID            uuid.UUID `json:"ownerUUID"`
+	OwnerType            int       `json:"ownerType"`
 	DocumentBase64String *string   `json:"documentBase64String"`
 }
 
@@ -40,8 +41,4 @@ type UpdateMetaRequest struct {
 
 type DeleteMetaRequest struct {
 	UUID uuid.UUID
-}
-
-type AddMetaResponse struct {
-	MetaUUID uuid.UUID `json:"metaUUID"`
 }

@@ -15,7 +15,7 @@ type MetaController struct {
 }
 
 // AddMeta handles the HTTP POST request to add new metadata.
-// It expects a JSON request body conforming to the AddMetaRequestGenerated struct,
+// It expects a JSON request body conforming to the AddMetaRequest struct,
 // which should contain the NumberOfPages, Height, Width, and Images for the new metadata.
 //
 // A new UUID will be generated for the metadata.
@@ -29,13 +29,13 @@ type MetaController struct {
 // @Tags meta
 // @Accept  json
 // @Produce  json
-// @Param   request body v1.AddMetaRequestGenerated true "Metadata creation request"
+// @Param   request body v1.AddMetaRequest true "Metadata creation request"
 // @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the metadata UUID"
 // @Failure 400 "Bad request, typically due to invalid input"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [post]
 func (t MetaController) AddMeta(c *gin.Context) {
-	body := &AddMetaRequestGenerated{}
+	body := &AddMetaRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -59,11 +59,17 @@ func (t MetaController) AddMeta(c *gin.Context) {
 		return
 	}
 
+	request.DocumentUUID = body.DocumentUUID
+	request.OwnerUUID = &body.OwnerUUID
+	request.OwnerType = &body.OwnerType
+
 	err = t.MetaRepository.AddMeta(request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.Status(http.StatusOK)
 }
 
 // UpdateMeta handles the HTTP PUT request to update existing metadata.

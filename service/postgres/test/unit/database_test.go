@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/stretchr/testify/assert"
 	"pdf_service_api/service/postgres"
+	_ "pdf_service_api/testutil"
 	"testing"
 )
 
