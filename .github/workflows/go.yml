@@ -25,4 +25,4 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: go test $(go list ./... | grep -v pdf_service_api/service/dataapi)
+      run: go test ./... -args -skip-dataapi
