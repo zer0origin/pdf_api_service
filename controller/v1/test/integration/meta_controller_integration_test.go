@@ -208,6 +208,13 @@ func addMeta(t *testing.T) {
 
 	documentUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	ownerUUID := "ea167a48-c1b3-46c4-911b-090e807132fc"
+	request := v1.AddMetaRequest{
+		DocumentUUID:         uuid.MustParse(documentUUID),
+		OwnerUUID:            uuid.MustParse(ownerUUID),
+		DocumentBase64String: func() *string { return &testutil.HundredPagesPdfInBase64 }(),
+	}
+	requestBytes, err := json.Marshal(request)
+	require.NoError(t, err)
 
 	p, ctr, err := testutil.CreateDataApiTestContainer()
 	require.NoError(t, err)
@@ -225,19 +232,11 @@ func addMeta(t *testing.T) {
 	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: postgres2.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
-	request := v1.AddMetaRequest{
-		DocumentUUID:         uuid.MustParse(documentUUID),
-		OwnerUUID:            uuid.MustParse(ownerUUID),
-		DocumentBase64String: func() *string { return &testutil.HundredPagesPdfInBase64 }(),
-	}
-	bytes, err := json.Marshal(request)
-	require.NoError(t, err)
-
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"POST",
 		"/api/v1/meta/",
-		strings.NewReader(string(bytes)),
+		strings.NewReader(string(requestBytes)),
 	))
 
 	assert.Equal(t, http.StatusOK, w.Code)
