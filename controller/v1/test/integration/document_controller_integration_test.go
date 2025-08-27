@@ -11,8 +11,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	v1 "pdf_service_api/controller/v1"
 	postgres2 "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
@@ -45,13 +43,6 @@ func TestDocumentIntegration(t *testing.T) {
 
 func databaseConnection(t *testing.T) {
 	t.Parallel()
-	wd, err := os.Getwd()
-	rd, err := os.Executable()
-	dir := filepath.Dir(rd)
-	fmt.Printf("%s", wd)
-	fmt.Printf("%s", rd)
-	fmt.Printf("%s", dir)
-
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgres(ctx, dbUser, dbPassword)
 	defer testcontainers.TerminateContainer(ctr)

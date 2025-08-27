@@ -27,7 +27,7 @@ func (d documentRepository) DeleteDocumentById(documentUuid, ownerUuid uuid.UUID
 	return nil
 }
 
-func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, offset int8, excludes map[string]bool) ([]models.Document, error) {
+func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, offset int8, excludes models.Exclude) ([]models.Document, error) {
 	if limit <= 0 || offset < 0 {
 		return make([]models.Document, 0), errors.New("limit or offset were invalid")
 	}
@@ -43,7 +43,7 @@ func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, of
 	return ss, nil
 }
 
-func (d documentRepository) GetDocumentByDocumentUUID(documentUid, ownerUid uuid.UUID, excludes map[string]bool) (models.Document, error) {
+func (d documentRepository) GetDocumentByDocumentUUID(documentUid, ownerUid uuid.UUID, excludes models.Exclude) (models.Document, error) {
 	document := &models.Document{}
 	err := d.databaseManager.WithConnection(getDocumentByDocumentUUIDFunction(documentUid, ownerUid, excludes, func(data models.Document) {
 		*document = data

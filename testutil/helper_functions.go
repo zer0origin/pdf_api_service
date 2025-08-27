@@ -5,22 +5,23 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
-	postgres2 "pdf_service_api/service/postgres"
+	pg "pdf_service_api/service/postgres"
 	"time"
 )
 
-func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (postgres2.DatabaseHandler, error) {
+func CreateDatabaseHandlerFromPostgresInfo(ctx context.Context, ctr postgres.PostgresContainer) (pg.DatabaseHandler, error) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		return postgres2.DatabaseHandler{}, err
+		return pg.DatabaseHandler{}, err
 	}
 
-	dbConfig := postgres2.DatabaseHandler{
-		DbConfig: postgres2.ConfigForDatabase{
+	dbConfig := pg.DatabaseHandler{
+		DbConfig: pg.ConfigForDatabase{
 			ConUrl: connectionString,
 		}}
 
@@ -45,6 +46,7 @@ func CleanUp(ctx context.Context, ctr postgres.PostgresContainer) func() {
 func CreateTestContainerPostgres(ctx context.Context, dbUser string, dbPassword string) (ctr *postgres.PostgresContainer, err error) {
 	return CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "")
 }
+
 func CreateTestContainerPostgresWithInitFileName(ctx context.Context, dbUser string, dbPassword string, initScript string) (ctr *postgres.PostgresContainer, err error) {
 	ctr, err = postgres.Run(
 		ctx,
@@ -98,4 +100,19 @@ func CreateTestContainerPostgresWithInitFileName(ctx context.Context, dbUser str
 	})
 
 	return ctr, err
+}
+
+func CreateDataApiTestContainer() (nat.Port, *testcontainers.DockerContainer, error) {
+	ctx := context.Background()
+	ctr, err := testcontainers.Run(ctx, "pdf_service_data:0.0.5",
+		testcontainers.WithWaitStrategy(wait.ForHTTP("/ping").WithPort("8080/tcp")),
+		testcontainers.WithExposedPorts("8080"))
+	if err != nil {
+		return "", ctr, nil
+	}
+
+	fmt.Printf("Container started!\n")
+	p, err := ctr.MappedPort(ctx, "8080")
+	fmt.Printf("Postgres container listening to: %s\n", p)
+	return p, ctr, err
 }

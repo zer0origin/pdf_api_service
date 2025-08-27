@@ -5,14 +5,17 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"pdf_service_api/models"
+	"pdf_service_api/service/dataapi"
 )
 
 type MetaController struct {
-	MetaRepository models.MetaRepository
+	DocumentRepository models.DocumentRepository
+	MetaRepository     models.MetaRepository
+	DataService        dataapi.DataService
 }
 
 // AddMeta handles the HTTP POST request to add new metadata.
-// It expects a JSON request body conforming to the AddMetaRequest struct,
+// It expects a JSON request body conforming to the AddMetaRequestGenerated struct,
 // which should contain the NumberOfPages, Height, Width, and Images for the new metadata.
 //
 // A new UUID will be generated for the metadata.
@@ -26,32 +29,41 @@ type MetaController struct {
 // @Tags meta
 // @Accept  json
 // @Produce  json
-// @Param   request body v1.AddMetaRequest true "Metadata creation request"
+// @Param   request body v1.AddMetaRequestGenerated true "Metadata creation request"
 // @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the metadata UUID"
 // @Failure 400 "Bad request, typically due to invalid input"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [post]
 func (t MetaController) AddMeta(c *gin.Context) {
-	body := &AddMetaRequest{}
+	body := &AddMetaRequestGenerated{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	model := models.Meta{
-		DocumentUUID:  uuid.New(),
-		NumberOfPages: body.NumberOfPages,
-		Height:        body.Height,
-		Width:         body.Width,
-		Images:        body.Images,
+	if body.DocumentBase64String == nil {
+		exclude := make(models.Exclude)
+		exclude.TimeCreated(true).OwnerUUID(true).OwnerType(true).DocumentTitle(true)
+		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(body.DocumentUUID, body.OwnerUUID, exclude)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		body.DocumentBase64String = document.PdfBase64
 	}
 
-	if err := t.MetaRepository.AddMeta(model); err != nil {
+	request, err := t.DataService.SendMetaRequest(*body.DocumentBase64String)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"metaUUID": model.DocumentUUID})
+	err = t.MetaRepository.AddMeta(request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 }
 
 // UpdateMeta handles the HTTP PUT request to update existing metadata.
