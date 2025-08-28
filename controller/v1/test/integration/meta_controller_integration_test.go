@@ -15,7 +15,7 @@ import (
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/models"
 	"pdf_service_api/service/dataapi"
-	postgres2 "pdf_service_api/service/postgres"
+	pg "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
@@ -26,7 +26,8 @@ func TestMetaIntegration(t *testing.T) {
 	t.Run("get meta using a present uuid", getMetaPresentUUID)
 	t.Run("update meta using a present uuid", updateMetaPresentUUID)
 	t.Run("update meta using a present uuid with new images", updateImageMetaPresentUUID)
-	t.Run("Add meta using the DataApi to generate the meta data", addMeta)
+	t.Run("Add meta using the DataApi to generate the meta data", addMetaBase64Included)
+	t.Run("Add meta using the DataApi to generate the meta data", addMetaBase64Excluded)
 }
 
 func getMetaPresentUUID(t *testing.T) {
@@ -48,8 +49,8 @@ func getMetaPresentUUID(t *testing.T) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
+	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	w := httptest.NewRecorder()
@@ -75,8 +76,8 @@ func updateMetaPresentUUID(t *testing.T) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
+	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	newData := models.Meta{
@@ -139,8 +140,8 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres2.NewMetaRepository(dbHandle)}
+	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	strArr := make(map[uint32]string, 0)
@@ -201,7 +202,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 
 }
 
-func addMeta(t *testing.T) {
+func addMetaBase64Included(t *testing.T) {
 	if *testutil.SkipDataApiIntegrationTest {
 		t.Skip("Skipping test due to flags")
 	}
@@ -212,6 +213,7 @@ func addMeta(t *testing.T) {
 		DocumentUUID:         uuid.MustParse(documentUUID),
 		OwnerUUID:            uuid.MustParse(ownerUUID),
 		DocumentBase64String: func() *string { return &testutil.HundredPagesPdfInBase64 }(),
+		OwnerType:            1,
 	}
 	requestBytes, err := json.Marshal(request)
 	require.NoError(t, err)
@@ -229,7 +231,7 @@ func addMeta(t *testing.T) {
 	require.NoError(t, err)
 
 	srv := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
-	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: postgres2.NewMetaRepository(dbHandle)}
+	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: pg.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
 	w := httptest.NewRecorder()
@@ -240,4 +242,71 @@ func addMeta(t *testing.T) {
 	))
 
 	assert.Equal(t, http.StatusOK, w.Code)
+	if w.Code != http.StatusOK {
+		fmt.Println(w.Body.String())
+	}
+
+	dbHandle.WithConnection(func(db *sql.DB) error {
+		row := db.QueryRow(`SELECT "Number_Of_Pages" FROM postgres.public.documentmeta_table WHERE "Document_UUID" = $1`, request.DocumentUUID)
+
+		var number int8
+		err := row.Scan(&number)
+		require.NoError(t, err)
+		assert.EqualValues(t, number, 101)
+		return nil
+	})
+}
+
+func addMetaBase64Excluded(t *testing.T) {
+	if *testutil.SkipDataApiIntegrationTest {
+		t.Skip("Skipping test due to flags")
+	}
+
+	documentUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
+	ownerUUID := "ea167a48-c1b3-46c4-911b-090e807132fc"
+	request := v1.AddMetaRequest{
+		DocumentUUID: uuid.MustParse(documentUUID),
+		OwnerUUID:    uuid.MustParse(ownerUUID),
+		OwnerType:    1,
+	}
+	requestBytes, err := json.Marshal(request)
+	require.NoError(t, err)
+
+	p, ctr, err := testutil.CreateDataApiTestContainer()
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	ctx := context.Background()
+	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithRealDocument")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(pgCtr)
+
+	dbHandle, err := testutil.CreateDatabaseHandlerFromPostgresInfo(ctx, *pgCtr)
+	require.NoError(t, err)
+
+	srv := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
+	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: pg.NewMetaRepository(dbHandle), DocumentRepository: pg.NewDocumentRepository(dbHandle)}
+	router := v1.SetupRouter(nil, nil, metaCtrl)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/meta/",
+		strings.NewReader(string(requestBytes)),
+	))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	if w.Code != http.StatusOK {
+		fmt.Println(w.Body.String())
+	}
+
+	dbHandle.WithConnection(func(db *sql.DB) error {
+		row := db.QueryRow(`SELECT "Number_Of_Pages" FROM postgres.public.documentmeta_table WHERE "Document_UUID" = $1`, request.DocumentUUID)
+
+		var number int8
+		err := row.Scan(&number)
+		require.NoError(t, err)
+		assert.EqualValues(t, number, 101)
+		return nil
+	})
 }
