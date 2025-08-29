@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -55,7 +56,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 
 	request, err := t.DataService.SendMetaRequest(*body.DocumentBase64String)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("error sending SendMetaRequest: %v", err.Error())})
 		return
 	}
 

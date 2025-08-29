@@ -16,6 +16,10 @@ type DataService struct {
 }
 
 func (t DataService) SendMetaRequest(base64 string) (models.Meta, error) {
+	if t.BaseUrl == "" {
+		panic("No BaseUrl Provided")
+	}
+
 	url := fmt.Sprintf("%s/meta", t.BaseUrl)
 	method := "POST"
 	payload := strings.NewReader(fmt.Sprintf(`{"base64": "%s"}`, base64))

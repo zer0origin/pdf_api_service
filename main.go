@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	v1 "pdf_service_api/controller/v1"
+	"pdf_service_api/service/dataapi"
 	"pdf_service_api/service/postgres"
 )
 
@@ -58,7 +59,7 @@ func main() {
 
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandler)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandler)}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler)}
+	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler), DocumentRepository: postgres.NewDocumentRepository(dbHandler), DataService: dataapi.DataService{BaseUrl: dataServiceUrl}}
 
 	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl)
 
