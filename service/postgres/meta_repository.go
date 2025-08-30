@@ -39,14 +39,14 @@ func (m metaRepository) UpdateMeta(uid uuid.UUID, data models.Meta) error {
 	return nil
 }
 
-func (m metaRepository) GetMeta(uid uuid.UUID) (models.Meta, error) {
+func (m metaRepository) GetMeta(documentUid, ownerUid uuid.UUID) (models.Meta, error) {
 	returnedData := &models.Meta{}
 	callbackFunction := func(data models.Meta) error {
 		*returnedData = data
 		return nil
 	}
 
-	if err := m.DatabaseHandler.WithConnection(getMetaDataFunction(uid, callbackFunction)); err != nil {
+	if err := m.DatabaseHandler.WithConnection(getMetaDataFunction(documentUid, ownerUid, callbackFunction)); err != nil {
 		return models.Meta{}, err
 	}
 
@@ -97,12 +97,12 @@ func updateMetaDataFunction(uid uuid.UUID, data models.Meta) func(db *sql.DB) er
 	}
 }
 
-func getMetaDataFunction(uid uuid.UUID, callback func(data models.Meta) error) func(db *sql.DB) error {
+func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data models.Meta) error) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		meta := &models.Meta{}
-		SqlStatement := `SELECT "Document_UUID", "Number_Of_Pages", "Height", "Width", "Images" FROM documentmeta_table where "Document_UUID" = $1`
+		SqlStatement := `SELECT mt."Document_UUID", mt."Number_Of_Pages", mt."Height", mt."Width", mt."Images" FROM documentmeta_table as mt join public.document_table dt on dt."Document_UUID" = mt."Document_UUID" where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2`
 
-		row := db.QueryRow(SqlStatement, uid)
+		row := db.QueryRow(SqlStatement, documentUid, ownerUid)
 		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &meta.Images)
 		if err != nil {
 			return err

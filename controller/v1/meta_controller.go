@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -177,29 +179,50 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param   documentUUID query string true "The UUID of the metadata to retrieve"
+// @Param   ownerUUID query string true "The UUID of the owner of the metadata to retrieve"
 // @Success 200 {object} models.Meta "Successful retrieval of metadata"
+// @Success 404 data not found
 // @Failure 400 "Bad request, typically due to missing/invalid UUID"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
-		uid, err := uuid.Parse(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		data, err := t.MetaRepository.GetMeta(uid)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, data)
+	documentUid, isPresent := c.GetQuery("documentUUID")
+	if !isPresent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Required param documentUUID missing!"})
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	ownerUid, isPresent := c.GetQuery("ownerUUID")
+	if !isPresent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Required param ownerUUID missing!"})
+		return
+	}
+
+	documentUUID, err := uuid.Parse(documentUid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ownerUUID, err := uuid.Parse(ownerUid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	data, err := t.MetaRepository.GetMeta(documentUUID, ownerUUID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, data)
+	return
 }
 
 func (t MetaController) SetupRouter(c *gin.RouterGroup) {

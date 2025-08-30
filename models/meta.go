@@ -6,7 +6,7 @@ type MetaRepository interface {
 	AddMeta(data Meta) error
 	DeleteMeta(data Meta) error
 	UpdateMeta(uid uuid.UUID, data Meta) error
-	GetMeta(uid uuid.UUID) (Meta, error)
+	GetMeta(documentUid, ownerUid uuid.UUID) (Meta, error)
 }
 
 type Meta struct {

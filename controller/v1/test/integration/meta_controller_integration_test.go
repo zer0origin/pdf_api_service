@@ -24,6 +24,7 @@ import (
 func TestMetaIntegration(t *testing.T) {
 	t.Parallel()
 	t.Run("get meta using a present uuid", getMetaPresentUUID)
+	t.Run("get meta using a uuid not present in table", getMetaUUIDDoesNotExistInTable)
 	t.Run("update meta using a present uuid", updateMetaPresentUUID)
 	t.Run("update meta using a present uuid with new images", updateImageMetaPresentUUID)
 	t.Run("Add meta using the DataApi to generate the meta data", addMetaBase64Included)
@@ -56,12 +57,39 @@ func getMetaPresentUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/meta/?documentUUID="+expectedObj.DocumentUUID.String(),
+		"/api/v1/meta/?documentUUID="+expectedObj.DocumentUUID.String()+"&ownerUUID=f701aa7e-10e9-48b9-83f1-6b035a5b7564",
 		nil,
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.Equal(t, w.Body.String(), string(bytes))
+	assert.Equal(t, string(bytes), w.Body.String())
+}
+
+func getMetaUUIDDoesNotExistInTable(t *testing.T) {
+	t.Parallel()
+	expectedObj := "{\"error\":\"data not found\"}"
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryTwoSelectionsAndMetaData")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
+	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
+	router := v1.SetupRouter(nil, nil, metaCtrl)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"/api/v1/meta/?documentUUID="+"b66fa223-515f-4503-80cc-2bdaa50ef474"+"&ownerUUID=f701aa7e-10e9-48b9-83f1-6b035a5b7564",
+		nil,
+	))
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, expectedObj, w.Body.String())
 }
 
 func updateMetaPresentUUID(t *testing.T) {
