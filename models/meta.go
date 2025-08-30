@@ -10,11 +10,11 @@ type MetaRepository interface {
 }
 
 type Meta struct {
-	DocumentUUID  uuid.UUID `json:"documentUUID" example:"ba3ca973-5052-4030-a528-39b49736d8ad"`
-	NumberOfPages *uint32   `json:"numberOfPages" example:"31"`
-	Width         *float32  `json:"width" example:"1920"`
-	Height        *float32  `json:"height" example:"1080"`
-	Images        *map[uint32]string
-	OwnerUUID     *uuid.UUID `json:"ownerUUID" example:"34906041-2d68-45a2-9671-9f0ba89f31a9"`
-	OwnerType     *int       `json:"ownerType" example:"1"`
+	DocumentUUID  uuid.UUID          `json:"documentUUID" example:"ba3ca973-5052-4030-a528-39b49736d8ad"`
+	NumberOfPages *uint32            `json:"numberOfPages,omitempty" example:"31"`
+	Width         *float32           `json:"width,omitempty" example:"1920"`
+	Height        *float32           `json:"height,omitempty" example:"1080"`
+	Images        *map[uint32]string `json:"images,omitempty"`
+	OwnerUUID     *uuid.UUID         `json:"ownerUUID,omitempty" example:"34906041-2d68-45a2-9671-9f0ba89f31a9"`
+	OwnerType     *int               `json:"ownerType,omitempty" example:"1"`
 }

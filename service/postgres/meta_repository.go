@@ -103,10 +103,16 @@ func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data mod
 		SqlStatement := `SELECT mt."Document_UUID", mt."Number_Of_Pages", mt."Height", mt."Width", mt."Images" FROM documentmeta_table as mt join public.document_table dt on dt."Document_UUID" = mt."Document_UUID" where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2`
 
 		row := db.QueryRow(SqlStatement, documentUid, ownerUid)
-		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &meta.Images)
+
+		var imageStr string
+		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &imageStr)
 		if err != nil {
 			return err
 		}
+
+		imageMap := make(map[uint32]string)
+		json.Unmarshal([]byte(imageStr), &imageMap)
+		meta.Images = &imageMap
 
 		return callback(*meta)
 	}

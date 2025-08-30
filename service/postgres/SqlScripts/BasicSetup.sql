@@ -21,7 +21,7 @@ create table if not exists documentmeta_table
     "Number_Of_Pages" integer,
     "Height"          numeric,
     "Width"           numeric,
-    "Images"          json
+    "Images"          json default '{}'
 );
 
 create table if not exists selection_table

@@ -8,4 +8,4 @@ insert into selection_table ("Selection_UUID", "Document_UUID", "isCompleted")
 values (uuid('335a6b95-6707-4e2b-9c37-c76d017f6f97'), uuid('b66fd223-515f-4503-80cc-2bdaa50ef474'), false);
 
 insert into documentmeta_table ("Document_UUID", "Number_Of_Pages", "Height", "Width", "Images")
-values (uuid('b66fd223-515f-4503-80cc-2bdaa50ef474'), 31, 1920, 1080, null);
+values (uuid('b66fd223-515f-4503-80cc-2bdaa50ef474'), 31, 1920, 1080, '{}');

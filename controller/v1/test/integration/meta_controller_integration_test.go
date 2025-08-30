@@ -33,11 +33,13 @@ func TestMetaIntegration(t *testing.T) {
 
 func getMetaPresentUUID(t *testing.T) {
 	t.Parallel()
+	mm := make(map[uint32]string)
 	expectedObj := models.Meta{
 		DocumentUUID:  uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		NumberOfPages: func() *uint32 { v := uint32(31); return &v }(),
 		Height:        func() *float32 { v := float32(1920); return &v }(),
 		Width:         func() *float32 { v := float32(1080); return &v }(),
+		Images:        &mm,
 	}
 	bytes, err := json.Marshal(expectedObj)
 	require.NoError(t, err)
