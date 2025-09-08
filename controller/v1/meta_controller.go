@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	"pdf_service_api/models"
 	"pdf_service_api/service/dataapi"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type MetaController struct {
@@ -186,6 +188,31 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
+	var pageStart uint16 = 0
+	var pageEnd uint16 = 65535
+	pageStartStr, startPresent := c.GetQuery("start")
+	pageEndStr, endPresent := c.GetQuery("end")
+
+	if startPresent {
+		pageNumber, err := strconv.ParseInt(pageStartStr, 10, 16)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for the query param start"})
+			return
+		}
+
+		pageStart = uint16(pageNumber)
+	}
+
+	if endPresent {
+		pageNumber, err := strconv.ParseInt(pageEndStr, 10, 16)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for the query param start"})
+			return
+		}
+
+		pageEnd = uint16(pageNumber)
+	}
+
 	documentUid, isPresent := c.GetQuery("documentUUID")
 	if !isPresent {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Required param documentUUID missing!"})
