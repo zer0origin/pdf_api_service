@@ -3,8 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/google/uuid"
 	"pdf_service_api/models"
+
+	"github.com/google/uuid"
 )
 
 type metaRepository struct {
@@ -47,6 +48,20 @@ func (m metaRepository) GetMeta(documentUid, ownerUid uuid.UUID) (models.Meta, e
 	}
 
 	if err := m.DatabaseHandler.WithConnection(getMetaDataFunction(documentUid, ownerUid, callbackFunction)); err != nil {
+		return models.Meta{}, err
+	}
+
+	return *returnedData, nil
+}
+
+func (m metaRepository) GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint16) (models.Meta, error) {
+	returnedData := &models.Meta{}
+	callbackFunction := func(data models.Meta) error {
+		*returnedData = data
+		return nil
+	}
+
+	if err := m.DatabaseHandler.WithConnection(getMetaDataPaginationFunction(documentUid, ownerUid, start, end, callbackFunction)); err != nil {
 		return models.Meta{}, err
 	}
 
@@ -111,7 +126,45 @@ func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data mod
 		}
 
 		imageMap := make(map[uint32]string)
-		json.Unmarshal([]byte(imageStr), &imageMap)
+		err = json.Unmarshal([]byte(imageStr), &imageMap)
+		if err != nil {
+			return err
+		}
+		meta.Images = &imageMap
+
+		return callback(*meta)
+	}
+}
+
+func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, start, end uint16, callback func(data models.Meta) error) func(db *sql.DB) error {
+	return func(db *sql.DB) error {
+		meta := &models.Meta{}
+		SqlStatement := `select mt."Document_UUID",
+       mt."Number_Of_Pages",
+       mt."Height",
+       mt."Width",
+       Pagination_Images
+from documentmeta_table as mt
+    inner join public.document_table dt on dt."Document_UUID" = mt."Document_UUID"
+         cross join (select coalesce(jsonb_object_agg(j.key, j.value), '{}') AS Pagination_Images
+                     from documentmeta_table mt,
+                          jsonb_each(mt."Images"::jsonb) j
+                     where key::int BETWEEN $3 and $4
+                       and mt."Document_UUID" = $1)
+where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2;`
+		row := db.QueryRow(SqlStatement, documentUid, ownerUid, start, end)
+
+		var imageStr string
+		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &imageStr)
+		if err != nil {
+			return err
+		}
+
+		imageMap := make(map[uint32]string)
+		err = json.Unmarshal([]byte(imageStr), &imageMap)
+		if err != nil {
+			return err
+		}
 		meta.Images = &imageMap
 
 		return callback(*meta)
