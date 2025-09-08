@@ -237,7 +237,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 		return
 	}
 
-	data, err := t.MetaRepository.GetMeta(documentUUID, ownerUUID)
+	data, err := t.MetaRepository.GetMetaPagination(documentUUID, ownerUUID, pageStart, pageEnd)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
