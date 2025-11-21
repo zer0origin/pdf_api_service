@@ -7,7 +7,7 @@ type MetaRepository interface {
 	DeleteMeta(data Meta) error
 	UpdateMeta(uid uuid.UUID, data Meta) error
 	GetMeta(documentUid, ownerUid uuid.UUID) (Meta, error)
-	GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint16) (Meta, error)
+	GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint32) (Meta, error)
 }
 
 type Meta struct {

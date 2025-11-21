@@ -188,8 +188,8 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
-	var pageStart uint16 = 0
-	var pageEnd uint16 = 65535
+	var pageStart uint32 = 0
+	var pageEnd uint32 = 65535
 	pageStartStr, startPresent := c.GetQuery("start")
 	pageEndStr, endPresent := c.GetQuery("end")
 
@@ -200,7 +200,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 			return
 		}
 
-		pageStart = uint16(pageNumber)
+		pageStart = uint32(pageNumber)
 	}
 
 	if endPresent {
@@ -210,7 +210,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 			return
 		}
 
-		pageEnd = uint16(pageNumber)
+		pageEnd = uint32(pageNumber)
 	}
 
 	documentUid, isPresent := c.GetQuery("documentUUID")
