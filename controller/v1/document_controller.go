@@ -3,12 +3,14 @@ package v1
 import (
 	"database/sql"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"fmt"
 	"net/http"
 	"pdf_service_api/models"
 	"slices"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // DocumentController injects the dependencies required for the controller implementations to operate.
@@ -55,24 +57,24 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 		}
 	}
 
-	var limit int8 = 100
+	var limit uint32 = 100
 	if values, present := c.GetQuery("limit"); present {
 		number, err := strconv.ParseInt(values, 10, 8)
 		if err != nil {
 			return
 		}
 
-		limit = int8(number)
+		limit = uint32(number)
 	}
 
-	var offset int8 = 0
+	var offset uint32 = 0
 	if values, present := c.GetQuery("offset"); present {
 		number, err := strconv.ParseInt(values, 10, 8)
 		if err != nil {
 			return
 		}
 
-		offset = int8(number)
+		offset = uint32(number)
 	}
 
 	documentUidStr, isDocumentUuidPresent := c.GetQuery("documentUUID")
@@ -104,6 +106,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 				return
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				fmt.Println("ERROR WHILE EXECUTING SQL QUERY: " + err.Error())
 				return
 			}
 		}
@@ -120,6 +123,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 			return
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			fmt.Println("ERROR WHILE EXECUTING SQL QUERY: " + err.Error())
 			return
 		}
 	}

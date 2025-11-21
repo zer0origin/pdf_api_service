@@ -28,7 +28,7 @@ func (d documentRepository) DeleteDocumentById(documentUuid, ownerUuid uuid.UUID
 	return nil
 }
 
-func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit int8, offset int8, excludes models.Exclude) ([]models.Document, error) {
+func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit uint32, offset uint32, excludes models.Exclude) ([]models.Document, error) {
 	if limit <= 0 || offset < 0 {
 		return make([]models.Document, 0), errors.New("limit or offset were invalid")
 	}
@@ -117,7 +117,7 @@ func getDocumentByDocumentUUIDFunction(uid, ownerUid uuid.UUID, excludes map[str
 	}
 }
 
-func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit int8, offset int8, excludes map[string]bool, callback func(data []models.Document)) func(db *sql.DB) error {
+func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit uint32, offset uint32, excludes map[string]bool, callback func(data []models.Document)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created" DESC limit $2 offset $3`
 		templ, err := template.New("documentQuery").Parse(sqlStatement)

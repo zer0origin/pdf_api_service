@@ -54,14 +54,14 @@ func (m metaRepository) GetMeta(documentUid, ownerUid uuid.UUID) (models.Meta, e
 	return *returnedData, nil
 }
 
-func (m metaRepository) GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint32) (models.Meta, error) {
+func (m metaRepository) GetMetaPagination(documentUid, ownerUid uuid.UUID, offset, limit uint32) (models.Meta, error) {
 	returnedData := &models.Meta{}
 	callbackFunction := func(data models.Meta) error {
 		*returnedData = data
 		return nil
 	}
 
-	if err := m.DatabaseHandler.WithConnection(getMetaDataPaginationFunction(documentUid, ownerUid, start, end, callbackFunction)); err != nil {
+	if err := m.DatabaseHandler.WithConnection(getMetaDataPaginationFunction(documentUid, ownerUid, offset, limit, callbackFunction)); err != nil {
 		return models.Meta{}, err
 	}
 
@@ -136,7 +136,7 @@ func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data mod
 	}
 }
 
-func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, start, end uint32, callback func(data models.Meta) error) func(db *sql.DB) error {
+func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, offset, limit uint32, callback func(data models.Meta) error) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		meta := &models.Meta{}
 		SqlStatement := `select mt."Document_UUID",
@@ -149,10 +149,10 @@ from documentmeta_table as mt
          cross join (select coalesce(jsonb_object_agg(j.key, j.value), '{}') AS Pagination_Images
                      from documentmeta_table mt,
                           jsonb_each(mt."Images"::jsonb) j
-                     where key::int BETWEEN $3 and $4
+                     where key::bigint BETWEEN $3 and $4
                        and mt."Document_UUID" = $1)
 where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2;`
-		row := db.QueryRow(SqlStatement, documentUid, ownerUid, start, end)
+		row := db.QueryRow(SqlStatement, documentUid, ownerUid, offset, offset+limit-1)
 
 		var imageStr string
 		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &imageStr)

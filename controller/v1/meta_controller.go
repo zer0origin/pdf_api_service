@@ -188,29 +188,29 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /meta [get]
 func (t MetaController) GetMeta(c *gin.Context) {
-	var pageStart uint32 = 0
-	var pageEnd uint32 = 65535
-	pageStartStr, startPresent := c.GetQuery("start")
-	pageEndStr, endPresent := c.GetQuery("end")
+	var pageoffset uint32 = 0
+	var pageLimit uint32 = 4294967295
+	pageStartStr, startPresent := c.GetQuery("offset")
+	pageEndStr, endPresent := c.GetQuery("limit")
 
 	if startPresent {
-		pageNumber, err := strconv.ParseInt(pageStartStr, 10, 16)
+		pageNumber, err := strconv.ParseUint(pageStartStr, 10, 32)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for the query param start"})
 			return
 		}
 
-		pageStart = uint32(pageNumber)
+		pageoffset = uint32(pageNumber)
 	}
 
 	if endPresent {
-		pageNumber, err := strconv.ParseInt(pageEndStr, 10, 16)
+		pageNumber, err := strconv.ParseUint(pageEndStr, 10, 32)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for the query param start"})
 			return
 		}
 
-		pageEnd = uint32(pageNumber)
+		pageLimit = uint32(pageNumber)
 	}
 
 	documentUid, isPresent := c.GetQuery("documentUUID")
@@ -237,7 +237,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 		return
 	}
 
-	data, err := t.MetaRepository.GetMetaPagination(documentUUID, ownerUUID, pageStart, pageEnd)
+	data, err := t.MetaRepository.GetMetaPagination(documentUUID, ownerUUID, pageoffset, pageLimit)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
@@ -245,6 +245,7 @@ func (t MetaController) GetMeta(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println("ERROR WHILE EXECUTING SQL QUERY: " + err.Error())
 		return
 	}
 

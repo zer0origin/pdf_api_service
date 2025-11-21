@@ -99,7 +99,7 @@ func getMetaPresentUUIDPagination(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"GET",
-		"/api/v1/meta/?documentUUID="+expectedObj.DocumentUUID.String()+"&ownerUUID=f701aa7e-10e9-48b9-83f1-6b035a5b7564&start=0&end=1",
+		"/api/v1/meta/?documentUUID="+expectedObj.DocumentUUID.String()+"&ownerUUID=f701aa7e-10e9-48b9-83f1-6b035a5b7564&offset=0&limit=2",
 		nil,
 	))
 

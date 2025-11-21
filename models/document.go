@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Document struct {
@@ -18,7 +19,7 @@ type Document struct {
 type DocumentRepository interface {
 	UploadDocument(document Document) error
 	GetDocumentByDocumentUUID(document, owner uuid.UUID, excludes Exclude) (Document, error)
-	GetDocumentByOwnerUUID(owner uuid.UUID, limit int8, offset int8, excludes Exclude) ([]Document, error)
+	GetDocumentByOwnerUUID(owner uuid.UUID, limit uint32, offset uint32, excludes Exclude) ([]Document, error)
 	DeleteDocumentById(documentUuid, ownerUuid uuid.UUID) error
 }
 
