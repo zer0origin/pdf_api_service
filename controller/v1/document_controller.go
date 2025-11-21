@@ -28,6 +28,8 @@ type DocumentController struct {
 // @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided"
 // @Param ownerUUID query string true "The unique identifier of the owner whose documents are to be retrieved."
 // @Param exclude query []string false "Fields to exclude from the response. Allowed values: `documentTitle`, `timeCreated`, `ownerUUID`, `ownerType`, `pdfBase64`." collectionFormat(multi)
+// @Param offset query
+// @Param limit query
 // @Success 200 {object} object{documents=[]models.Document} "Successfully retrieved document(s)."
 // @Failure 400 {object} object{error=string} "Bad Request: Invalid UUID format or no valid parameters specified."
 // @Failure 404 {object} object{error=string} "Not Found: No document(s) found for the given UUID."
