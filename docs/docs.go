@@ -214,6 +214,13 @@ const docTemplate = `{
                         "name": "documentUUID",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "The UUID of the owner of the metadata to retrieve",
+                        "name": "ownerUUID",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -225,6 +232,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request, typically due to missing/invalid UUID"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "data"
+                        }
                     },
                     "500": {
                         "description": "Internal server error, typically due to database issues"
@@ -537,8 +550,8 @@ const docTemplate = `{
                     "example": 31
                 },
                 "ownerType": {
-                    "type": "string",
-                    "example": "1"
+                    "type": "integer",
+                    "example": 1
                 },
                 "ownerUUID": {
                     "type": "string",
@@ -604,23 +617,17 @@ const docTemplate = `{
         "v1.AddMetaRequest": {
             "type": "object",
             "properties": {
-                "height": {
-                    "type": "number",
-                    "format": "float32"
+                "documentBase64String": {
+                    "type": "string"
                 },
-                "images": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                "documentUUID": {
+                    "type": "string"
                 },
-                "numberOfPages": {
-                    "type": "integer",
-                    "format": "int32"
+                "ownerType": {
+                    "type": "integer"
                 },
-                "width": {
-                    "type": "number",
-                    "format": "float32"
+                "ownerUUID": {
+                    "type": "string"
                 }
             }
         },

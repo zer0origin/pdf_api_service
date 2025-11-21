@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"pdf_service_api/models"
 	"text/template"
+
+	"github.com/google/uuid"
 )
 
 type documentRepository struct {

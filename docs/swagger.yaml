@@ -36,8 +36,8 @@ definitions:
         example: 31
         type: integer
       ownerType:
-        example: "1"
-        type: string
+        example: 1
+        type: integer
       ownerUUID:
         example: 34906041-2d68-45a2-9671-9f0ba89f31a9
         type: string
@@ -82,19 +82,14 @@ definitions:
     type: object
   v1.AddMetaRequest:
     properties:
-      height:
-        format: float32
-        type: number
-      images:
-        additionalProperties:
-          type: string
-        type: object
-      numberOfPages:
-        format: int32
+      documentBase64String:
+        type: string
+      documentUUID:
+        type: string
+      ownerType:
         type: integer
-      width:
-        format: float32
-        type: number
+      ownerUUID:
+        type: string
     type: object
   v1.AddNewSelectionRequest:
     properties:
@@ -319,6 +314,11 @@ paths:
         name: documentUUID
         required: true
         type: string
+      - description: The UUID of the owner of the metadata to retrieve
+        in: query
+        name: ownerUUID
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -328,6 +328,10 @@ paths:
             $ref: '#/definitions/models.Meta'
         "400":
           description: Bad request, typically due to missing/invalid UUID
+        "404":
+          description: Not Found
+          schema:
+            type: data
         "500":
           description: Internal server error, typically due to database issues
       summary: Get metadata by UUID
