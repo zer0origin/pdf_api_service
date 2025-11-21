@@ -54,7 +54,7 @@ func (m metaRepository) GetMeta(documentUid, ownerUid uuid.UUID) (models.Meta, e
 	return *returnedData, nil
 }
 
-func (m metaRepository) GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint16) (models.Meta, error) {
+func (m metaRepository) GetMetaPagination(documentUid, ownerUid uuid.UUID, start, end uint32) (models.Meta, error) {
 	returnedData := &models.Meta{}
 	callbackFunction := func(data models.Meta) error {
 		*returnedData = data
@@ -136,7 +136,7 @@ func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data mod
 	}
 }
 
-func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, start, end uint16, callback func(data models.Meta) error) func(db *sql.DB) error {
+func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, start, end uint32, callback func(data models.Meta) error) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		meta := &models.Meta{}
 		SqlStatement := `select mt."Document_UUID",
