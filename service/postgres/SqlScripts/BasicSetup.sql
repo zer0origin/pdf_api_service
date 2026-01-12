@@ -7,7 +7,7 @@ create table if not exists document_table
     "Document_Base64" text not null,
     "Owner_UUID"      uuid,
     "Owner_Type"      smallint,
-    "Time_Created"      timestamp default now()
+    "Time_Created"    timestamp default now()
 );
 
 create table if not exists documentmeta_table
@@ -33,8 +33,7 @@ create table if not exists selection_table
         constraint "selection_table_document_table_Document_UUID_fk"
             references document_table
             on delete cascade,
-    "isCompleted"      boolean default false,
-    "Settings"         json,
     "Selection_bounds" json,
-    "Page_Words"       json
+    "Page_Words"       json,
+    "PageKey"          text
 );

@@ -3,8 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"errors"
-	"github.com/google/uuid"
 	"pdf_service_api/models"
+
+	"github.com/google/uuid"
 )
 
 type selectionRepository struct {
@@ -72,7 +73,7 @@ func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error
 
 func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "isCompleted", "Settings", "Selection_bounds") values ($1, $2, $3, $4, $5);`
+		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "Selection_bounds") values ($1, $2, $3);`
 
 		selUid := selection.Uuid
 		if selUid == uuid.Nil {
@@ -84,16 +85,9 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 			return errors.New("selection uuid cannot be nil")
 		}
 
-		isComplete := selection.IsComplete
-		settings := selection.Settings
-		if settings == nil || *settings == "" {
-			settings = func() *string { v := "{}"; return &v }()
-		}
-
 		selBounds := selection.SelectionBounds
 
-		_, err := db.Exec(sqlStatement, selUid, docUid, isComplete, settings, selBounds)
-
+		_, err := db.Exec(sqlStatement, selUid, docUid, selBounds)
 		if err != nil {
 			return err
 		}

@@ -20,9 +20,8 @@ type CreateRequest struct {
 
 type AddNewSelectionRequest struct {
 	DocumentUUID    *uuid.UUID                        `json:"documentUUID,omitempty"`
-	IsComplete      bool                              `json:"isComplete,omitempty"`
-	Settings        *string                           `json:"settings,omitempty"`
 	SelectionBounds *map[int][]models.SelectionBounds `json:"selectionBounds,omitempty"`
+	PageKey         string                            `json:"pageKey,omitempty"`
 }
 
 type AddMetaRequest struct {

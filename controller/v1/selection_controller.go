@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	"pdf_service_api/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type SelectionController struct {
@@ -148,8 +149,6 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 	toCreate := models.Selection{
 		Uuid:            uuid.New(),
 		DocumentUUID:    reqBody.DocumentUUID,
-		IsComplete:      reqBody.IsComplete,
-		Settings:        reqBody.Settings,
 		SelectionBounds: reqBody.SelectionBounds,
 	}
 
