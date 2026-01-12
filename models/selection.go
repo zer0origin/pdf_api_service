@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type Selection struct {
 	Uuid            uuid.UUID                  `json:"selectionUUID"`
-	PageKey         string                     `json:"pageKey,omitempty"`
+	PageKey         *string                    `json:"pageKey,omitempty"`
 	DocumentUUID    *uuid.UUID                 `json:"documentUUID,omitempty"`
 	SelectionBounds *map[int][]SelectionBounds `json:"selectionBounds,omitempty"`
 }

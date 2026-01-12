@@ -150,6 +150,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 		Uuid:            uuid.New(),
 		DocumentUUID:    reqBody.DocumentUUID,
 		SelectionBounds: reqBody.SelectionBounds,
+		PageKey:         &reqBody.PageKey,
 	}
 
 	err := t.SelectionRepository.AddNewSelection(toCreate)

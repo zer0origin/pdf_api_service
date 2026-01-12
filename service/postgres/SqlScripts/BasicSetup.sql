@@ -35,5 +35,5 @@ create table if not exists selection_table
             on delete cascade,
     "Selection_bounds" json,
     "Page_Words"       json,
-    "PageKey"          text
+    "Page_Key"          text
 );
