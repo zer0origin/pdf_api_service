@@ -1,8 +1,9 @@
 package v1
 
 import (
-	"github.com/google/uuid"
 	"pdf_service_api/models"
+
+	"github.com/google/uuid"
 )
 
 type GetDocumentRequest struct {
@@ -36,7 +37,7 @@ type UpdateMetaRequest struct {
 	NumberOfPages *uint32
 	Height        *float32
 	Width         *float32
-	Images        *map[uint32]string
+	Images        *map[string]string
 }
 
 type DeleteMetaRequest struct {

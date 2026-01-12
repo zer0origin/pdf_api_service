@@ -15,7 +15,7 @@ type Meta struct {
 	NumberOfPages *uint32            `json:"numberOfPages,omitempty" example:"31"`
 	Width         *float32           `json:"width,omitempty" example:"1920"`
 	Height        *float32           `json:"height,omitempty" example:"1080"`
-	Images        *map[uint32]string `json:"images,omitempty"`
+	Images        *map[string]string `json:"images,omitempty"`
 	OwnerUUID     *uuid.UUID         `json:"ownerUUID,omitempty" example:"34906041-2d68-45a2-9671-9f0ba89f31a9"`
 	OwnerType     *int               `json:"ownerType,omitempty" example:"1"`
 }

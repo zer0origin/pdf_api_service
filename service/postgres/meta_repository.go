@@ -125,7 +125,7 @@ func getMetaDataFunction(documentUid, ownerUid uuid.UUID, callback func(data mod
 			return err
 		}
 
-		imageMap := make(map[uint32]string)
+		imageMap := make(map[string]string)
 		err = json.Unmarshal([]byte(imageStr), &imageMap)
 		if err != nil {
 			return err
@@ -140,19 +140,18 @@ func getMetaDataPaginationFunction(documentUid, ownerUid uuid.UUID, offset, limi
 	return func(db *sql.DB) error {
 		meta := &models.Meta{}
 		SqlStatement := `select mt."Document_UUID",
-       mt."Number_Of_Pages",
-       mt."Height",
-       mt."Width",
-       Pagination_Images
-from documentmeta_table as mt
-    inner join public.document_table dt on dt."Document_UUID" = mt."Document_UUID"
-         cross join (select coalesce(jsonb_object_agg(j.key, j.value), '{}') AS Pagination_Images
-                     from documentmeta_table mt,
-                          jsonb_each(mt."Images"::jsonb) j
-                     where key::bigint BETWEEN $3 and $4
-                       and mt."Document_UUID" = $1)
-where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2;`
-		row := db.QueryRow(SqlStatement, documentUid, ownerUid, offset, offset+limit-1)
+					mt."Number_Of_Pages",
+					mt."Height",
+					mt."Width",
+					p.Pagination_Images
+					from documentmeta_table as mt
+					cross join LATERAL (
+					select coalesce(json_object_agg(f.key, f.value), '{}') AS Pagination_Images
+						from (select key, value from json_each_text(mt."Images")
+							limit $2 offset $3)
+							f) p
+							WHERE mt."Document_UUID" = $1;`
+		row := db.QueryRow(SqlStatement, documentUid, limit, offset)
 
 		var imageStr string
 		err := row.Scan(&meta.DocumentUUID, &meta.NumberOfPages, &meta.Height, &meta.Width, &imageStr)
@@ -160,7 +159,7 @@ where mt."Document_UUID" = $1 and dt."Owner_UUID" = $2;`
 			return err
 		}
 
-		imageMap := make(map[uint32]string)
+		imageMap := make(map[string]string)
 		err = json.Unmarshal([]byte(imageStr), &imageMap)
 		if err != nil {
 			return err

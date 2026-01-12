@@ -5,10 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/testcontainers/testcontainers-go"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
@@ -16,8 +12,14 @@ import (
 	"pdf_service_api/testutil"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
 )
 
+// 123
 var dbUser = "user"
 var dbPassword = "password"
 
