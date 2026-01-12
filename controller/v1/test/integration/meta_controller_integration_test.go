@@ -35,7 +35,7 @@ func TestMetaIntegration(t *testing.T) {
 
 func getMetaPresentUUID(t *testing.T) {
 	t.Parallel()
-	mm := make(map[uint32]string)
+	mm := make(map[string]string)
 	expectedObj := models.Meta{
 		DocumentUUID:  uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		NumberOfPages: func() *uint32 { v := uint32(31); return &v }(),
@@ -71,9 +71,9 @@ func getMetaPresentUUID(t *testing.T) {
 
 func getMetaPresentUUIDPagination(t *testing.T) {
 	t.Parallel()
-	mm := make(map[uint32]string)
-	mm[0] = "test0"
-	mm[1] = "test1"
+	mm := make(map[string]string)
+	mm["0"] = "test0"
+	mm["1"] = "test1"
 	expectedObj := models.Meta{
 		DocumentUUID:  uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		NumberOfPages: func() *uint32 { v := uint32(31); return &v }(),
@@ -214,10 +214,10 @@ func updateImageMetaPresentUUID(t *testing.T) {
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
 	router := v1.SetupRouter(nil, nil, metaCtrl)
 
-	strArr := make(map[uint32]string, 0)
-	strArr[0] = "Image0"
-	strArr[1] = "Image1"
-	strArr[2] = "Image2"
+	strArr := make(map[string]string, 0)
+	strArr["0"] = "Image0"
+	strArr["1"] = "Image1"
+	strArr["2"] = "Image2"
 
 	newData := models.Meta{
 		DocumentUUID:  uuid.MustParse(testUUID),
