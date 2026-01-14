@@ -33,7 +33,6 @@ create table if not exists selection_table
         constraint "selection_table_document_table_Document_UUID_fk"
             references document_table
             on delete cascade,
-    "Selection_bounds" json,
-    "Page_Words"       json,
+    "Coordinates" json,
     "Page_Key"          text
 );

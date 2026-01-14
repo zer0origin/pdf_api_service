@@ -73,7 +73,7 @@ func (s selectionRepository) DeleteSelectionBySelectionUUID(uid uuid.UUID) error
 
 func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "Selection_bounds", "Page_Key") values ($1, $2, $3, $4);`
+		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "Coordinates", "Page_Key") values ($1, $2, $3, $4);`
 
 		selUid := selection.Uuid
 		if selUid == uuid.Nil {
@@ -99,7 +99,7 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 
 func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Selection_bounds", "Page_Key" FROM selection_table where "Document_UUID" = $1`
+		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Coordinates", "Page_Key" FROM selection_table where "Document_UUID" = $1`
 
 		rows, err := db.Query(sqlStatement, uid.String())
 		if err != nil {
@@ -126,7 +126,7 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 
 func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
-		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Selection_bounds", "Page_Key" FROM selection_table where "Selection_UUID" = $1`
+		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Coordinates", "Page_Key" FROM selection_table where "Selection_UUID" = $1`
 
 		rows, err := db.Query(sqlStatement, uid.String())
 		if err != nil {
