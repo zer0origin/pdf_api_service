@@ -85,7 +85,7 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 			return errors.New("selection uuid cannot be nil")
 		}
 
-		selBounds := selection.SelectionBounds
+		selBounds := selection.Coordinates
 		pageKey := selection.PageKey
 
 		_, err := db.Exec(sqlStatement, selUid, docUid, selBounds, pageKey)
@@ -111,7 +111,7 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 		ss := make([]models.Selection, 0)
 		for rows.Next() {
 			data := models.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds, &data.PageKey)
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.Coordinates, &data.PageKey)
 			if err != nil {
 				return err
 			}
@@ -137,7 +137,7 @@ func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []mod
 		var ss []models.Selection
 		for rows.Next() {
 			data := models.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.SelectionBounds, &data.PageKey)
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.Coordinates, &data.PageKey)
 			if err != nil {
 				return err
 			}

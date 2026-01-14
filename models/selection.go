@@ -3,10 +3,10 @@ package models
 import "github.com/google/uuid"
 
 type Selection struct {
-	Uuid            uuid.UUID                  `json:"selectionUUID"`
-	PageKey         *string                    `json:"pageKey,omitempty"`
-	DocumentUUID    *uuid.UUID                 `json:"documentUUID,omitempty"`
-	SelectionBounds *map[int][]SelectionBounds `json:"selectionBounds,omitempty"`
+	Uuid         uuid.UUID    `json:"selectionUUID"`
+	PageKey      *string      `json:"pageKey,omitempty"`
+	DocumentUUID *uuid.UUID   `json:"documentUUID,omitempty"`
+	Coordinates  *Coordinates `json:"coordinates,omitempty"`
 }
 
 type SelectionRepository interface {
@@ -17,10 +17,9 @@ type SelectionRepository interface {
 	DeleteSelectionByDocumentUUID(uid uuid.UUID) error
 }
 
-type SelectionBounds struct {
-	SelectionMethod *string `json:"extract_method" example:"None"`
-	X1              float64 `json:"x1" example:"43.122"`
-	X2              float64 `json:"x2" example:"13"`
-	Y1              float64 `json:"y1" example:"52.125"`
-	Y2              float64 `json:"y2" example:"27.853"`
+type Coordinates struct {
+	X1 float64 `json:"x1" example:"43.122"`
+	Y1 float64 `json:"y1" example:"52.125"`
+	X2 float64 `json:"x2" example:"13"`
+	Y2 float64 `json:"y2" example:"27.853"`
 }

@@ -19,9 +19,9 @@ type CreateRequest struct {
 }
 
 type AddNewSelectionRequest struct {
-	DocumentUUID    *uuid.UUID                        `json:"documentUUID,omitempty"`
-	SelectionBounds *map[int][]models.SelectionBounds `json:"selectionBounds,omitempty"`
-	PageKey         string                            `json:"pageKey,omitempty"`
+	DocumentUUID *uuid.UUID          `json:"documentUUID,omitempty"`
+	Coordinates  *models.Coordinates `json:"selectionBounds,omitempty"`
+	PageKey      string              `json:"pageKey,omitempty"`
 }
 
 type AddMetaRequest struct {

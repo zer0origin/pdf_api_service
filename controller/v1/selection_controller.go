@@ -119,7 +119,7 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 
 // AddSelection handles the HTTP POST request to add a new selection.
 // It expects a JSON request body conforming to the AddNewSelectionRequest struct,
-// which should include the DocumentUUID, IsComplete status, Settings, and SelectionBounds
+// which should include the DocumentUUID, IsComplete status, Settings, and Coordinates
 // for the new selection.
 //
 // A new UUID will be generated for the selection.
@@ -147,10 +147,10 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 	}
 
 	toCreate := models.Selection{
-		Uuid:            uuid.New(),
-		DocumentUUID:    reqBody.DocumentUUID,
-		SelectionBounds: reqBody.SelectionBounds,
-		PageKey:         &reqBody.PageKey,
+		Uuid:         uuid.New(),
+		DocumentUUID: reqBody.DocumentUUID,
+		Coordinates:  reqBody.Coordinates,
+		PageKey:      &reqBody.PageKey,
 	}
 
 	err := t.SelectionRepository.AddNewSelection(toCreate)

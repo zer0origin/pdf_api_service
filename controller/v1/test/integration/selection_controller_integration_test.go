@@ -30,6 +30,7 @@ func TestSelectionsIntegration(t *testing.T) {
 	t.Run("Delete selections by present document uuid", deleteSelectionsByDocumentUUID)
 	t.Run("Delete selections by nonexistent selection uuid", deleteDelectionByNonexistentSelectionUUID)
 	t.Run("Create new selection", createNewSelection)
+	t.Run("Create new selection that includes a page key", CreateNewSelectionWithPageKey)
 }
 
 func getSelectionFromPresentSelectionUUID(t *testing.T) {
@@ -263,8 +264,7 @@ func createNewSelection(t *testing.T) {
 	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	request := &v1.AddNewSelectionRequest{
-		DocumentUUID:    func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
-		SelectionBounds: nil,
+		DocumentUUID: func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
 	}
 
 	requestJSON, _ := json.Marshal(request)
@@ -279,7 +279,7 @@ func createNewSelection(t *testing.T) {
 	assert.NotContains(t, w.Body.String(), "Error")
 }
 
-func TestCreateNewSelectionWithPageKey(t *testing.T) {
+func CreateNewSelectionWithPageKey(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
@@ -296,9 +296,8 @@ func TestCreateNewSelectionWithPageKey(t *testing.T) {
 	router := v1.SetupRouter(nil, selectionCtrl, nil)
 
 	request := &v1.AddNewSelectionRequest{
-		DocumentUUID:    func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
-		PageKey:         "TestPage",
-		SelectionBounds: nil,
+		DocumentUUID: func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
+		PageKey:      "TestPage",
 	}
 
 	requestJSON, _ := json.Marshal(request)
