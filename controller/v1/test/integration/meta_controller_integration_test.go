@@ -29,8 +29,8 @@ func TestMetaIntegration(t *testing.T) {
 	t.Run("get meta wth paginated values", getMetaPresentUUIDPagination)
 	t.Run("update meta using a present uuid", updateMetaPresentUUID)
 	t.Run("update meta using a present uuid with new images", updateImageMetaPresentUUID)
-	t.Run("Add meta using the DataApi to generate the meta data", addMetaBase64Included)
-	t.Run("Add meta using the DataApi to generate the meta data", addMetaBase64Excluded)
+	t.Run("add meta using the DataApi to generate the meta data with base64 included", addMetaBase64Included)
+	t.Run("add meta using the DataApi to generate the meta data with base64 excluded", addMetaBase64Excluded)
 }
 
 func getMetaPresentUUID(t *testing.T) {
@@ -316,7 +316,7 @@ func addMetaBase64Included(t *testing.T) {
 		fmt.Println(w.Body.String())
 	}
 
-	dbHandle.WithConnection(func(db *sql.DB) error {
+	_ = dbHandle.WithConnection(func(db *sql.DB) error {
 		row := db.QueryRow(`SELECT "Number_Of_Pages" FROM postgres.public.documentmeta_table WHERE "Document_UUID" = $1`, request.DocumentUUID)
 
 		var number int8
