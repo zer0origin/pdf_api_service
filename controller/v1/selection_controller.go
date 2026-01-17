@@ -162,8 +162,59 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 	c.JSON(200, gin.H{"selectionUUID": toCreate.Uuid.String()})
 }
 
+// AddSelectionBulk handles the HTTP POST request to add new selections in bulk.
+// It expects a JSON request body conforming to the AddNewSelectionRequest inside an array,
+// which should include the DocumentUUID, IsComplete status, Settings, and Coordinates
+// for the new selection.
+//
+// A new UUID will be generated for the selection.
+// Upon successful creation, it returns a 200 OK. If there's an error during request binding or
+// selection creation, it returns a 400 Bad Request or 500 Internal Server Error
+// status with an error message.
+//
+// @Summary Add a new selection
+// @Description Creates a new selection associated with a document.
+// @Tags selections
+// @Accept  json
+// @Produce  json
+// @Param request body []AddNewSelectionRequest true "Selections in a json array, that need to be saved"
+// @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the selection UUID"
+// @Failure 400 "Bad request, typically due to invalid input"
+// @Failure 500 "Internal server error, typically due to database issues"
+// @Router /selections/bulk [post]
+func (t SelectionController) AddSelectionBulk(c *gin.Context) {
+	reqBody := &[]AddNewSelectionRequest{}
+
+	if err := c.ShouldBindJSON(reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	selectionsToProcess := *reqBody
+	for i := 0; i < len(selectionsToProcess); i++ {
+		selection := selectionsToProcess[i]
+
+		toCreate := models.Selection{
+			Uuid:         uuid.New(),
+			DocumentUUID: selection.DocumentUUID,
+			Coordinates:  selection.Coordinates,
+			PageKey:      &selection.PageKey,
+		}
+
+		err := t.SelectionRepository.AddNewSelection(toCreate)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	//c.JSON(200, gin.H{"selectionUUID": toCreate.Uuid.String()}) array?
+	c.Status(200)
+}
+
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
 	c.DELETE("/", t.DeleteSelection)
 	c.POST("/", t.AddSelection)
+	c.POST("/bulk", t.AddSelectionBulk)
 	c.GET("/", t.GetSelection)
 }

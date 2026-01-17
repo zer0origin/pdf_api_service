@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"pdf_service_api/models"
 
@@ -75,6 +76,7 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 	return func(db *sql.DB) error {
 		sqlStatement := `insert into selection_table ("Selection_UUID", "Document_UUID", "Coordinates", "Page_Key") values ($1, $2, $3, $4);`
 
+		pageKey := selection.PageKey
 		selUid := selection.Uuid
 		if selUid == uuid.Nil {
 			return errors.New("selection uuid cannot be nil")
@@ -85,10 +87,12 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 			return errors.New("selection uuid cannot be nil")
 		}
 
-		selBounds := selection.Coordinates
-		pageKey := selection.PageKey
+		bytes, err := json.Marshal(selection.Coordinates)
+		if err != nil {
+			return err
+		}
 
-		_, err := db.Exec(sqlStatement, selUid, docUid, selBounds, pageKey)
+		_, err = db.Exec(sqlStatement, selUid, docUid, bytes, pageKey)
 		if err != nil {
 			return err
 		}
