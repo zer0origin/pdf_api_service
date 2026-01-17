@@ -104,7 +104,7 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 	expectedJsonResponse := `{"selections":[]}`
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -134,7 +134,7 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 	expectedJsonResponse := `{"selections":[]}`
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -163,7 +163,7 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -190,7 +190,7 @@ func deleteSelectionsByDocumentUUID(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -229,7 +229,7 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -256,7 +256,7 @@ func createNewSelection(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
@@ -288,7 +288,7 @@ func CreateNewSelectionWithPageKey(t *testing.T) {
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntry")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
