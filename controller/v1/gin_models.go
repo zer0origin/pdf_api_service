@@ -20,7 +20,7 @@ type CreateRequest struct {
 
 type AddNewSelectionRequest struct {
 	DocumentUUID *uuid.UUID          `json:"documentUUID,omitempty"`
-	Coordinates  *models.Coordinates `json:"selectionBounds,omitempty"`
+	Coordinates  *models.Coordinates `json:"coordinates,omitempty"`
 	PageKey      string              `json:"pageKey,omitempty"`
 }
 
