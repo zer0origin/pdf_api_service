@@ -51,13 +51,13 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 		c.JSON(200, gin.H{"selections": results})
 	}
 
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent {
-		getSelection(id, t.SelectionRepository.GetSelectionsByDocumentUUID)
+	if id, isPresent := c.GetQuery("documentUUID"); isPresent && id != "" {
+		getSelection(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
 		return
 	}
 
-	if id, isPresent := c.GetQuery("selectionUUID"); isPresent {
-		getSelection(id, t.SelectionRepository.GetSelectionsBySelectionUUID)
+	if id, isPresent := c.GetQuery("selectionUUID"); isPresent && id != "" {
+		getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
 		return
 	}
 

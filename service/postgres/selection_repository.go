@@ -26,7 +26,7 @@ func (s selectionRepository) AddNewSelection(selection models.Selection) error {
 	return nil
 }
 
-func (s selectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]models.Selection, error) {
+func (s selectionRepository) GetSelectionBySelectionUUID(uid uuid.UUID) ([]models.Selection, error) {
 	var ss []models.Selection
 	getSelection := getSelectionBySelectionUUIDFunction(uid, func(data []models.Selection) {
 		ss = data
@@ -40,9 +40,9 @@ func (s selectionRepository) GetSelectionsBySelectionUUID(uid uuid.UUID) ([]mode
 	return ss, nil
 }
 
-func (s selectionRepository) GetSelectionsByDocumentUUID(uid uuid.UUID) ([]models.Selection, error) {
+func (s selectionRepository) GetSelectionListByDocumentUUID(uid uuid.UUID) ([]models.Selection, error) {
 	ss := make([]models.Selection, 0)
-	getSelection := getSelectionByDocumentUUIDFunction(uid, func(data []models.Selection) {
+	getSelection := getSelectionListByDocumentUUIDFunction(uid, func(data []models.Selection) {
 		ss = data
 	})
 
@@ -101,7 +101,7 @@ func AddNewSelectionFunction(selection models.Selection) func(db *sql.DB) error 
 	}
 }
 
-func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
+func getSelectionListByDocumentUUIDFunction(uid uuid.UUID, callback func(data []models.Selection)) func(db *sql.DB) error {
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT "Selection_UUID", "Document_UUID", "Coordinates", "Page_Key" FROM selection_table where "Document_UUID" = $1`
 
@@ -115,11 +115,22 @@ func getSelectionByDocumentUUIDFunction(uid uuid.UUID, callback func(data []mode
 		ss := make([]models.Selection, 0)
 		for rows.Next() {
 			data := models.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.Coordinates, &data.PageKey)
+
+			var coordinateStr sql.NullString
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &coordinateStr, &data.PageKey)
 			if err != nil {
 				return err
 			}
 
+			if coordinateStr.Valid {
+				coordinate := models.Coordinates{}
+				err = json.Unmarshal([]byte(coordinateStr.String), &coordinate)
+				if err != nil {
+					return err
+				}
+
+				data.Coordinates = &coordinate
+			}
 			ss = append(ss, data)
 		}
 
@@ -141,9 +152,20 @@ func getSelectionBySelectionUUIDFunction(uid uuid.UUID, callback func(data []mod
 		var ss []models.Selection
 		for rows.Next() {
 			data := models.Selection{}
-			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &data.Coordinates, &data.PageKey)
+			var coordinateStr sql.NullString
+			err := rows.Scan(&data.Uuid, &data.DocumentUUID, &coordinateStr, &data.PageKey)
 			if err != nil {
 				return err
+			}
+
+			if coordinateStr.Valid {
+				coordinate := models.Coordinates{}
+				err = json.Unmarshal([]byte(coordinateStr.String), &coordinate)
+				if err != nil {
+					return err
+				}
+
+				data.Coordinates = &coordinate
 			}
 
 			ss = append(ss, data)
