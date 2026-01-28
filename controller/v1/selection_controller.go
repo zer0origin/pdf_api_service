@@ -178,24 +178,26 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param request body []AddNewSelectionRequest true "Selections in a json array, that need to be saved"
-// @Success 200 {object} map[string]uuid.UUID "Successful creation, returns the selection UUID"
+// @Success 201 {object} []uuid.UUID "Successful creation, returns the selection UUIDs"
 // @Failure 400 "Bad request, typically due to invalid input"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections/bulk [post]
 func (t SelectionController) AddSelectionBulk(c *gin.Context) {
-	reqBody := &[]AddNewSelectionRequest{}
+	reqBody := &[]AddNewSelectionRequest{} //TODO: maybe switch to a map.
 
 	if err := c.ShouldBindJSON(reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	uids := make([]string, len(*reqBody))
 	selectionsToProcess := *reqBody
 	for i := 0; i < len(selectionsToProcess); i++ {
 		selection := selectionsToProcess[i]
 
+		selectionUid := uuid.New()
 		toCreate := models.Selection{
-			Uuid:         uuid.New(),
+			Uuid:         selectionUid,
 			DocumentUUID: selection.DocumentUUID,
 			Coordinates:  selection.Coordinates,
 			PageKey:      &selection.PageKey,
@@ -203,13 +205,14 @@ func (t SelectionController) AddSelectionBulk(c *gin.Context) {
 
 		err := t.SelectionRepository.AddNewSelection(toCreate)
 		if err != nil {
+			uids[i] = "StatusInternalServerError. Failed to upload selection."
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		uids[i] = selectionUid.String()
 	}
 
-	//c.JSON(200, gin.H{"selectionUUID": toCreate.Uuid.String()}) array?
-	c.Status(200)
+	c.JSON(http.StatusCreated, gin.H{"uids": uids})
 }
 
 func (t SelectionController) SetupRouter(c *gin.RouterGroup) {

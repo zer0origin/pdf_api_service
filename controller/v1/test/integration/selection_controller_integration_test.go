@@ -413,7 +413,8 @@ func CreateNewSelectionWithCoordinatesBulk(t *testing.T) {
 		"/api/v1/selections/bulk",
 		strings.NewReader(string(requestJSON)),
 	))
-	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+	assert.Equal(t, http.StatusCreated, w.Result().StatusCode)
+	assert.NotEmpty(t, w.Body.String())
 
 	_ = dbHandle.WithConnection(func(db *sql.DB) error {
 		data := 0
