@@ -182,8 +182,8 @@ func (t MetaController) DeleteMeta(c *gin.Context) {
 // @Produce  json
 // @Param   documentUUID query string true "The UUID of the metadata to retrieve"
 // @Param   ownerUUID query string true "The UUID of the owner of the metadata to retrieve"
-// @Param offset query
-// @Param limit query
+// @Param offset query int false "What should the offset be"
+// @Param limit query int false "How many should be returned"
 // @Success 200 {object} models.Meta "Successful retrieval of metadata"
 // @Success 404 data not found
 // @Failure 400 "Bad request, typically due to missing/invalid UUID"
