@@ -53,7 +53,7 @@ func main() {
 
 	err := dbHandler.RunInitScript()
 	if err != nil {
-		err = fmt.Errorf("failed to run init script: %s", err)
+		err = fmt.Errorf("failed to run init script: %w", err)
 		panic(err)
 	}
 
