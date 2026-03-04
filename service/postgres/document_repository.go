@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"errors"
-	"fmt"
 	"pdf_service_api/models"
 	"text/template"
 
@@ -71,10 +70,14 @@ func getDocumentByDocumentUUIDFunction(uid, ownerUid uuid.UUID, excludes map[str
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Document_UUID" = $1 and "Owner_UUID" = $2`
 		templ, err := template.New("documentQuery").Parse(sqlStatement)
+		if err != nil {
+			return err
+		}
+
 		var buffer bytes.Buffer
 		err = templ.Execute(&buffer, excludes)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 
 		generatedSQL := buffer.String()
@@ -121,10 +124,14 @@ func getDocumentByOwnerUUIDFunction(uid uuid.UUID, limit uint32, offset uint32, 
 	return func(db *sql.DB) error {
 		sqlStatement := `SELECT {{if .documentTitle }}{{else}}"Document_Title", {{end}}{{if .pdfBase64 }}{{else}}"Document_Base64", {{end}}{{if .timeCreated }}{{else}}"Time_Created", {{end}}{{if .ownerUUID }}{{else}}"Owner_UUID", {{end}}{{if .ownerType }}{{else}}"Owner_Type",{{end}} "Document_UUID" FROM document_table WHERE "Owner_UUID" = $1 order by "Time_Created" DESC limit $2 offset $3`
 		templ, err := template.New("documentQuery").Parse(sqlStatement)
+		if err != nil {
+			return err
+		}
+
 		var buffer bytes.Buffer
 		err = templ.Execute(&buffer, excludes)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 
 		generatedSQL := buffer.String()
