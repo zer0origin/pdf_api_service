@@ -61,7 +61,7 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
 }
 
 // DeleteSelection handles the HTTP DELETE request to remove selections.
@@ -114,7 +114,7 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
 }
 
 // AddSelection handles the HTTP POST request to add a new selection.

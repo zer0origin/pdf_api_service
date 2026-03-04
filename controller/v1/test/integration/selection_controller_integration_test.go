@@ -64,7 +64,7 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 	fmt.Println(w.Body.String())
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	assert.NotNil(t, w.Body.String())
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
@@ -94,7 +94,7 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	assert.NotNil(t, w.Body.String())
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
@@ -124,7 +124,7 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	assert.NotNil(t, w.Body.String())
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
@@ -155,7 +155,7 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 	fmt.Println(w.Body.String())
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	assert.NotNil(t, w.Body.String())
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
@@ -280,7 +280,7 @@ func createNewSelection(t *testing.T) {
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 }
 
 func CreateNewSelectionWithPageKey(t *testing.T) {
@@ -313,7 +313,7 @@ func CreateNewSelectionWithPageKey(t *testing.T) {
 	))
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.NotContains(t, w.Body.String(), "Error")
+	assert.NotContains(t, w.Body.String(), "error")
 }
 
 func CreateNewSelectionWithCoordinates(t *testing.T) {
