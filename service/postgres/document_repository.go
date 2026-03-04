@@ -28,7 +28,7 @@ func (d documentRepository) DeleteDocumentById(documentUuid, ownerUuid uuid.UUID
 }
 
 func (d documentRepository) GetDocumentByOwnerUUID(uid uuid.UUID, limit uint32, offset uint32, excludes models.Exclude) ([]models.Document, error) {
-	if limit <= 0 || offset < 0 {
+	if limit <= 0 {
 		return make([]models.Document, 0), errors.New("limit or offset were invalid")
 	}
 
