@@ -128,7 +128,7 @@ func (t MetaController) UpdateMeta(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"Error": "No param specified."})
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
 }
 
 // DeleteMeta handles the HTTP DELETE request to remove metadata.
