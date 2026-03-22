@@ -22,7 +22,7 @@ type DocumentController struct {
 // @Summary Get documents
 // @Description Retrieves document details. Documents can be fetched either by their unique Document UUID or by an Owner UUID.
 // @Description Optional exclusion parameters can be used to omit specific fields from the response.
-// @Tags documents
+// @Tags document
 // @Accept json
 // @Produce json
 // @Param documentUUID query string false "The unique identifier of the document to retrieve. If provided"
@@ -144,7 +144,7 @@ func (t DocumentController) GetDocumentHandler(c *gin.Context) {
 //
 // @Summary Upload a new document
 // @Description Uploads a document by receiving its base64 encoded string in the request body.
-// @Tags documents
+// @Tags document
 // @Accept  json
 // @Produce  json
 // @Param   request body v1.CreateRequest true "Document upload request"
@@ -188,7 +188,7 @@ func (t DocumentController) UploadDocumentHandler(c *gin.Context) {
 //
 // @Summary Delete a document
 // @Description Deletes a document based on the provided document UUID.
-// @Tags documents
+// @Tags document
 // @Accept  json
 // @Produce  json
 // @Param   documentUUID query string true "The UUID of the document to delete"

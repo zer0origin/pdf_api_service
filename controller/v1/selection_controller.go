@@ -25,7 +25,7 @@ type SelectionController struct {
 //
 // @Summary Get selections by document or selection UUID
 // @Description Retrieves selections based on either a document's UUID or a specific selection's UUID.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   documentUUID query string false "The UUID of the document to retrieve selections for"
@@ -78,7 +78,7 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 //
 // @Summary Delete selections by selection or document UUID
 // @Description Deletes selections based on a specific selection UUID or all selections associated with a document UUID.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   selectionUUID query string false "The UUID of the specific selection to delete"
@@ -130,7 +130,7 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 //
 // @Summary Add a new selection
 // @Description Creates a new selection associated with a document.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   request body v1.AddNewSelectionRequest true "Selection creation request"
@@ -174,7 +174,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 //
 // @Summary Add a new selection
 // @Description Creates a new selection associated with a document.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param request body []AddNewSelectionRequest true "Selections in a json array, that need to be saved"
