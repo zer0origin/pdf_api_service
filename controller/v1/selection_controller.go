@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"pdf_service_api/models"
 
@@ -34,7 +35,14 @@ type SelectionController struct {
 // @Failure 400 "Bad request, typically due to missing/invalid UUID parameter"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [get]
+// @Router /selections [post]
 func (t SelectionController) GetSelection(c *gin.Context) {
+	if c.Request.Method != "GET" && c.Request.Method != "POST" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "HTTP method not supported."})
+		return
+	}
+
+	result := make([]models.Selection, 0)
 	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
@@ -42,23 +50,54 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 			return
 		}
 
-		results, err := passedServiceGetFunction(uid)
+		returnedData, err := passedServiceGetFunction(uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(200, gin.H{"selections": results})
+		result = append(result, returnedData...)
 	}
 
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent && id != "" {
-		getSelection(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
-		return
+	if c.Request.Method == "GET" {
+		if values, isPresent := c.GetQueryArray("documentUUID"); isPresent && len(values) != 0 {
+			for x := 0; x < len(values); x++ {
+				id := values[x]
+				getSelection(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
+			}
+
+			c.JSON(200, gin.H{"selections": result})
+			return
+		}
+
+		if values, isPresent := c.GetQueryArray("selectionUUID"); isPresent && len(values) != 0 {
+			for x := 0; x < len(values); x++ {
+				id := values[x]
+				getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
+			}
+
+			c.JSON(200, gin.H{"selections": result})
+			return
+		}
 	}
 
-	if id, isPresent := c.GetQuery("selectionUUID"); isPresent && id != "" {
-		getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
-		return
+	if c.Request.Method == "POST" {
+		var bodyData []string
+		err := c.ShouldBindBodyWithJSON(&bodyData)
+		if err != nil {
+			fmt.Println(fmt.Errorf("failed to parse body: %w", err))
+			return
+		}
+
+		if len(bodyData) > 0 {
+			for x := 0; x < len(bodyData); x++ {
+				id := bodyData[x]
+				getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
+			}
+
+			c.JSON(200, gin.H{"selections": result})
+			return
+		}
 	}
 
 	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
@@ -219,5 +258,6 @@ func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
 	c.DELETE("/", t.DeleteSelection)
 	c.POST("/", t.AddSelection)
 	c.POST("/bulk", t.AddSelectionBulk)
-	c.GET("/", t.GetSelection)
+	c.GET("/", t.GetSelection) //Backwards compatibility
+	c.Any("/list", t.GetSelection)
 }

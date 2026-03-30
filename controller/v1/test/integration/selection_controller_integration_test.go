@@ -23,12 +23,15 @@ import (
 
 func TestSelectionsIntegration(t *testing.T) {
 	t.Parallel()
-	t.Run("Get selection from a present document uuid", getSelectionsFromPresentDocumentUUID)
-	t.Run("Get selection from a nonexistent document uuid", getSelectionsFromInvalidDocumentUUID)
+	t.Run("Get selection from a present document uuid", getSelectionFromPresentDocumentUUID)
+	t.Run("Get selection from a nonexistent document uuid", getSelectionFromInvalidDocumentUUID)
 	t.Run("Get selection from a present selection uuid", getSelectionFromPresentSelectionUUID)
-	t.Run("Get selection from a nonexistent selection uuid", getSelectionsFromNonExistentDocumentUUID)
-	t.Run("Delete selections by selection uuid", deleteSelectionsBySelectionUUID)
-	t.Run("Delete selections by present document uuid", deleteSelectionsByDocumentUUID)
+	t.Run("Get selection from a nonexistent selection uuid", getSelectionFromNonExistentDocumentUUID)
+	t.Run("Get selection from list endpoint with a body using a post request", getMultipleSelectionsListEndpointWithBodyPresentSelectionUUID)
+	t.Run("Get selection from list endpoint using query array", getMultipleSelectionsListEndpointFromPresentSelectionUUID)
+	t.Run("Get selection from standard endpoint using query array", getMultipleSelectionsFromPresentSelectionUUID)
+	t.Run("Delete selections by selection uuid", deleteSelectionBySelectionUUID)
+	t.Run("Delete selections by present document uuid", deleteSelectionByDocumentUUID)
 	t.Run("Delete selections by nonexistent selection uuid", deleteDelectionByNonexistentSelectionUUID)
 	t.Run("Create new selection", createNewSelection)
 	t.Run("Create lots of new selection", CreateNewSelectionWithCoordinatesBulk)
@@ -68,7 +71,101 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
-func getSelectionsFromPresentDocumentUUID(t *testing.T) {
+func getMultipleSelectionsFromPresentSelectionUUID(t *testing.T) {
+	t.Parallel()
+	testDocumentUuidStringFirst := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
+	testDocumentUuidStringSecond := "335a6b95-6707-4e2b-9c37-c76d017f6f97"
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		fmt.Sprintf("/api/v1/selections/?selectionUUID=%s&selectionUUID=%s", testDocumentUuidStringFirst, testDocumentUuidStringSecond),
+		nil,
+	))
+
+	response := w.Body.String()
+	assert.Contains(t, response, testDocumentUuidStringFirst)
+	assert.Contains(t, response, testDocumentUuidStringSecond)
+	fmt.Println(w.Body.String())
+}
+
+func getMultipleSelectionsListEndpointFromPresentSelectionUUID(t *testing.T) {
+	t.Parallel()
+	testDocumentUuidStringFirst := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
+	testDocumentUuidStringSecond := "335a6b95-6707-4e2b-9c37-c76d017f6f97"
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		fmt.Sprintf("/api/v1/selections/list?selectionUUID=%s&selectionUUID=%s", testDocumentUuidStringFirst, testDocumentUuidStringSecond),
+		nil,
+	))
+
+	response := w.Body.String()
+	assert.Contains(t, response, testDocumentUuidStringFirst)
+	assert.Contains(t, response, testDocumentUuidStringSecond)
+	fmt.Println(w.Body.String())
+}
+
+func getMultipleSelectionsListEndpointWithBodyPresentSelectionUUID(t *testing.T) {
+	t.Parallel()
+	testDocumentUuidStringFirst := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
+	testDocumentUuidStringSecond := "335a6b95-6707-4e2b-9c37-c76d017f6f97"
+	uuidArray := []string{testDocumentUuidStringFirst, testDocumentUuidStringSecond}
+
+	bytes, err := json.Marshal(uuidArray)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctr)
+
+	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
+	require.NoError(t, err)
+
+	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
+	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(
+		"POST",
+		"/api/v1/selections/list",
+		strings.NewReader(string(bytes)),
+	))
+
+	response := w.Body.String()
+	assert.Contains(t, response, testDocumentUuidStringFirst)
+	assert.Contains(t, response, testDocumentUuidStringSecond)
+	fmt.Println(w.Body.String())
+}
+
+func getSelectionFromPresentDocumentUUID(t *testing.T) {
 	t.Parallel()
 	testDocumentUuidString := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"},{"selectionUUID":"335a6b95-6707-4e2b-9c37-c76d017f6f97","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
@@ -98,7 +195,7 @@ func getSelectionsFromPresentDocumentUUID(t *testing.T) {
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
-func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
+func getSelectionFromNonExistentDocumentUUID(t *testing.T) {
 	t.Parallel()
 	testDocumentUuidString := uuid.Nil.String()
 	expectedJsonResponse := `{"selections":[]}`
@@ -128,7 +225,7 @@ func getSelectionsFromNonExistentDocumentUUID(t *testing.T) {
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
-func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
+func getSelectionFromInvalidDocumentUUID(t *testing.T) {
 	t.Parallel()
 	testDocumentUuidString := uuid.New().String()
 	expectedJsonResponse := `{"selections":[]}`
@@ -159,7 +256,7 @@ func getSelectionsFromInvalidDocumentUUID(t *testing.T) {
 	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }
 
-func deleteSelectionsBySelectionUUID(t *testing.T) {
+func deleteSelectionBySelectionUUID(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
@@ -185,7 +282,7 @@ func deleteSelectionsBySelectionUUID(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 }
 
-func deleteSelectionsByDocumentUUID(t *testing.T) {
+func deleteSelectionByDocumentUUID(t *testing.T) {
 	t.Parallel()
 	documentTestUUID := "b66fd223-515f-4503-80cc-2bdaa50ef474"
 
