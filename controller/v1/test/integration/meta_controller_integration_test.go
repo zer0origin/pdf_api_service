@@ -56,7 +56,7 @@ func getMetaPresentUUID(t *testing.T) {
 
 	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -94,7 +94,7 @@ func getMetaPresentUUIDPagination(t *testing.T) {
 
 	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -121,7 +121,7 @@ func getMetaUUIDDoesNotExistInTable(t *testing.T) {
 
 	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -148,7 +148,7 @@ func updateMetaPresentUUID(t *testing.T) {
 
 	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	newData := models.Meta{
 		DocumentUUID:  uuid.MustParse(testUUID),
@@ -212,7 +212,7 @@ func updateImageMetaPresentUUID(t *testing.T) {
 
 	dbHandle := pg.DatabaseHandler{DbConfig: pg.ConfigForDatabase{ConUrl: connectionString}}
 	metaCtrl := &v1.MetaController{MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	strArr := make(map[string]string, 0)
 	strArr["0"] = "Image0"
@@ -302,7 +302,7 @@ func addMetaBase64Included(t *testing.T) {
 
 	srv := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
 	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: pg.NewMetaRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -356,7 +356,7 @@ func addMetaBase64Excluded(t *testing.T) {
 
 	srv := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
 	metaCtrl := &v1.MetaController{DataService: srv, MetaRepository: pg.NewMetaRepository(dbHandle), DocumentRepository: pg.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(nil, nil, metaCtrl)
+	router := v1.SetupRouter(nil, nil, metaCtrl, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(

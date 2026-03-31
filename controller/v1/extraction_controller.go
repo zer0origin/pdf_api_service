@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"pdf_service_api/models"
 
@@ -14,17 +15,17 @@ type ExtractionController struct {
 
 // extraction handles the HTTP POST request to take selections and retrieve the text.
 //
-// @Summary
-// @Description
-// @Tags extraction
-// @Accept
-// @Produce
-// @Param
+// @Summary Get text inside selection UUIDs
+// @Description  Provide a bunch of selection UUIDs and receive the text within them.
+// @Tags extract
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string][]string "Successful retrieval of selections"
 // @Success 200
 // @Failure 400 "Bad request, typically due to invalid input"
 // @Failure 500 "Internal server error, typically due to database issues"
-// @Router
-func (t SelectionController) extractAsText(c *gin.Context) {
+// @Router /extract/basic [post]
+func (t ExtractionController) extractAsText(c *gin.Context) {
 	body := &ExtractUUIDsRequest{}
 	if err := c.ShouldBindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -38,10 +39,15 @@ func (t SelectionController) extractAsText(c *gin.Context) {
 			return
 		}
 
-		_, err = t.SelectionRepository.GetSelectionBySelectionUUID(stringUUID)
+		res, err := t.SelectionRepository.GetSelectionBySelectionUUID(stringUUID)
 		if err != nil {
 			return
 		}
-	}
 
+		fmt.Println(res)
+	}
+}
+
+func (t ExtractionController) SetupRouter(c *gin.RouterGroup) {
+	c.POST("/basic", t.extractAsText)
 }

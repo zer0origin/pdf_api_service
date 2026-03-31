@@ -35,7 +35,7 @@ type SelectionController struct {
 // @Failure 400 "Bad request, typically due to missing/invalid UUID parameter"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [get]
-// @Router /selections [post]
+// @Router /selections/retrieve [post]
 func (t SelectionController) GetSelection(c *gin.Context) {
 	if c.Request.Method != "GET" && c.Request.Method != "POST" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "HTTP method not supported."})

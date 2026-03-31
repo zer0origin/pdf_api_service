@@ -55,7 +55,7 @@ func getSelectionFromPresentSelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -86,7 +86,7 @@ func getMultipleSelectionsFromPresentSelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -116,7 +116,7 @@ func getMultipleSelectionsListEndpointFromPresentSelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -150,7 +150,7 @@ func getMultipleSelectionsListEndpointWithBodyPresentSelectionUUID(t *testing.T)
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -180,7 +180,7 @@ func getSelectionFromPresentDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -210,7 +210,7 @@ func getSelectionFromNonExistentDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -240,7 +240,7 @@ func getSelectionFromInvalidDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -269,7 +269,7 @@ func deleteSelectionBySelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -296,7 +296,7 @@ func deleteSelectionByDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -335,7 +335,7 @@ func deleteDelectionByNonexistentSelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -362,7 +362,7 @@ func createNewSelection(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	request := &v1.AddNewSelectionRequest{
 		DocumentUUID: func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
@@ -394,7 +394,7 @@ func CreateNewSelectionWithPageKey(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	request := &v1.AddNewSelectionRequest{
 		DocumentUUID: func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
@@ -427,7 +427,7 @@ func CreateNewSelectionWithCoordinates(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	request := &v1.AddNewSelectionRequest{
 		DocumentUUID: func() *uuid.UUID { v := uuid.MustParse(documentTestUUID); return &v }(),
@@ -480,7 +480,7 @@ func CreateNewSelectionWithCoordinatesBulk(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	request := make([]v1.AddNewSelectionRequest, 2)
 	request[0] = v1.AddNewSelectionRequest{
@@ -538,7 +538,7 @@ func CreateNewSelectionWithCoordinatesBulkFailure(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil)
+	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
 
 	request := make([]v1.AddNewSelectionRequest, 2)
 	request[0] = v1.AddNewSelectionRequest{
