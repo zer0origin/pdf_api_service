@@ -60,8 +60,9 @@ func main() {
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandler)}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandler)}
 	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler), DocumentRepository: postgres.NewDocumentRepository(dbHandler), DataService: dataapi.DataService{BaseUrl: dataServiceUrl}}
+	extractCtrl := &v1.ExtractionController{SelectionRepository: postgres.NewSelectionRepository(dbHandler)}
 
-	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl, nil) //TODO: Setup extraction controller.
+	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl, extractCtrl)
 
 	if appPort == "" {
 		appPort = "8080"
