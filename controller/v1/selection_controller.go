@@ -92,11 +92,35 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 			return
 		}
 
+		type response struct {
+			SelectionData map[uuid.UUID]models.Selection `json:"results,omitempty"`
+			Errors        []string                       `json:"error,omitempty"`
+		}
+
 		if len(bodyData) > 0 {
-			for x := 0; x < len(bodyData); x++ {
-				id := bodyData[x]
-				getSelectionFromUuidThenUseCallback(id, SelectionResponseToArrayCallback)
+			parsedData := make([]uuid.UUID, len(bodyData))
+			errors := make([]string, 0)
+			var selectionData map[uuid.UUID]models.Selection
+
+			for x, str := range bodyData {
+				uid, err := uuid.Parse(str)
+				if err != nil {
+					errors = append(errors, fmt.Errorf("%s: %w", str, err).Error())
+					continue
+				}
+
+				parsedData[x] = uid
+				selectionData, err = t.SelectionRepository.GetMapOfSelectionsBySelectionUUID(parsedData)
+				if err != nil {
+					errors = append(errors, fmt.Errorf("%s: %w", str, err).Error())
+					continue
+				}
 			}
+
+			c.JSON(200, response{
+				SelectionData: selectionData,
+				Errors:        errors,
+			})
 
 			return
 		}

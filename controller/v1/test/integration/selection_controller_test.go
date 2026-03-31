@@ -141,7 +141,7 @@ func getMultipleSelectionsListEndpointWithBodyPresentSelectionUUID(t *testing.T)
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
+	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelectionsWithCoordinates")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
