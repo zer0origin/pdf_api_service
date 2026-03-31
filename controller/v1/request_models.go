@@ -43,6 +43,4 @@ type DeleteMetaRequest struct {
 	UUID uuid.UUID
 }
 
-type ExtractUUIDsRequest struct {
-	SelectionUUIDs []string
-}
+type ExtractUUIDsRequest []string

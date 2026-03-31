@@ -2,12 +2,14 @@ package integration
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	v1 "pdf_service_api/controller/v1"
 	postgres2 "pdf_service_api/service/postgres"
 	"pdf_service_api/testutil"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,8 +24,9 @@ func TestExtractionIntegration(t *testing.T) {
 
 func getTextFromSelectionUUID(t *testing.T) {
 	t.Parallel()
-	testDocumentUuidString := "a5fdea38-0a86-4c19-ae4f-c87a01bc860d"
-	expectedJsonResponse := `{"selections":[{"selectionUUID":"a5fdea38-0a86-4c19-ae4f-c87a01bc860d","documentUUID":"b66fd223-515f-4503-80cc-2bdaa50ef474"}]}`
+	uuids := []string{"a5fdea38-0a86-4c19-ae4f-c87a01bc860d", "335a6b95-6707-4e2b-9c37-c76d017f6f97"}
+	bytes, err := json.Marshal(uuids)
+	require.NoError(t, err)
 
 	ctx := context.Background()
 	ctr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryAndTwoSelections")
@@ -35,18 +38,16 @@ func getTextFromSelectionUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
-	router := v1.SetupRouter(nil, selectionCtrl, nil, nil)
+	extractCtrl := &v1.ExtractionController{SelectionRepository: postgres2.NewSelectionRepository(dbHandle)}
+	router := v1.SetupRouter(nil, selectionCtrl, nil, extractCtrl)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
-		"GET",
-		fmt.Sprintf("/api/v1/selections/?selectionUUID=%s", testDocumentUuidString),
-		nil,
+		"POST",
+		fmt.Sprintf("/api/v1/extract/basic"),
+		strings.NewReader(string(bytes)),
 	))
 
 	fmt.Println(w.Body.String())
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-	assert.NotNil(t, w.Body.String())
-	assert.NotContains(t, w.Body.String(), "error")
-	assert.Equal(t, expectedJsonResponse, w.Body.String(), "Body does not match expected output.")
 }

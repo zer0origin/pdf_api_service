@@ -27,12 +27,12 @@ type ExtractionController struct {
 // @Router /extract/basic [post]
 func (t ExtractionController) extractAsText(c *gin.Context) {
 	body := &ExtractUUIDsRequest{}
-	if err := c.ShouldBindJSON(body); err != nil {
+	if err := c.ShouldBindBodyWithJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	for _, element := range body.SelectionUUIDs {
+	for _, element := range *body {
 		stringUUID, err := uuid.Parse(element)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
