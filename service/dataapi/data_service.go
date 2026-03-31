@@ -84,10 +84,13 @@ func (t DataService) sendBasicExtractionRequest(data []models.Selection) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	fmt.Println(string(body))
 
-	return nil
+	return err
 }
