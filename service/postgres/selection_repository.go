@@ -13,6 +13,11 @@ type selectionRepository struct {
 	databaseManager DatabaseHandler
 }
 
+func (s selectionRepository) GetMapOfSelectionsBySelectionUUID(uid []uuid.UUID) (map[uuid.UUID]models.Selection, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewSelectionRepository(db DatabaseHandler) models.SelectionRepository {
 	return selectionRepository{databaseManager: db}
 }
