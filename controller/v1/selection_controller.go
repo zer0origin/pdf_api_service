@@ -42,8 +42,12 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 		return
 	}
 
-	result := make([]models.Selection, 0)
-	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
+	SelectionResponseToArrayCallback := func(uid uuid.UUID) ([]models.Selection, error) {
+		selectionUUID, err := t.SelectionRepository.GetSelectionBySelectionUUID(uid)
+		return []models.Selection{selectionUUID}, err
+	}
+
+	getSelectionFromUuidThenUseCallback := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,27 +60,26 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 			return
 		}
 
-		result = append(result, returnedData...)
+		c.JSON(200, gin.H{"selections": returnedData})
+		return
 	}
 
 	if c.Request.Method == "GET" {
 		if values, isPresent := c.GetQueryArray("documentUUID"); isPresent && len(values) != 0 {
 			for x := 0; x < len(values); x++ {
 				id := values[x]
-				getSelection(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
+				getSelectionFromUuidThenUseCallback(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
 			}
 
-			c.JSON(200, gin.H{"selections": result})
 			return
 		}
 
 		if values, isPresent := c.GetQueryArray("selectionUUID"); isPresent && len(values) != 0 {
 			for x := 0; x < len(values); x++ {
 				id := values[x]
-				getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
+				getSelectionFromUuidThenUseCallback(id, SelectionResponseToArrayCallback)
 			}
 
-			c.JSON(200, gin.H{"selections": result})
 			return
 		}
 	}
@@ -92,15 +95,14 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 		if len(bodyData) > 0 {
 			for x := 0; x < len(bodyData); x++ {
 				id := bodyData[x]
-				getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
+				getSelectionFromUuidThenUseCallback(id, SelectionResponseToArrayCallback)
 			}
 
-			c.JSON(200, gin.H{"selections": result})
 			return
 		}
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No ids supplied."})
 }
 
 // DeleteSelection handles the HTTP DELETE request to remove selections.
