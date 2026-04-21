@@ -9,6 +9,8 @@ import (
 	"pdf_service_api/models"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type DataService struct {
@@ -57,7 +59,24 @@ func (t DataService) SendMetaRequest(base64 string) (models.Meta, error) {
 	return *data, nil
 }
 
-func (t DataService) sendBasicExtractionRequest(data []models.Selection) error {
+type ExtractionRequest struct {
+	DocumentUid           uuid.UUID                      `json:"documentUid,omitempty"`
+	Base64EncodedDocument string                         `json:"base64EncodedDocument,omitempty"`
+	Selections            map[uuid.UUID]models.Selection `json:"selections,omitempty"`
+}
+
+type ExtractionResponse map[uuid.UUID]struct {
+	Text                string
+	TextCoordinates     models.Coordinates
+	SelectionCoordinate models.Coordinates
+}
+
+type TextData struct {
+	Text            string
+	TextCoordinates models.Coordinates
+}
+
+func (t DataService) SendBasicExtractionRequest(data ExtractionRequest) error {
 	if t.BaseUrl == "" {
 		panic("No BaseUrl Provided")
 	}
@@ -69,14 +88,15 @@ func (t DataService) sendBasicExtractionRequest(data []models.Selection) error {
 	if err != nil {
 		return err
 	}
-	payload := strings.NewReader(fmt.Sprintf(`{"base64": "%s"}`, string(bytes)))
+
+	fmt.Println(string(bytes))
 
 	client := &http.Client{}
 	ctx := context.Background()
 	ctx, cancelFunc := context.WithTimeout(ctx, 30*time.Second)
 	defer cancelFunc()
 
-	req, err := http.NewRequestWithContext(ctx, method, url, payload)
+	req, err := http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(bytes)))
 	if err != nil {
 		return err
 	}
@@ -91,6 +111,14 @@ func (t DataService) sendBasicExtractionRequest(data []models.Selection) error {
 
 	body, err := io.ReadAll(res.Body)
 	fmt.Println(string(body))
+
+	extractRes := &ExtractionResponse{}
+	err = json.Unmarshal(body, extractRes)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(len(*extractRes))
 
 	return err
 }
