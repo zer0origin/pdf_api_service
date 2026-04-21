@@ -293,7 +293,7 @@ func addMetaBase64Included(t *testing.T) {
 	defer testcontainers.TerminateContainer(ctr)
 
 	ctx := context.Background()
-	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithRealDocument")
+	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithSquare100Pages")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(pgCtr)
 
@@ -347,7 +347,7 @@ func addMetaBase64Excluded(t *testing.T) {
 	defer testcontainers.TerminateContainer(ctr)
 
 	ctx := context.Background()
-	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithRealDocument")
+	pgCtr, err := testutil.CreateTestContainerPostgresWithInitFileName(ctx, dbUser, dbPassword, "OneDocumentTableEntryWithSquare100Pages")
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(pgCtr)
 

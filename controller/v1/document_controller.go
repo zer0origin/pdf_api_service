@@ -36,7 +36,7 @@ type DocumentController struct {
 // @Failure 500 {object} object{error=string} "Internal Server Error: An unexpected error occurred on the server."
 // @Router /documents [get]
 func (t DocumentController) GetDocumentHandler(c *gin.Context) {
-	exclude := make(models.Exclude)
+	exclude := make(models.DocumentExcludes)
 	if values, present := c.GetQueryArray("exclude"); present {
 		if slices.Contains(values, "documentTitle") {
 			exclude.DocumentTitle(true)
