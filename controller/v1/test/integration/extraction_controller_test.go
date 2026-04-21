@@ -26,12 +26,12 @@ func TestExtractionIntegration(t *testing.T) {
 
 func getTextFromSelectionUuidBase64NotIncluded(t *testing.T) {
 	t.Parallel()
-	uuids := []uuid.UUID{uuid.MustParse("a5fdea38-0a86-4c19-ae4f-c87a01bc860d"), uuid.MustParse("335a6b95-6707-4e2b-9c37-c76d017f6f97")}
+	selectionUids := []uuid.UUID{uuid.MustParse("a5fdea38-0a86-4c19-ae4f-c87a01bc860d"), uuid.MustParse("335a6b95-6707-4e2b-9c37-c76d017f6f97")}
 
 	dataToSend := v1.ExtractUUIDsRequest{
 		DocumentUid: uuid.MustParse("b66fd223-515f-4503-80cc-2bdaa50ef474"),
 		OwnerUid:    uuid.MustParse("ea167a48-c1b3-46c4-911b-090e807132fc"),
-		Uids:        uuids,
+		Uids:        selectionUids,
 	}
 
 	bytes, err := json.Marshal(dataToSend)
