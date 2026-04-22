@@ -93,7 +93,7 @@ func CreateTestContainerPostgresWithInitFileName(ctx context.Context, dbUser str
 func CreateDataApiTestContainer() (nat.Port, *testcontainers.DockerContainer, error) {
 	ctx := context.Background()
 
-	ctr, err := testcontainers.Run(ctx, "pdf_service_data:v0.2.4",
+	ctr, err := testcontainers.Run(ctx, "pdf_service_data:v0.2.5",
 		testcontainers.WithWaitStrategy(wait.ForHTTP("/ping").WithPort("8080/tcp")),
 		testcontainers.WithExposedPorts("8080"))
 	if err != nil {

@@ -42,15 +42,15 @@ func getTextFromSelectionUuidBase64NotIncluded(t *testing.T) {
 	require.NoError(t, err)
 	defer testcontainers.TerminateContainer(ctr)
 
-	//p, ctrTwo, err := testutil.CreateDataApiTestContainer()
-	//require.NoError(t, err)
-	//defer testcontainers.TerminateContainer(ctrTwo)
+	p, ctrTwo, err := testutil.CreateDataApiTestContainer()
+	require.NoError(t, err)
+	defer testcontainers.TerminateContainer(ctrTwo)
 
 	connectionString, err := ctr.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
-	dataApi := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", 8080)}
+	dataApi := dataapi.DataService{BaseUrl: fmt.Sprintf("http://localhost:%d", p.Int())}
 
 	extractCtrl := &v1.ExtractionController{
 		SelectionRepository: postgres2.NewSelectionRepository(dbHandle),
