@@ -44,8 +44,8 @@ type DeleteMetaRequest struct {
 }
 
 type ExtractUUIDsRequest struct {
-	DocumentUid           uuid.UUID
-	OwnerUid              uuid.UUID
-	Base64EncodedDocument string
-	Uids                  []uuid.UUID
+	DocumentUid           uuid.UUID   `json:"documentUid"`
+	OwnerUid              uuid.UUID   `json:"ownerUid"`
+	Base64EncodedDocument string      `json:"base64EncodedDocument"`
+	Uids                  []uuid.UUID `json:"uids"`
 }
