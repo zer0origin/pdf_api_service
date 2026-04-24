@@ -2,10 +2,11 @@ package unit
 
 import (
 	"database/sql"
-	"github.com/stretchr/testify/assert"
 	"pdf_service_api/service/postgres"
 	_ "pdf_service_api/testutil"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDatabaseEmptyArgs(t *testing.T) {

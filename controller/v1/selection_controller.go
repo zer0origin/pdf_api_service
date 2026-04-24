@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"pdf_service_api/models"
 
@@ -25,7 +26,7 @@ type SelectionController struct {
 //
 // @Summary Get selections by document or selection UUID
 // @Description Retrieves selections based on either a document's UUID or a specific selection's UUID.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   documentUUID query string false "The UUID of the document to retrieve selections for"
@@ -34,34 +35,98 @@ type SelectionController struct {
 // @Failure 400 "Bad request, typically due to missing/invalid UUID parameter"
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /selections [get]
+// @Router /selections/retrieve [post]
 func (t SelectionController) GetSelection(c *gin.Context) {
-	getSelection := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
+	if c.Request.Method != "GET" && c.Request.Method != "POST" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "HTTP method not supported."})
+		return
+	}
+
+	SelectionResponseToArrayCallback := func(uid uuid.UUID) ([]models.Selection, error) {
+		selectionUUID, err := t.SelectionRepository.GetSelectionBySelectionUUID(uid)
+		return []models.Selection{selectionUUID}, err
+	}
+
+	getSelectionFromUuidThenUseCallback := func(id string, passedServiceGetFunction func(uid uuid.UUID) ([]models.Selection, error)) {
 		uid, err := uuid.Parse(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		results, err := passedServiceGetFunction(uid)
+		returnedData, err := passedServiceGetFunction(uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(200, gin.H{"selections": results})
-	}
-
-	if id, isPresent := c.GetQuery("documentUUID"); isPresent && id != "" {
-		getSelection(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
+		c.JSON(200, gin.H{"selections": returnedData})
 		return
 	}
 
-	if id, isPresent := c.GetQuery("selectionUUID"); isPresent && id != "" {
-		getSelection(id, t.SelectionRepository.GetSelectionBySelectionUUID)
-		return
+	if c.Request.Method == "GET" {
+		if values, isPresent := c.GetQueryArray("documentUUID"); isPresent && len(values) != 0 {
+			for x := 0; x < len(values); x++ {
+				id := values[x]
+				getSelectionFromUuidThenUseCallback(id, t.SelectionRepository.GetSelectionListByDocumentUUID)
+			}
+
+			return
+		}
+
+		if values, isPresent := c.GetQueryArray("selectionUUID"); isPresent && len(values) != 0 {
+			for x := 0; x < len(values); x++ {
+				id := values[x]
+				getSelectionFromUuidThenUseCallback(id, SelectionResponseToArrayCallback)
+			}
+
+			return
+		}
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{"error": "No param specified."})
+	if c.Request.Method == "POST" {
+		var bodyData []string
+		err := c.ShouldBindBodyWithJSON(&bodyData)
+		if err != nil {
+			fmt.Println(fmt.Errorf("failed to parse body: %w", err))
+			return
+		}
+
+		type response struct {
+			SelectionData map[uuid.UUID]models.Selection `json:"results,omitempty"`
+			Errors        []string                       `json:"error,omitempty"`
+		}
+
+		if len(bodyData) > 0 {
+			parsedData := make([]uuid.UUID, len(bodyData))
+			errors := make([]string, 0)
+			var selectionData map[uuid.UUID]models.Selection
+
+			for x, str := range bodyData {
+				uid, err := uuid.Parse(str)
+				if err != nil {
+					errors = append(errors, fmt.Errorf("%s: %w", str, err).Error())
+					continue
+				}
+
+				parsedData[x] = uid
+				selectionData, err = t.SelectionRepository.GetMapOfSelectionsBySelectionUUID(parsedData)
+				if err != nil {
+					errors = append(errors, fmt.Errorf("%s: %w", str, err).Error())
+					continue
+				}
+			}
+
+			c.JSON(200, response{
+				SelectionData: selectionData,
+				Errors:        errors,
+			})
+
+			return
+		}
+	}
+
+	c.JSON(http.StatusBadRequest, gin.H{"error": "No ids supplied."})
 }
 
 // DeleteSelection handles the HTTP DELETE request to remove selections.
@@ -78,7 +143,7 @@ func (t SelectionController) GetSelection(c *gin.Context) {
 //
 // @Summary Delete selections by selection or document UUID
 // @Description Deletes selections based on a specific selection UUID or all selections associated with a document UUID.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   selectionUUID query string false "The UUID of the specific selection to delete"
@@ -130,7 +195,7 @@ func (t SelectionController) DeleteSelection(c *gin.Context) {
 //
 // @Summary Add a new selection
 // @Description Creates a new selection associated with a document.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param   request body v1.AddNewSelectionRequest true "Selection creation request"
@@ -174,7 +239,7 @@ func (t SelectionController) AddSelection(c *gin.Context) {
 //
 // @Summary Add a new selection
 // @Description Creates a new selection associated with a document.
-// @Tags selections
+// @Tags selection
 // @Accept  json
 // @Produce  json
 // @Param request body []AddNewSelectionRequest true "Selections in a json array, that need to be saved"
@@ -219,5 +284,6 @@ func (t SelectionController) SetupRouter(c *gin.RouterGroup) {
 	c.DELETE("/", t.DeleteSelection)
 	c.POST("/", t.AddSelection)
 	c.POST("/bulk", t.AddSelectionBulk)
-	c.GET("/", t.GetSelection)
+	c.GET("/", t.GetSelection) //Backwards compatibility
+	c.Any("/list", t.GetSelection)
 }

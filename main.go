@@ -7,17 +7,34 @@ import (
 	v1 "pdf_service_api/controller/v1"
 	"pdf_service_api/service/dataapi"
 	"pdf_service_api/service/postgres"
+	"strings"
 )
 
 var (
-	dbUser         = os.Getenv("DATABASE_USER")
-	dbPassword     = os.Getenv("DATABASE_PASSWORD")
-	dbPort         = os.Getenv("DATABASE_PORT")
-	dbHost         = os.Getenv("DATABASE_HOST")
-	dbDatabase     = os.Getenv("DATABASE_DB")
-	appPort        = os.Getenv("APP_PORT")
-	dataServiceUrl = os.Getenv("DATA_SERVICE_URL")
+	dbUser                 = os.Getenv("DATABASE_USER")
+	dbPassword             = os.Getenv("DATABASE_PASSWORD")
+	dbPort                 = os.Getenv("DATABASE_PORT")
+	dbHost                 = os.Getenv("DATABASE_HOST")
+	dbDatabase             = os.Getenv("DATABASE_DB")
+	appPort                = os.Getenv("APP_PORT")
+	dataServiceUrl         = os.Getenv("DATA_SERVICE_URL")
+	getBase64IfNotIncluded = strings.ToLower(os.Getenv("GET_BASE64_IF_NOT_INCLUDED"))
 )
+
+func init() {
+	errHandleFunction := func(str string) {
+		panic("Database login credentials must be present.")
+	}
+	mustNotBeEmpty(errHandleFunction, dbUser, dbPassword, dbPort, dbHost, dbDatabase)
+
+	if appPort == "" {
+		appPort = "8080"
+	}
+
+	if getBase64IfNotIncluded != "true" && getBase64IfNotIncluded != "false" && getBase64IfNotIncluded != "" {
+		panic("Invalid option provided for GET_BASE64_IF_NOT_INCLUDED.")
+	}
+}
 
 // @title           Go Backend API
 // @version         1.0
@@ -37,12 +54,6 @@ var (
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-	fmt.Println(os.Hostname())
-	errHandleFunction := func(str string) {
-		panic("Database login credentials must be present.")
-	}
-	mustNotBeEmpty(errHandleFunction, dbUser, dbPassword, dbPort, dbHost, dbDatabase)
-
 	dbHandler := postgres.DatabaseHandler{DbConfig: postgres.ConfigForDatabase{
 		Host:     dbHost,
 		Port:     dbPort,
@@ -57,15 +68,29 @@ func main() {
 		panic(err)
 	}
 
-	documentCtrl := &v1.DocumentController{DocumentRepository: postgres.NewDocumentRepository(dbHandler)}
-	selectionCtrl := &v1.SelectionController{SelectionRepository: postgres.NewSelectionRepository(dbHandler)}
-	metaCtrl := &v1.MetaController{MetaRepository: postgres.NewMetaRepository(dbHandler), DocumentRepository: postgres.NewDocumentRepository(dbHandler), DataService: dataapi.DataService{BaseUrl: dataServiceUrl}}
-
-	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl)
-
-	if appPort == "" {
-		appPort = "8080"
+	documentCtrl := &v1.DocumentController{
+		DocumentRepository: postgres.NewDocumentRepository(dbHandler),
 	}
+
+	selectionCtrl := &v1.SelectionController{
+		SelectionRepository: postgres.NewSelectionRepository(dbHandler),
+	}
+
+	metaCtrl := &v1.MetaController{
+		MetaRepository:     postgres.NewMetaRepository(dbHandler),
+		DocumentRepository: postgres.NewDocumentRepository(dbHandler),
+		DataService:        dataapi.DataService{BaseUrl: dataServiceUrl}}
+
+	extractCtrl := &v1.ExtractionController{
+		SelectionRepository: postgres.NewSelectionRepository(dbHandler),
+		DocumentRepository:  postgres.NewDocumentRepository(dbHandler),
+		DataService:         dataapi.DataService{BaseUrl: dataServiceUrl}}
+
+	if getBase64IfNotIncluded == "true" {
+		extractCtrl.Options.GetBase64IfNotIncluded = true
+	}
+
+	router := v1.SetupRouter(documentCtrl, selectionCtrl, metaCtrl, extractCtrl)
 
 	log.Fatal(router.Run(":" + appPort))
 }
