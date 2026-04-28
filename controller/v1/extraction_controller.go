@@ -1,11 +1,13 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"pdf_service_api/models"
 	"pdf_service_api/service/dataapi"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ExtractionController struct {
@@ -33,10 +35,20 @@ type ExtractionOptions struct {
 // @Failure 500 "Internal server error, typically due to database issues"
 // @Router /extract/basic [post]
 func (t ExtractionController) extractAsText(c *gin.Context) {
-	body := &ExtractUUIDsRequest{} //TODO: Change this to reflect the new json schema, also allow tests to be disabled.
+	body := &ExtractUUIDsRequest{}
 	if err := c.ShouldBindBodyWithJSON(body); err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if body.OwnerUid == uuid.Nil {
+		value, isPresent := c.GetQuery("OwnerUid")
+		if isPresent {
+			if parse, err := uuid.Parse(value); err == nil {
+				body.OwnerUid = parse
+			}
+		}
 	}
 
 	if body.Base64EncodedDocument == "" {

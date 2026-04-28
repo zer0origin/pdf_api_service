@@ -84,7 +84,8 @@ func main() {
 	extractCtrl := &v1.ExtractionController{
 		SelectionRepository: postgres.NewSelectionRepository(dbHandler),
 		DocumentRepository:  postgres.NewDocumentRepository(dbHandler),
-		DataService:         dataapi.DataService{BaseUrl: dataServiceUrl}}
+		DataService:         dataapi.DataService{BaseUrl: dataServiceUrl},
+		Options:             v1.ExtractionOptions{GetBase64IfNotIncluded: true}} //TODO: make this an environment variable.
 
 	if getBase64IfNotIncluded == "true" {
 		extractCtrl.Options.GetBase64IfNotIncluded = true
