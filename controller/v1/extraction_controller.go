@@ -79,13 +79,13 @@ func (t ExtractionController) extractAsText(c *gin.Context) {
 		Selections:            res,
 	}
 
-	err = t.DataService.SendBasicExtractionRequest(req)
+	extractRes, err := t.DataService.SendBasicExtractionRequest(req)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	c.Status(200)
+	c.JSON(http.StatusOK, extractRes)
 }
 
 func (t ExtractionController) SetupRouter(c *gin.RouterGroup) {

@@ -65,18 +65,17 @@ type ExtractionRequest struct {
 	Selections            map[uuid.UUID]models.Selection `json:"selections,omitempty"`
 }
 
-type ExtractionResponse map[uuid.UUID]struct {
+type ExtractionResponse map[string]map[string][]struct {
 	Text                string
 	TextCoordinates     models.Coordinates
 	SelectionCoordinate models.Coordinates
 }
-
 type TextData struct {
 	Text            string
 	TextCoordinates models.Coordinates
 }
 
-func (t DataService) SendBasicExtractionRequest(data ExtractionRequest) error {
+func (t DataService) SendBasicExtractionRequest(data ExtractionRequest) (*ExtractionResponse, error) {
 	if t.BaseUrl == "" {
 		panic("No BaseUrl Provided")
 	}
@@ -86,26 +85,24 @@ func (t DataService) SendBasicExtractionRequest(data ExtractionRequest) error {
 
 	bytes, err := json.Marshal(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	fmt.Println(string(bytes))
 
 	client := &http.Client{}
 	ctx := context.Background()
-	ctx, cancelFunc := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancelFunc := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancelFunc()
 
 	req, err := http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(bytes)))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -115,10 +112,8 @@ func (t DataService) SendBasicExtractionRequest(data ExtractionRequest) error {
 	extractRes := &ExtractionResponse{}
 	err = json.Unmarshal(body, extractRes)
 	if err != nil {
-		return err
+		return extractRes, err
 	}
 
-	fmt.Println(len(*extractRes))
-
-	return err
+	return extractRes, err
 }

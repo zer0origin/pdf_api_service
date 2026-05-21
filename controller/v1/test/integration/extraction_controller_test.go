@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -124,4 +125,14 @@ func getTextFromSelectionUuidBase64NotIncludedAndOwnerUuidAsQueryParam(t *testin
 
 	fmt.Println(w.Body.String())
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+}
+
+//go:embed ExtractionExampleResponseTwo.txt
+var exampleResponseOne string
+
+func TestExpectedResponseMarshal(t *testing.T) {
+	extractRes := &dataapi.ExtractionResponse{}
+	err := json.Unmarshal([]byte(exampleResponseOne), extractRes)
+	assert.NoError(t, err)
+	fmt.Println("DONE")
 }
