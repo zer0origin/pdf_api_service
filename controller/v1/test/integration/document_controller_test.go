@@ -83,7 +83,7 @@ func getDocumentWithDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -112,7 +112,7 @@ func getDocumentWithDocumentUUIDExcludeBase64(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -140,7 +140,7 @@ func getDocumentWithNoOwnerUuid(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
 	requestJSON, _ := json.Marshal(request)
@@ -173,7 +173,7 @@ func getDocumentWithNonexistentDocumentUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	request := &v1.GetDocumentRequest{DocumentUUID: &documentTestUUID}
 	requestJSON, _ := json.Marshal(request)
@@ -204,7 +204,7 @@ func getDocumentWithOwnerUUID(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -232,7 +232,7 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset0(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -260,7 +260,7 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset1(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -288,7 +288,7 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset2(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -316,7 +316,7 @@ func getDocumentWithOwnerUUIDWithLimit1AndOffset10(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -344,7 +344,7 @@ func getDocumentWithOwnerUUIDWithLimit2AndOffset0(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -372,7 +372,7 @@ func getDocumentWithOwnerUUIDWithLimit2AndOffset1(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -400,7 +400,7 @@ func getDocumentWithOwnerUUIDWithExcludes(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
@@ -430,7 +430,7 @@ func uploadDocument(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 	request := &v1.CreateRequest{DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
 
@@ -462,7 +462,7 @@ func uploadDocumentWithTitle(t *testing.T) {
 
 	dbHandle := postgres2.DatabaseHandler{DbConfig: postgres2.ConfigForDatabase{ConUrl: connectionString}}
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 	request := &v1.CreateRequest{DocumentTitle: func() *string { v := "Document Title"; return &v }(), DocumentBase64String: "THIS IS A TEST DOCUMENT"}
 	requestJSON, _ := json.Marshal(request)
 
@@ -506,7 +506,7 @@ func deleteDocument(t *testing.T) {
 	require.NoError(t, err)
 
 	documentCtrl := &v1.DocumentController{DocumentRepository: postgres2.NewDocumentRepository(dbHandle)}
-	router := v1.SetupRouter(documentCtrl, nil, nil)
+	router := v1.SetupRouter(documentCtrl, nil, nil, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, httptest.NewRequest(
 		"DELETE",

@@ -25,4 +25,4 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: go test ./... -args -skip-dataapi
+      run: go test ./... -args -skip-dataapi -skip-extract

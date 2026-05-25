@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+
 	_ "github.com/lib/pq"
 )
 

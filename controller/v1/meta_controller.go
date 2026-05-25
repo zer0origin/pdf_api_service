@@ -47,7 +47,7 @@ func (t MetaController) AddMeta(c *gin.Context) {
 	}
 
 	if body.DocumentBase64String == nil {
-		exclude := make(models.Exclude)
+		exclude := make(models.DocumentExcludes)
 		exclude.TimeCreated(true).OwnerUUID(true).OwnerType(true).DocumentTitle(true)
 		document, err := t.DocumentRepository.GetDocumentByDocumentUUID(body.DocumentUUID, body.OwnerUUID, exclude)
 		if err != nil {

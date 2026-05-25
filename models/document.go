@@ -18,34 +18,34 @@ type Document struct {
 
 type DocumentRepository interface {
 	UploadDocument(document Document) error
-	GetDocumentByDocumentUUID(document, owner uuid.UUID, excludes Exclude) (Document, error)
-	GetDocumentByOwnerUUID(owner uuid.UUID, limit uint32, offset uint32, excludes Exclude) ([]Document, error)
+	GetDocumentByDocumentUUID(document, owner uuid.UUID, excludes DocumentExcludes) (Document, error)
+	GetDocumentByOwnerUUID(owner uuid.UUID, limit uint32, offset uint32, excludes DocumentExcludes) ([]Document, error)
 	DeleteDocumentById(documentUuid, ownerUuid uuid.UUID) error
 }
 
-type Exclude map[string]bool
+type DocumentExcludes map[string]bool
 
-func (e Exclude) DocumentTitle(value bool) Exclude {
+func (e DocumentExcludes) DocumentTitle(value bool) DocumentExcludes {
 	e["documentTitle"] = value
 	return e
 }
 
-func (e Exclude) TimeCreated(value bool) Exclude {
+func (e DocumentExcludes) TimeCreated(value bool) DocumentExcludes {
 	e["timeCreated"] = value
 	return e
 }
 
-func (e Exclude) OwnerUUID(value bool) Exclude {
+func (e DocumentExcludes) OwnerUUID(value bool) DocumentExcludes {
 	e["ownerUUID"] = value
 	return e
 }
 
-func (e Exclude) OwnerType(value bool) Exclude {
+func (e DocumentExcludes) OwnerType(value bool) DocumentExcludes {
 	e["ownerType"] = value
 	return e
 }
 
-func (e Exclude) PdfBase64(value bool) Exclude {
+func (e DocumentExcludes) PdfBase64(value bool) DocumentExcludes {
 	e["pdfBase64"] = value
 	return e
 }

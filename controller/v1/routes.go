@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(documentController *DocumentController, selectionController *SelectionController, metaController *MetaController) *gin.Engine {
+func SetupRouter(documentController *DocumentController, selectionController *SelectionController, metaController *MetaController, extractionController *ExtractionController) *gin.Engine {
 	router := gin.Default()
 	router.GET("/ping", OnPing)
 	apiV1Group := router.Group("/api/v1/")
@@ -22,6 +22,11 @@ func SetupRouter(documentController *DocumentController, selectionController *Se
 	if metaController != nil {
 		metaGroup := apiV1Group.Group("/meta")
 		metaController.SetupRouter(metaGroup)
+	}
+
+	if extractionController != nil {
+		extractionGroup := apiV1Group.Group("/extract")
+		extractionController.SetupRouter(extractionGroup)
 	}
 
 	return router
